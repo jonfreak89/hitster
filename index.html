@@ -475,6 +475,45 @@ input[type=range]::-moz-range-thumb{width:28px;height:28px;border-radius:50%;bac
 .opt.playing{box-shadow:0 0 0 4px var(--yel)}
 .vs.sm{font-size:1.6rem;text-align:center;animation:none}
 #fakein{font-size:1.2rem}
+
+/* ---------- v5: zoom, bordspel, pauze, beheer ---------- */
+body.is-tv #app{zoom:var(--z,1)}
+body.is-tv .tv{width:calc(100vw / var(--z,1));height:calc(100vh / var(--z,1))}
+.boardwrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative}
+.board{position:relative;margin:0 auto;max-height:100%}
+.bsq{position:absolute;transform:translate(-50%,-50%);padding:.35vh}
+.bsq>div{width:100%;height:100%;border-radius:1.4vh;background:hsla(var(--h),70%,55%,.16);border:.25vh solid hsla(var(--h),80%,65%,.45);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.bsq b{font-size:3.4vh}.bsq small{font-size:1.5vh;opacity:.55;margin-top:.3vh}
+.bsq.special>div{background:hsla(var(--h),80%,55%,.34);border-color:hsla(var(--h),90%,70%,.9);box-shadow:0 0 1.6vh hsla(var(--h),90%,60%,.35)}
+.bsq.start>div,.bsq.finish>div{background:rgba(255,210,63,.22);border-color:#ffd23f}
+.pawn{position:absolute;width:5.2vh;height:5.2vh;margin:-2.6vh 0 0 -2.6vh;border-radius:50%;background:var(--c);border:.4vh solid #fff;display:flex;align-items:center;justify-content:center;font-size:2.8vh;box-shadow:0 .6vh 1.4vh rgba(0,0,0,.5);transition:left .28s ease,top .28s ease;z-index:3}
+.pawn.moving{z-index:5;animation:hop .3s ease infinite}
+@keyframes hop{50%{transform:translateY(-1.2vh) scale(1.08)}}
+.bbanner{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:8;background:rgba(14,7,30,.92);border:.3vh solid var(--c,#ff3d9a);border-radius:3vh;padding:2.6vh 4vh;text-align:center;max-width:70%;box-shadow:0 2vh 6vh rgba(0,0,0,.6);animation:pop .35s ease}
+.bbanner .bev{font-size:9vh;line-height:1}.bbanner h2{font-size:4.4vh;margin:.8vh 0}.bbanner p{font-size:2.6vh;opacity:.85;margin:.4vh 0}
+.bbanner.sm{top:auto;bottom:2vh;transform:translateX(-50%);padding:1.4vh 3vh;animation:none}.bbanner.sm h2{font-size:3vh}
+.nextch{font-size:3vh;font-weight:800;color:#ffd23f}
+.legend{display:flex;gap:2.4vh;justify-content:center;flex-wrap:wrap;font-size:2vh;opacity:.8}
+#bchips{display:flex;gap:1.2vh;justify-content:center;flex-wrap:wrap}
+#bchips .bc{display:flex;align-items:center;gap:.8vh;padding:.7vh 1.6vh;border-radius:99px;background:rgba(255,255,255,.08);border-left:.6vh solid var(--c);font-size:2.2vh}
+#bchips .bc b{font-size:2.6vh}#bchips .st{font-weight:800;color:#3ddc97}#bchips .st.neg{color:#ff5a5f}
+@keyframes pop{from{transform:translate(-50%,-50%) scale(.6);opacity:0}}
+#pauseov{position:fixed;inset:0;z-index:60;background:rgba(5,2,14,.78);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center}
+#pauseov[hidden]{display:none}
+.pausebox{text-align:center}.pausebox .pz{font-size:16vh;animation:pulse 1.6s ease infinite}.pausebox h1{font-size:8vh;margin:1vh 0}.pausebox p{font-size:3vh;opacity:.8}
+@keyframes pulse{50%{opacity:.45}}
+#pauseovp{z-index:70;background:rgba(11,6,24,.96)}
+.pzbtn{margin-left:6px;border:0;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;font-size:18px;padding:4px 10px;cursor:pointer}
+.pman{display:flex;flex-direction:column;gap:6px}
+.prow{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:12px;background:rgba(255,255,255,.06);border-left:4px solid var(--c)}
+.prow.off{opacity:.55}.prow .e{font-size:22px}.prow .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prow .tg{padding:6px 10px;min-width:40px}
+.tg.kick.armed{background:#ff5a5f;color:#fff;border-color:#ff5a5f}
+.evcard{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,210,63,.12);border:1px solid rgba(255,210,63,.5)}
+.evcard span{font-size:34px}
+#sheard{display:flex;align-items:center;gap:8px;margin-top:8px}
+.bbanner>b{display:block;font-size:4.4vh;margin:.6vh 0}.bbanner>span{display:block;font-size:2.6vh;opacity:.9;margin:.6vh 0}.bbanner .legend{margin:1.4vh 0}.bbanner.sm>span{margin:0}
+#bchips .chip b.ok{color:#3ee08f}#bchips .chip b.bad{color:#ff5a5f}
 </style>
 </head>
 <body>
@@ -484,6 +523,7 @@ input[type=range]::-moz-range-thumb{width:28px;height:28px;border-radius:50%;bac
 <div id="corner" hidden></div>
 <div id="cwarn" hidden></div>
 <div id="welcome" hidden></div>
+<div id="pauseov" hidden></div>
 <canvas id="confetti"></canvas>
 <script>
 'use strict';
@@ -737,6 +777,58 @@ fame:"Fame",fame_hits:"Only big hits",fame_mix:"Mix",fame_all:"Hidden gems too",
 fameTip_hits:"Only songs that really everyone knows (based on Deezer popularity). Great with kids or guests.",fameTip_mix:"Mostly well-known songs, now and then something less known. Truly obscure songs are skipped.",fameTip_all:"Anything goes, including lesser-known songs. For the real music buffs!"
 }};
 Object.assign(I18N.nl,I18N_ADD.nl);Object.assign(I18N.vl,I18N_ADD.nl,I18N_ADD.vl);Object.assign(I18N.en,I18N_ADD.en);
+
+/* ---------- v5: bordspel, pauze, lobbybeheer, tekstgrootte, delen ---------- */
+const I18N_ADD5={
+nl:{
+m_board:"Bordspel",md_board:"Race over het bord: elke beurt een andere muziekuitdaging. Hoe beter je scoort, hoe verder je pion gaat.",
+rules_board:"🎲 Elke beurt een andere muziekuitdaging. Goed antwoorden = vakjes vooruit. Land je op een speciaal vakje, dan gebeurt er iets: ⭐ +2, ⚡ volgende worp dubbel, ⬅️ 3 terug, 🎲 dobbelsteen, 🔄 wissel met de leider, 🧲 trek de leider terug. Wie eerst op 🏁 staat, wint!",
+turnN:"Beurt {n}",boardGoal:"Eerst op vakje {n} 🏁",boardLenN:"{n} vakjes",boardIntro:"Iedereen staat klaar op 🚩. Succes!",
+nextChallenge:"Volgende uitdaging",hostNextTurn:"Spelleider: druk op Volgende beurt",nextTurn:"🎲 Volgende beurt",
+sqn_bonus:"+2 vakjes",sqn_boost:"Turbo",sqn_back:"3 terug",sqn_dice:"Dobbelsteen",sqn_swap:"Wissel",sqn_magnet:"Magneet",
+sq_bonus:"{u} krijgt een ster: 2 vakjes vooruit!",sq_boost:"{u} heeft turbo: de volgende worp telt dubbel!",sq_back:"Pech! {u} moet 3 vakjes terug.",
+sq_dice:"{u} gooit de dobbelsteen: {n}!",sq_swap:"{u} wisselt van plaats met {n}!",sq_swapNone:"{u} staat al vooraan, niets te wisselen.",
+sq_magnet:"{u} trekt {n} 2 vakjes terug en schuift zelf 2 op!",sq_magnetNone:"{u} staat al vooraan: 1 vakje bonus.",
+sayBoard:"Welkom bij het bordspel! Wie eerst aan de finish is, wint.",
+pauseT:"Pauze",pauseSub:"Het spel staat even stil. Even een drankje halen!",sayPause:"Even pauze.",resume:"▶ Verder spelen",pauseBtn:"Pauze",
+lookBoard:"Kijk naar het bord",yourPos2:"Je staat op vakje {p} van {n}",boostOn:"Turbo actief: je volgende worp telt dubbel",
+boardModesLbl:"Uitdagingen op het bord (min. 2)",boardLenLbl:"Lengte van het bord",boardTip:"Elke beurt kiest het spel willekeurig een van deze uitdagingen.",
+squaresWord:"vakjes",
+heardN:"🔁 {h} van ~{n} nummers al eens gehoord. Die komen pas terug als de rest op is.",resetHeard:"Wissen",
+kick:"Verwijderen",kickSure:"Zeker?",makeHost:"Spelleider maken",kickedT:"Je bent uit het spel gehaald",kickedSub:"De spelleider heeft je verwijderd.",rejoinAgain:"Opnieuw meedoen",
+manageTip:"👑 = spelleider maken · ✖ = verwijderen (2× tikken)",you:"jij",
+textSize:"Tekstgrootte op tv",ts_S:"Klein",ts_M:"Normaal",ts_L:"Groot",
+share:"Uitslag delen",shareTitle:"Uitslag Draaitafel",shareSaved:"Afbeelding opgeslagen"
+},
+vl:{
+md_board:"Race over het bord: elke beurt een andere muziekuitdaging. Hoe beter ge scoort, hoe verder uw pion gaat.",
+boardIntro:"Iedereen staat klaar op 🚩. Veel succes!",
+pauseSub:"Het spel ligt efkes stil. Tijd voor een pintje!",sayPause:"Efkes pauze.",
+lookBoard:"Kijk naar het bord",yourPos2:"Ge staat op vakje {p} van {n}",boostOn:"Turbo actief: uw volgende worp telt dubbel",
+kickedT:"Ge zijt uit het spel gezet",kickedSub:"De spelleider heeft u verwijderd.",you:"gij",
+heardN:"🔁 {h} van ~{n} nummers al eens gehoord. Die komen pas terug als de rest op is."
+},
+en:{
+m_board:"Board game",md_board:"Race across the board: every turn is a different music challenge. The better you score, the further your pawn moves.",
+rules_board:"🎲 Every turn is a different music challenge. Good answers = squares forward. Land on a special square and something happens: ⭐ +2, ⚡ next move counts double, ⬅️ 3 back, 🎲 dice, 🔄 swap with the leader, 🧲 pull the leader back. First to 🏁 wins!",
+turnN:"Turn {n}",boardGoal:"First to square {n} 🏁",boardLenN:"{n} squares",boardIntro:"Everyone is ready on 🚩. Good luck!",
+nextChallenge:"Next challenge",hostNextTurn:"Game leader: press Next turn",nextTurn:"🎲 Next turn",
+sqn_bonus:"+2 squares",sqn_boost:"Turbo",sqn_back:"3 back",sqn_dice:"Dice",sqn_swap:"Swap",sqn_magnet:"Magnet",
+sq_bonus:"{u} gets a star: 2 squares forward!",sq_boost:"{u} has turbo: the next move counts double!",sq_back:"Bad luck! {u} goes 3 squares back.",
+sq_dice:"{u} rolls the dice: {n}!",sq_swap:"{u} swaps places with {n}!",sq_swapNone:"{u} is already in front, nothing to swap.",
+sq_magnet:"{u} pulls {n} back 2 squares and moves up 2!",sq_magnetNone:"{u} is already in front: 1 bonus square.",
+sayBoard:"Welcome to the board game! First to the finish wins.",
+pauseT:"Paused",pauseSub:"The game is on hold. Time to grab a drink!",sayPause:"Short break.",resume:"▶ Resume",pauseBtn:"Pause",
+lookBoard:"Look at the board",yourPos2:"You are on square {p} of {n}",boostOn:"Turbo active: your next move counts double",
+boardModesLbl:"Challenges on the board (min. 2)",boardLenLbl:"Board length",boardTip:"Each turn the game randomly picks one of these challenges.",
+squaresWord:"squares",
+heardN:"🔁 {h} of ~{n} songs already heard. They only come back once the rest is used up.",resetHeard:"Clear",
+kick:"Remove",kickSure:"Sure?",makeHost:"Make game leader",kickedT:"You were removed from the game",kickedSub:"The game leader removed you.",rejoinAgain:"Join again",
+manageTip:"👑 = make game leader · ✖ = remove (tap twice)",you:"you",
+textSize:"Text size on TV",ts_S:"Small",ts_M:"Normal",ts_L:"Large",
+share:"Share results",shareTitle:"Draaitafel results",shareSaved:"Image saved"
+}};
+Object.assign(I18N.nl,I18N_ADD5.nl);Object.assign(I18N.vl,I18N_ADD5.nl,I18N_ADD5.vl);Object.assign(I18N.en,I18N_ADD5.en);
 
 const RAW=`
 White Christmas|Bing Crosby|1942|k
@@ -3239,7 +3331,8 @@ The Subway|Chappell Roan|2025|p
    ========================================================= */
 const PREFIX='draaitafel-v2-';
 const CURY=new Date().getFullYear();
-const MODES=[['hitster','🃏'],['year','📅'],['hl','↕️'],['buzz','🔔'],['chip','🐿️'],['fake','🎭'],['herd','🐑'],['vibe','🎚️'],['battle','🥊'],['bingo','🎱'],['evening','🎪']];
+const MODES=[['hitster','🃏'],['year','📅'],['hl','↕️'],['buzz','🔔'],['chip','🐿️'],['fake','🎭'],['herd','🐑'],['vibe','🎚️'],['battle','🥊'],['bingo','🎱'],['board','🎲'],['evening','🎪']];
+const BOARD_MODES=['year','hl','chip','buzz','herd','fake'];
 const EV_MODES=['hitster','year','hl','buzz','chip','fake','herd','vibe','battle'];
 const COOP_OK=['hitster','year','hl','chip','vibe'];
 const LIVES_OK=['hitster','year','hl','buzz','chip','fake','herd','vibe'];
@@ -3353,9 +3446,9 @@ async function resolveTrack(song){
    ========================================================= */
 const T={code:null,peer:null,players:new Map(),units:new Map(),phase:'boot',msg:'',unlocked:false,joinUrl:'',
   settings:{mode:'hitster',play:'solo',teams:2,src:'mix',genres:GENRES.filter(g=>g!=='m'&&g!=='v'),decades:DECADES.slice(),pack:'t',target:10,rounds:10,time:30,quick:4,bingo:4,
-    theme:'neon',lang:defLang(),voice:true,crowd:true,lives:0,double:0,evModes:['year','herd','fake','chip','battle'],evRounds:3,battleSize:8,fame:'mix'},
+    theme:'neon',lang:defLang(),voice:true,crowd:true,lives:0,double:0,evModes:['year','herd','fake','chip','battle'],evRounds:3,battleSize:8,fame:'mix',boardLen:30,boardModes:['year','hl','chip','buzz','herd','fake'],textSize:'M'},
   live:null,liveStatus:'',liveResults:null,used:new Set(),round:0,segRound:0,sinceQuick:0,cur:null,roundStart:0,deadline:0,bonusQ:null,quick:null,qTimer:null,
-  anchor:null,buzz:null,buzzWin:null,locked:new Set(),bingo:null,fake:null,herd:null,vibe:null,chip:null,battle:null,ev:null,
+  anchor:null,buzz:null,buzzWin:null,board:null,pre:null,paused:null,qFn:null,qAt:0,locked:new Set(),bingo:null,fake:null,herd:null,vibe:null,chip:null,battle:null,ev:null,
   awards:null,coopWon:null,record:null,ratings:new Map(),hitflop:null,vol:1,lastSec:-1};
 const audio=new Audio();audio.preload='auto';audio.loop=true;
 let actx=null,tvKey='',fadeTok=0,speaking=false,voices=[];
@@ -3364,11 +3457,12 @@ const genCode=()=>Array.from({length:4},()=>rnd(CH)).join('');
 
 /* ---------- modus-helpers ---------- */
 const isEvening=()=>T.settings.mode==='evening';
-const curMode=()=>isEvening()?((T.ev&&T.ev.list[Math.max(0,T.ev.idx)])||'year'):T.settings.mode;
+const isBoard=()=>T.settings.mode==='board';
+const curMode=()=>isEvening()?((T.ev&&T.ev.list[Math.max(0,T.ev.idx)])||'year'):isBoard()?((T.board&&(T.phase==='board'&&T.board.nextMode||T.board.mode))||'year'):T.settings.mode;
 const cardMode=()=>curMode()==='hitster'&&!isEvening();
-function segRounds(){const cm=curMode();if(cm==='battle')return (T.battle?T.battle.size:T.settings.battleSize)-1;return isEvening()?T.settings.evRounds:T.settings.rounds}
-const livesOn=()=>T.settings.play==='coop'||(T.settings.lives>0&&LIVES_OK.includes(curMode()));
-function mult(){const s=T.settings;if(!s.double)return 1;const cm=curMode();if(cm==='bingo'||cardMode())return 1;if(isEvening()&&T.ev&&T.ev.idx<T.ev.list.length-1)return 1;return (segRounds()-T.segRound)<s.double?2:1}
+function segRounds(){if(isBoard())return 9999;const cm=curMode();if(cm==='battle')return (T.battle?T.battle.size:T.settings.battleSize)-1;return isEvening()?T.settings.evRounds:T.settings.rounds}
+const livesOn=()=>!isBoard()&&T.settings.play==='coop'||!isBoard()&&(T.settings.lives>0&&LIVES_OK.includes(curMode()));
+function mult(){const s=T.settings;if(!s.double||isBoard())return 1;const cm=curMode();if(cm==='bingo'||cardMode())return 1;if(isEvening()&&T.ev&&T.ev.idx<T.ev.list.length-1)return 1;return (segRounds()-T.segRound)<s.double?2:1}
 function needYear(){return ['hitster','year','hl'].includes(curMode())}
 function roundTime(){const s=T.settings,cm=curMode();if(cm==='fake')return s.time+20;if(cm==='herd')return Math.max(45,s.time+28);if(cm==='chip')return Math.max(20,s.time);return s.time}
 
@@ -3405,12 +3499,18 @@ function srcSongs(){const s=T.settings;if(s.src==='live')return T.live?T.live.so
   if(s.src==='pack'){const k=s.pack;return SONGS.filter(x=>[...k].some(c=>x.tags.includes(c)))}
   return SONGS.filter(x=>[...x.tags].some(c=>s.genres.includes(c))&&s.decades.includes(decade(x.year)))}
 const pool=()=>srcSongs();
-function minPool(){const s=T.settings;if(s.mode==='bingo')return s.bingo===4?28:16;if(s.mode==='battle')return s.battleSize+2;if(isEvening())return s.evModes.includes('battle')?Math.max(12,s.battleSize+2):12;return 8}
+function minPool(){const s=T.settings;if(isBoard())return 12;if(s.mode==='bingo')return s.bingo===4?28:16;if(s.mode==='battle')return s.battleSize+2;if(isEvening())return s.evModes.includes('battle')?Math.max(12,s.battleSize+2):12;return 8}
 function card(s){return {key:s.key,title:s.title,artist:s.artist,year:s.year,cover:s.cover||null}}
 function insertCard(u,s){u.timeline.push(card(s));u.timeline.sort((a,b)=>a.year-b.year)}
+/* nummers die al gehoord zijn (ook vorige spelavonden) komen pas later terug */
+let playedM=null;
+function playedMap(){if(!playedM){playedM=store.get('dt_played',{})||{};const cut=Date.now()-120*864e5;for(const k in playedM)if(!(playedM[k]>cut))delete playedM[k]}return playedM}
+let playedT=null;function markPlayed(s){if(!s||!s.key)return;playedMap()[s.key]=Date.now();clearTimeout(playedT);playedT=setTimeout(()=>store.set('dt_played',playedM),1500)}
+function heardCount(){const pm=playedMap();return pool().filter(s=>pm[s.key]).length}
 function drawSong(){const p=pool();const held=new Set();T.units.forEach(u=>u.timeline.forEach(c=>held.add(c.key)));
   let c=p.filter(s=>!T.used.has(s.key)&&!held.has(s.key));if(!c.length){T.used.clear();c=p.filter(s=>!held.has(s.key))}
-  if(!c.length)return null;const s=rnd(c);T.used.add(s.key);return s}
+  if(!c.length)return null;
+  const pm=playedMap();const fresh=c.filter(s=>!pm[s.key]);if(fresh.length>=Math.min(6,c.length))c=fresh;else c=c.slice().sort((a,b)=>(pm[a.key]||0)-(pm[b.key]||0)).slice(0,Math.max(6,Math.ceil(c.length*.3)));const s=rnd(c);T.used.add(s.key);return s}
 function mergeSong(s,d){if(!s.year&&d.year)s.year=d.year;return Object.assign({},s,{preview:d.preview,cover:d.cover||s.cover,link:d.link,year:s.year||d.year||null})}
 /* bekendheid: Deezer-populariteit (0–1.000.000) */
 const FAME_THR={hits:500000,mix:150000,all:0};
@@ -3452,7 +3552,7 @@ function assignUnit(p){const s=T.settings;
   const id='u'+p.id;if(!T.units.has(id))T.units.set(id,newUnit(id,p.name,p.emoji,p.color));const u=T.units.get(id);u.name=p.name;u.emoji=p.emoji;u.color=p.color;p.unit=id;return u}
 function buildUnits(){T.units=new Map();[...T.players.values()].forEach(p=>{p.unit=null;assignUnit(p)});for(const [id,u] of T.units)if(!members(u).length)T.units.delete(id)}
 function shuffleTeams(){const n=T.settings.teams;shuffle([...T.players.values()]).forEach((p,i)=>p.team=TEAMS[i%n][0])}
-const unitScore=u=>cardMode()?u.timeline.length:u.score;
+const unitScore=u=>isBoard()?(u.pos||0)+1:cardMode()?u.timeline.length:u.score;
 const ranking=()=>[...T.units.values()].sort((a,b)=>(livesOn()&&T.settings.play!=='coop'?(a.out?1:0)-(b.out?1:0):0)||unitScore(b)-unitScore(a)||b.coins-a.coins);
 const unitOf=p=>p&&T.units.get(p.unit);
 function addPts(u,n){const v=n*mult();u.score=Math.max(0,u.score+v);return v}
@@ -3477,15 +3577,15 @@ async function startGame(){
   const needsTwo=s.mode==='vibe'||(isEvening()&&s.evModes.includes('vibe'));
   if(needsTwo&&[...T.players.values()].filter(p=>p.online).length<2){T.liveStatus=t('needTwo');sync();return}
   store.set('dt_settings',Object.assign({},s,{src:s.src==='live'?'mix':s.src}));
-  clearTimeout(T.qTimer);T.used.clear();T.round=0;T.segRound=0;T.sinceQuick=0;T.anchor=null;T.cur=null;T.awards=null;T.coopWon=null;T.record=null;T.bingo=null;T.battle=null;T.buzz=null;T.buzzWin=null;T.liveStatus='';T.ratings=new Map();T.hitflop=null;
+  clearTimeout(T.qTimer);T.pre=null;T.paused=null;T.board=null;T.used.clear();T.round=0;T.segRound=0;T.sinceQuick=0;T.anchor=null;T.cur=null;T.awards=null;T.coopWon=null;T.record=null;T.bingo=null;T.battle=null;T.buzz=null;T.buzzWin=null;T.liveStatus='';T.ratings=new Map();T.hitflop=null;
   T.players.forEach(p=>{p.st=newStats()});
   buildUnits();sfx('start');crowd('clap');
   if(isEvening()){const order=EV_MODES.filter(m=>s.evModes.includes(m));T.ev={list:order,idx:-1};return nextSegment()}
-  T.ev=null;startSegment();
+  T.ev=null;if(isBoard())return startBoard();startSegment();
 }
-function nextSegment(){clearTimeout(T.qTimer);T.ev.idx++;if(T.ev.idx>=T.ev.list.length)return endGame();
+function nextSegment(){clearTimeout(T.qTimer);T.pre=null;T.ev.idx++;if(T.ev.idx>=T.ev.list.length)return endGame();
   T.phase='segintro';T.segRound=0;T.anchor=null;T.cur=null;T.battle=null;T.bingo=null;audio.pause();T.units.forEach(u=>{u.ans=null;u.res=null;u.streak=0});sfx('quick');sync();
-  speak(t('saySeg',{n:T.ev.idx+1,m:t('m_'+curMode())}));T.qTimer=setTimeout(()=>{if(T.phase==='segintro')startSegment()},7000)}
+  speak(t('saySeg',{n:T.ev.idx+1,m:t('m_'+curMode())}));sched(()=>{if(T.phase==='segintro')startSegment()},7000)}
 async function startSegment(){clearTimeout(T.qTimer);const cm=curMode();T.segRound=0;T.sinceQuick=0;
   if(cm==='hitster'){T.phase='deal';sync();
     try{for(const u of T.units.values())if(!u.timeline.length)await dealCard(u)}catch(e){return fail(t('errDeezer'))}
@@ -3502,11 +3602,12 @@ async function nextRound(){
   if(cm==='hl'&&T.cur&&T.cur.year)T.anchor=T.cur;
   if(cardMode()&&s.quick&&T.sinceQuick>=s.quick){T.sinceQuick=0;return startQuick()}
   T.sinceQuick++;T.round++;T.segRound++;T.phase='loading';audio.pause();resetRate();
-  T.buzz=null;T.buzzWin=null;T.locked=new Set();T.fake=null;T.herd=null;T.vibe=null;T.chip=null;T.units.forEach(u=>{u.ans=null;u.res=null;u.fakeErr=false});sync();
+  T.buzz=null;T.buzzWin=null;T.locked=new Set();T.fake=null;T.herd=null;T.vibe=null;T.chip=null;T.units.forEach(u=>{u.ans=null;u.res=null;u.fakeErr=false;u._s0=u.score});
+  const pre=takePre(cm);if(!(pre&&pre.done))sync();
   try{
-    if(cm==='herd')return await startHerdRound();
-    if(cm==='vibe')return await startVibeRound();
-    const song=await getPlayableSong(needYear());
+    if(cm==='herd')return await startHerdRound(pre);
+    if(cm==='vibe')return await startVibeRound(pre);
+    let song=pre?await pre.p:null;if(!song)song=await getPlayableSong(needYear());
     if(T.phase!=='loading')return;
     if(!song)return fail(t('errNone'));
     T.cur=song;
@@ -3518,7 +3619,7 @@ async function nextRound(){
   else T.bonusQ=null;
   if(cm==='fake')T.fake={sub:'write',opts:null,votes:new Map()};
   T.phase='round';T.roundStart=now();T.deadline=T.roundStart+roundTime()*1000;T.lastSec=-1;
-  playAudio(song.preview,0);
+  playAudio(song.preview,0);markPlayed(song);
   if(cm==='chip'){T.chip={start:Math.random()<.5?2:.55};setRate(T.chip.start)}
   sync();announceRound();
 }
@@ -3566,7 +3667,7 @@ function reveal(){
   T.units.forEach(u=>{if(u.lives<0)u.lives=0});
   afterReveal(anyOk,maxErr);
 }
-function afterReveal(anyOk,maxErr){sfx(anyOk?'win':'lose');crowd(anyOk?'cheer':'aww');sync();
+function afterReveal(anyOk,maxErr){sfx(anyOk?'win':'lose');crowd(anyOk?'cheer':'aww');if(isBoard()&&T.board)T.board.nextMode=pickBoardMode();sync();prefetch();
   const c=T.cur;if(c)speak(t('sayReveal',{t:c.title,a:c.artist,y:c.year||''}));
   if(maxErr>=20){shake();setTimeout(()=>crowd('boo'),900)}}
 
@@ -3587,7 +3688,7 @@ function revealFake(){const F=T.fake,song=T.cur;if(!F)return;if(F.sub==='write')
   afterReveal(anyOk,0)}
 
 /* ---------- kuddegeest ---------- */
-async function startHerdRound(){const r=await Promise.all([0,1,2,3].map(()=>getPlayableSong(false)));const songs=r.filter(Boolean);
+async function startHerdRound(pre){let songs=pre?await pre.p:null;if(!songs||songs.length<2)songs=(await Promise.all([0,1,2,3].map(()=>getPlayableSong(false)))).filter(Boolean);songs.forEach(markPlayed);
   if(T.phase!=='loading')return;if(songs.length<2)return fail(t('errNone'));
   const qs=tList('herdQs');T.herd={q:Math.floor(Math.random()*qs.length),songs,playing:0,nextAt:now()+HERD_CLIP,votes:new Map()};T.cur=songs[0];
   T.phase='round';T.roundStart=now();T.deadline=T.roundStart+roundTime()*1000;T.lastSec=-1;playAudio(songs[0].preview,8);sync();announceRound()}
@@ -3602,13 +3703,13 @@ function revealHerd(){const H=T.herd;if(!H)return;T.phase='reveal';const counts=
 
 /* ---------- sfeermeter ---------- */
 function vibeEligible(u){const V=T.vibe;if(!V||u.out)return false;return members(u).some(p=>p.online&&p.id!==V.dj)}
-async function startVibeRound(){const online=[...T.players.values()].filter(p=>p.online&&!(unitOf(p)||{}).out);if(online.length<2)return fail(t('needTwo'));
-  const r=await Promise.all([0,1,2,3].map(()=>getPlayableSong(false)));const songs=r.filter(Boolean);if(T.phase!=='loading')return;if(songs.length<2)return fail(t('errNone'));
+async function startVibeRound(pre){const online=[...T.players.values()].filter(p=>p.online&&!(unitOf(p)||{}).out);if(online.length<2)return fail(t('needTwo'));
+  let songs=pre?await pre.p:null;if(!songs||songs.length<2)songs=(await Promise.all([0,1,2,3].map(()=>getPlayableSong(false)))).filter(Boolean);if(T.phase!=='loading')return;if(songs.length<2)return fail(t('errNone'));
   const dj=online[(T.round-1)%online.length];const scales=tList('vibeScales');
   T.vibe={dj:dj.id,djUnit:dj.unit,scale:Math.floor(Math.random()*scales.length),target:Math.round(10+Math.random()*80),opts:songs,sub:'pick',pick:null};
   T.phase='round';T.roundStart=now();T.deadline=now()+25000;T.lastSec=-1;audio.pause();sync();speak(t('sayVibe',{n:dj.name}))}
 function vibePick(i){const V=T.vibe;if(!V||V.sub!=='pick')return;if(!(i>=0&&i<V.opts.length))i=Math.floor(Math.random()*V.opts.length);
-  V.pick=i;V.sub='guess';T.cur=V.opts[i];T.roundStart=now();T.deadline=now()+Math.max(25,T.settings.time)*1000;T.lastSec=-1;playAudio(T.cur.preview,0);sync();announceRound()}
+  V.pick=i;V.sub='guess';T.cur=V.opts[i];markPlayed(T.cur);T.roundStart=now();T.deadline=now()+Math.max(25,T.settings.time)*1000;T.lastSec=-1;playAudio(T.cur.preview,0);sync();announceRound()}
 function revealVibe(){const V=T.vibe;if(!V)return;if(V.sub==='pick')return vibePick(-1);T.phase='reveal';setVol(.55);let anyOk=false;const others=[];
   T.units.forEach(u=>{if(u.out){u.res=null;return}if(!vibeEligible(u)){u.res=u.id===V.djUnit?{dj:true,pts:0}:null;return}
     const a=u.ans;if(!a||a.pos==null){u.res={none:true,pts:0};loseLife(u);if(u.id!==V.djUnit)others.push(0);return}
@@ -3622,7 +3723,7 @@ async function startBattle(){T.phase='battleload';sync();let deck;
   try{deck=await buildDeck(T.settings.battleSize)}catch(e){return fail(t('errDeezer'))}
   if(T.phase!=='battleload')return;
   let size=deck.length>=16&&T.settings.battleSize>=16?16:deck.length>=8?8:deck.length>=4?4:0;if(!size)return fail(t('errNone'));
-  deck=deck.slice(0,size);
+  deck=deck.slice(0,size);deck.forEach(markPlayed);
   T.battle={size,songs:deck,round:shuffle(deck.map((_,i)=>i)),next:[],m:0,sub:'predict',preds:new Map(),votes:new Map(),last:null,champ:null,duel:0,startedAt:0};
   T.phase='battle';T.roundStart=now();T.deadline=now()+25000;T.lastSec=-1;sync();speak(t('sayBattle'))}
 function stageName(){const B=T.battle;if(!B)return '';const left=B.round.length;return left===2?t('final'):left===4?t('semi'):left===8?t('quarter'):t('last16')}
@@ -3670,7 +3771,7 @@ function quickNext(){
   const Q=T.quick;if(!Q||!['quick','quickintro'].includes(T.phase))return;
   Q.i++;if(Q.i>=Q.list.length){T.phase='quickend';fadeOut();sync();return}
   Q.sub='play';Q.ans=new Map();Q.res=new Map();T.phase='quick';T.roundStart=now();T.deadline=T.roundStart+QUICK_MS;T.lastSec=-1;
-  playAudio(Q.list[Q.i].s.preview,6);sync();
+  playAudio(Q.list[Q.i].s.preview,6);markPlayed(Q.list[Q.i].s);sync();
 }
 function quickShow(){
   const Q=T.quick;if(!Q||Q.sub!=='play')return;Q.sub='show';const it=Q.list[Q.i];
@@ -3678,7 +3779,7 @@ function quickShow(){
   ok.forEach(([uid,a],i)=>{const u=T.units.get(uid);if(!u)return;const g=i===0?2:1;u.coins+=g;Q.res.set(uid,g);stat(a.by,'coins',g);credit(a.by,true,{ms:a.t,year:it.s.year})});
   [...Q.ans.entries()].filter(([,a])=>a.c!==it.q.answer).forEach(([,a])=>credit(a.by,false));
   setVol(.5);sfx(ok.length?'coin':'lose');crowd(ok.length?'clap':'aww');sync();
-  clearTimeout(T.qTimer);T.qTimer=setTimeout(quickNext,4000);
+  sched(quickNext,4000);
 }
 
 /* ---------- bingo ---------- */
@@ -3690,7 +3791,7 @@ async function startBingo(){const s=T.settings;T.phase='bingoload';sync();const 
   T.units.forEach(u=>bingoCard(u));T.phase='bingo';speak(t('sayBingoStart'));bingoNext()}
 function bingoCard(u){const B=T.bingo;if(!B||B.cards.has(u.id))return;B.cards.set(u.id,shuffle(B.deck.map((_,i)=>i)).slice(0,B.size*B.size));B.marks.set(u.id,new Set())}
 function bingoNext(){const B=T.bingo;if(!B||T.phase!=='bingo')return;B.i++;if(B.i>=B.order.length)return endGame();
-  B.sub='play';T.round=B.i+1;T.segRound=B.i+1;T.cur=B.deck[B.order[B.i]];T.roundStart=now();T.deadline=T.roundStart+Math.min(T.settings.time,30)*1000;T.lastSec=-1;playAudio(T.cur.preview,0);sync()}
+  B.sub='play';T.round=B.i+1;T.segRound=B.i+1;T.cur=B.deck[B.order[B.i]];markPlayed(T.cur);T.roundStart=now();T.deadline=T.roundStart+Math.min(T.settings.time,30)*1000;T.lastSec=-1;playAudio(T.cur.preview,0);sync()}
 function bingoShow(){const B=T.bingo;if(!B||B.sub!=='play')return;B.sub='show';T.deadline=now()+SHOW_MS;setVol(.5);sync();speak(t('saySong',{t:T.cur.title,a:T.cur.artist}))}
 function hasLine(mk,n){for(let r=0;r<n;r++){let a=true,b=true;for(let c=0;c<n;c++){if(!mk.has(r*n+c))a=false;if(!mk.has(c*n+r))b=false}if(a||b)return true}
   let d1=true,d2=true;for(let k=0;k<n;k++){if(!mk.has(k*n+k))d1=false;if(!mk.has(k*n+(n-1-k)))d2=false}return d1||d2}
@@ -3705,6 +3806,7 @@ function bingoMark(p,i){const B=T.bingo,u=unitOf(p);if(!B||!u||T.phase!=='bingo'
 /* ---------- na de ronde ---------- */
 function afterRound(){const s=T.settings,us=[...T.units.values()],cm=curMode();
   if(!us.length)return endGame();
+  if(isBoard())return boardMove();
   if(s.play==='coop'&&us[0].lives<=0){T.coopWon=false;return endGame()}
   if(livesOn()&&s.play!=='coop'&&us.length>1&&us.filter(u=>!u.out).length<=1)return endGame();
   const segOver=cardMode()?us.some(u=>u.timeline.length>=s.target):T.segRound>=segRounds();
@@ -3715,18 +3817,19 @@ function hostNext(){
   if(T.phase==='segintro')return startSegment();
   if(T.phase==='bingo'&&T.bingo){const B=T.bingo;if(B.sub==='win')return endGame();if(B.sub==='show')return bingoNext();return bingoShow()}
   if(T.phase==='battle'&&T.battle){const B=T.battle;if(B.sub==='predict')return startDuel();if(B.sub==='duel')return duelResult();if(B.sub==='res')return battleAdvance();if(B.sub==='champ')return battleDone()}
+  if(T.phase==='board'&&T.board){const B=T.board;if(B.sub==='intro'||B.sub==='idle')return boardTurn();return}
   if(T.phase==='end')return toLobby();
   if(T.phase==='error'){if(T.units.size&&T.round>0&&!['bingo','battle'].includes(curMode()))return nextRound();return toLobby()}
 }
 function endGame(){
   if(T.phase==='end')return;
-  T.phase='end';clearTimeout(T.qTimer);fadeOut();sfx('end');crowd('drum');setTimeout(()=>crowd('cheer'),1900);const s=T.settings;
+  T.phase='end';clearTimeout(T.qTimer);T.pre=null;T.paused=null;fadeOut();sfx('end');crowd('drum');setTimeout(()=>crowd('cheer'),1900);const s=T.settings;
   if(s.play==='coop'){const u=[...T.units.values()][0];if(T.coopWon==null)T.coopWon=!!(u&&u.lives>0);const sc=u?unitScore(u):0;const key='dt_rec_'+s.mode;const old=store.get(key,0);T.record={score:sc,old,isNew:sc>old};if(sc>old)store.set(key,sc)}
   T.awards=computeAwards();T.hitflop=computeHitFlop();updateHof();sync();
   const w=ranking()[0];
   speak(s.play==='coop'?(T.coopWon?t('coopWin'):t('coopLose')):w?t('sayWin',{n:uName(w)}):'');
 }
-function toLobby(){clearTimeout(T.qTimer);T.phase='lobby';T.msg='';audio.pause();resetRate();T.bingo=null;T.battle=null;T.buzz=null;T.ev=null;
+function toLobby(){clearTimeout(T.qTimer);T.pre=null;T.paused=null;T.board=null;T.phase='lobby';T.msg='';audio.pause();resetRate();T.bingo=null;T.battle=null;T.buzz=null;T.ev=null;
   for(const [id,p] of T.players){if(!p.online)T.players.delete(id)}
   T.units=new Map();fixHost();sync()}
 function fail(m){T.phase='error';T.msg=m;audio.pause();sync()}
@@ -3781,11 +3884,14 @@ function applySettings(n){if(!n||typeof n!=='object')return;const s=T.settings;
   if([0,3].includes(+n.lives))s.lives=+n.lives;
   if([0,1,3].includes(+n.double))s.double=+n.double;
   if(['hits','mix','all'].includes(n.fame))s.fame=n.fame;
+  if([20,30,40].includes(+n.boardLen))s.boardLen=+n.boardLen;
+  if(Array.isArray(n.boardModes)){const b=BOARD_MODES.filter(x=>n.boardModes.includes(x));if(b.length>=2)s.boardModes=b}
+  if(['S','M','L'].includes(n.textSize))s.textSize=n.textSize;
   if(THEMES.some(x=>x[0]===n.theme))s.theme=n.theme;
   if(LANGS.some(x=>x[0]===n.lang))s.lang=n.lang;
   if(typeof n.voice==='boolean')s.voice=n.voice;
   if(typeof n.crowd==='boolean')s.crowd=n.crowd;
-  sanitize();applyTheme(s.theme)}
+  sanitize();applyTheme(s.theme);applyZoom()}
 async function liveSearch(q){q=String(q||'').trim().slice(0,100);if(!q)return;
   const m=q.match(/playlist\/(\d+)/)||q.match(/^(\d{4,})$/);if(m)return liveLoad(m[1]);
   T.liveStatus=t('liveSearching');T.liveResults=null;sync();
@@ -3832,9 +3938,11 @@ function onMsg(conn,m){
     p.conn=conn;p.online=true;fixHost();if(back){sfx('join');T.welcome={name:p.name,emoji:p.emoji,at:now()}}sync();return;
   }
   const p=[...T.players.values()].find(x=>x.conn===conn);if(!p)return;
+  if(T.paused&&!['react','rate','pause','lobby'].includes(m.t))return;
   const u=unitOf(p),cm=curMode(),tnow=now(),R=T.phase==='round'&&u&&!u.out;
   const A=()=>u.ans||(u.ans={});
   switch(m.t){
+    case 'pause':if(p.host)togglePause();return;
     case 'react':if(REACTS.includes(m.e)&&tnow-(p.lastReact||0)>600){p.lastReact=tnow;floatReact(p,m.e)}return;
     case 'rate':rate(p,m.stars);return;
     case 'team':if(!inGame()&&TEAMS.some(x=>x[0]===m.team)){p.team=m.team;sync()}return;
@@ -3865,6 +3973,10 @@ function onMsg(conn,m){
     case 'lload':if(!inGame())liveLoad(m.id);break;
     case 'lclear':T.live=null;T.liveResults=null;T.liveStatus='';T.settings.src='mix';sync();break;
     case 'start':startGame();break;
+    case 'kick':{const x=T.players.get(m.id);if(x&&x!==p&&!inGame()){try{x.conn&&x.conn.send({t:'kicked'})}catch(e){}const c=x.conn;T.players.delete(x.id);try{c&&c.close()}catch(e){}sync()}break}
+    case 'mkhost':{const x=T.players.get(m.id);if(x&&x.online&&x!==p){T.players.forEach(y=>y.host=false);x.host=true;sync()}break}
+    case 'setteam':{const x=T.players.get(m.id);if(x&&!inGame()&&TEAMS.some(d=>d[0]===m.team)){x.team=m.team;sync()}break}
+    case 'resetHeard':playedM={};store.set('dt_played',{});sync();break;
     case 'next':hostNext();break;
     case 'lobby':toLobby();break;
     case 'replay':if(['round','reveal','bingo'].includes(T.phase)&&audio.src){audio.currentTime=0;audio.play().catch(()=>{})}break;
@@ -3878,7 +3990,7 @@ function doneState(u){if(u.out)return -2;if(T.phase==='round'){const cm=curMode(
   return 0}
 const pName=id=>{const p=T.players.get(id);return p?p.name:''};
 function pub(p){return {id:p.id,name:p.name,emoji:p.emoji,color:p.color,online:!!p.online,host:p.host,team:p.team,unit:p.unit}}
-function pubUnit(u,full){const o={id:u.id,name:uName(u),emoji:u.emoji,color:u.color,score:unitScore(u),coins:u.coins,lives:u.lives,out:!!u.out,streak:u.streak,done:doneState(u),online:unitOnline(u),team:!!u.tkey};
+function pubUnit(u,full){const o={pos:u.pos||0,boost:!!u.boost,id:u.id,name:uName(u),emoji:u.emoji,color:u.color,score:unitScore(u),coins:u.coins,lives:u.lives,out:!!u.out,streak:u.streak,done:doneState(u),online:unitOnline(u),team:!!u.tkey};
   if(full)o.timeline=u.timeline.map(c=>({title:c.title,artist:c.artist,year:c.year,key:c.key}));return o}
 function view(p){const s=T.settings,u=unitOf(p),cm=curMode();
   const v={t:'state',phase:T.phase,code:T.code,msg:T.msg,round:T.segRound,lang:s.lang,theme:s.theme,mode:cm,baseMode:s.mode,play:s.play,target:s.target,rounds:segRounds(),time:s.time,teams:s.teams,tvReady:T.unlocked,
@@ -3886,8 +3998,9 @@ function view(p){const s=T.settings,u=unitOf(p),cm=curMode();
     me:{id:p.id,name:p.name,emoji:p.emoji,color:p.color,host:p.host,team:p.team},unit:u?pubUnit(u,true):null,
     players:[...T.players.values()].map(pub),units:[...T.units.values()].map(x=>pubUnit(x,false))};
   if(T.ev)v.ev={i:T.ev.idx,n:T.ev.list.length,list:T.ev.list};
-  if(p.host){v.settings=s;v.pool=pool().length;v.live=T.live?{name:T.live.name,n:T.live.songs.length}:null;v.liveStatus=T.liveStatus;v.liveResults=T.liveResults}
-  const rem=Math.max(0,T.deadline-now());
+  v.paused=!!T.paused;if(isBoard()){v.boardLen=T.settings.boardLen;if(T.board)v.turn=T.board.turn}
+  if(p.host){v.settings=s;v.pool=pool().length;v.heard=inGame()?0:heardCount();v.live=T.live?{name:T.live.name,n:T.live.songs.length}:null;v.liveStatus=T.liveStatus;v.liveResults=T.liveResults}
+  const rem=Math.max(0,T.deadline-(T.paused?T.paused.at:now()));
   if(T.phase==='deal'){if(T.anchor)v.anchor=pubSong(T.anchor)}
   if(T.phase==='round'&&u){const a=u.ans||{};v.remaining=T.buzz?Math.max(0,T.deadline-T.buzz.at):rem;
     v.ans={slot:a.slot,bonus:a.bonus,year:a.year,dir:a.dir,choice:a.choice,fake:a.fake,pos:a.pos,byName:pName(a.by||a.bby)};
@@ -3915,11 +4028,13 @@ function view(p){const s=T.settings,u=unitOf(p),cm=curMode();
   if(T.phase==='battle'&&T.battle&&u){const B=T.battle;const pr=B.preds.get(u.id);const vt=B.votes.get(u.id);
     v.battle={sub:B.sub,stage:stageName(),songs:B.songs.map(pubSong),pair:B.sub==='predict'?null:(B.sub==='res'&&B.last?B.last.pair:duelPair()),side:B.side,pred:pr?pr.i:null,vote:vt?vt.side:null,
       last:B.sub==='res'&&B.last?{w:B.last.w,counts:B.last.counts}:null,champ:B.champ,res:u.res,duel:B.duel,n:B.size-1};v.remaining=rem}
+  if(T.phase==='board'&&T.board&&u){const B=T.board;const mv=(B.moved||[]).find(x=>x.id===u.id);v.board={sub:B.sub,turn:B.turn,len:B.len,pos:u.pos||0,boost:!!u.boost,msg:B.msg?{em:B.msg.em,txt:B.msg.txt}:null,next:B.nextMode||null,steps:mv?mv.st:null,sq:B.sq[u.pos||0]}}
   if(T.phase==='end'){v.ranking=ranking().map(x=>pubUnit(x,false));v.awards=T.awards||[];v.coopWon=T.coopWon;v.record=T.record;v.hitflop=T.hitflop}
   return v;
 }
 function sync(){renderTV();for(const p of T.players.values()){if(p.online&&p.conn&&p.conn.open){try{p.conn.send(view(p))}catch(e){}}}}
 function tick(){
+  if(T.paused){if(MODE==='tv'){updCorner()}return}
   const tn=now(),cm=curMode();
   if(T.phase==='round'){
     if(cm==='buzz'){if(T.buzz){if(tn>=T.buzz.until)resolveBuzz(null)}else{const on=activeUnits();if(tn>=T.deadline||(on.length&&on.every(x=>T.locked.has(x.id))))reveal()}}
@@ -3930,9 +4045,83 @@ function tick(){
   }else if(T.phase==='quick'&&T.quick&&T.quick.sub==='play'){const on=activeUnits();const all=on.length>0&&on.every(x=>T.quick.ans.has(x.id));if(tn>=T.deadline||all)quickShow()}
   else if(T.phase==='bingo'&&T.bingo){const B=T.bingo;if(B.sub==='play'&&tn>=T.deadline)bingoShow();else if(B.sub==='show'&&tn>=T.deadline)bingoNext();else if(B.sub==='win'&&tn>=B.endAt)endGame()}
   else if(T.phase==='battle')battleTick();
+  else if(T.phase==='board')boardTick();
   if(['round','quick'].includes(T.phase)&&!T.buzz){const sec=Math.ceil((T.deadline-tn)/1000);if(sec<=5&&sec>0&&sec!==T.lastSec){T.lastSec=sec;sfx('tick')}}
   if(MODE==='tv'){updTimer();updCorner()}
 }
+
+/* ---------- planning, pauze & vooraf laden ---------- */
+function sched(fn,ms){clearTimeout(T.qTimer);T.qFn=fn;T.qAt=now()+ms;T.qTimer=setTimeout(()=>{T.qFn=null;fn()},ms)}
+const pausable=()=>['round','reveal','quick','bingo','battle','segintro','board','quickend'].includes(T.phase);
+function togglePause(){
+  if(T.paused){const P=T.paused,d=now()-P.at;T.paused=null;
+    T.deadline+=d;T.roundStart+=d;if(T.buzz){T.buzz.at+=d;T.buzz.until+=d}if(T.herd)T.herd.nextAt+=d;
+    if(T.battle){T.battle.startedAt+=d;T.battle.nextSwap=(T.battle.nextSwap||0)+d}if(T.bingo)T.bingo.endAt+=d;if(T.board)T.board.nextStep=(T.board.nextStep||0)+d;
+    if(P.q)sched(P.q.fn,P.q.left);if(P.playing&&audio.src)audio.play().catch(()=>{});sfx('start');sync();return}
+  if(!pausable())return;
+  T.paused={at:now(),playing:!audio.paused};audio.pause();
+  if(T.qFn&&T.qAt>now()){clearTimeout(T.qTimer);T.paused.q={fn:T.qFn,left:T.qAt-now()};T.qFn=null}
+  sfx('lose');sync();speak(t('sayPause'))}
+function takePre(cm){const P=T.pre;T.pre=null;return P&&P.mode===cm?P:null}
+function preloadAudio(r){try{(Array.isArray(r)?r:[r]).filter(Boolean).slice(0,2).forEach(s=>{const a=new Audio();a.preload='auto';a.src=s.preview})}catch(e){}}
+function prefetch(){T.pre=null;const s=T.settings;const cm=isBoard()?(T.board&&T.board.nextMode):curMode();
+  if(!cm||['bingo','battle'].includes(cm))return;
+  if(!isBoard()&&T.segRound>=segRounds())return;
+  if(cardMode()&&s.quick&&T.sinceQuick>=s.quick)return;
+  const multi=cm==='herd'||cm==='vibe';const ny=['hitster','year','hl'].includes(cm);
+  const job={mode:cm,done:false};
+  job.p=(multi?Promise.all([0,1,2,3].map(()=>getPlayableSong(false))).then(r=>r.filter(Boolean)):getPlayableSong(ny))
+    .then(r=>{job.done=true;preloadAudio(r);return r}).catch(()=>{job.done=true;return null});
+  T.pre=job}
+function applyZoom(){if(MODE!=='tv')return;try{document.documentElement.style.setProperty('--z',{S:.88,M:1,L:1.15}[T.settings.textSize]||1)}catch(e){}}
+
+/* =========================================================
+   BORDSPEL — eigen spelvorm. Uitbreidbaar: voeg nieuwe vakjes toe aan SQUARES
+   (em = icoon, w = hoe vaak het voorkomt, fn = wat er gebeurt) of nieuwe
+   uitdagingen aan BOARD_MODES.
+   ========================================================= */
+const SQUARES={
+  bonus:{em:'⭐',w:3,fn:u=>({k:'sq_bonus',moves:[[u.id,2]]})},
+  boost:{em:'⚡',w:2,fn:u=>{u.boost=true;return {k:'sq_boost'}}},
+  back:{em:'⬅️',w:2,fn:u=>({k:'sq_back',moves:[[u.id,-3]]})},
+  dice:{em:'🎲',w:2,fn:u=>{const d=rnd([-2,-1,1,2,3,4]);return {k:'sq_dice',o:{n:(d>0?'+':'')+d},moves:[[u.id,d]]}}},
+  swap:{em:'🔄',w:1,fn:u=>{const l=boardLeader(u);if(!l)return {k:'sq_swapNone'};return {k:'sq_swap',o:{n:uName(l)},set:[[u.id,l.pos],[l.id,u.pos]]}}},
+  magnet:{em:'🧲',w:1,fn:u=>{const l=boardLeader(u);if(!l)return {k:'sq_magnetNone',moves:[[u.id,1]]};return {k:'sq_magnet',o:{n:uName(l)},moves:[[l.id,-2],[u.id,2]]}}},
+};
+const STEP_MUL={herd:2,hl:2};
+function boardLeader(u){return [...T.units.values()].filter(x=>x!==u&&(x.pos||0)>(u.pos||0)).sort((a,b)=>b.pos-a.pos)[0]||null}
+function makeBoard(len){const sq=Array(len).fill('plain');sq[0]='start';sq[len-1]='finish';const bag=[];Object.keys(SQUARES).forEach(k=>{for(let i=0;i<SQUARES[k].w;i++)bag.push(k)});
+  for(let i=2+Math.floor(Math.random()*2);i<len-2;i+=2+Math.floor(Math.random()*2))sq[i]=rnd(bag);return sq}
+function pickBoardMode(){const B=T.board;let list=T.settings.boardModes.filter(m=>BOARD_MODES.includes(m));if(!list.length)list=['year'];const o=list.filter(m=>m!==(B&&B.mode));return rnd(o.length?o:list)}
+function startBoard(){const s=T.settings;T.board={len:s.boardLen,sq:makeBoard(s.boardLen),turn:0,mode:null,nextMode:null,sub:'intro',events:[],anim:new Map(),moved:[],msg:null,nextStep:0,evBuilt:true};
+  T.units.forEach(u=>{u.pos=0;u.boost=false});T.board.nextMode=pickBoardMode();T.phase='board';T.deadline=now()+6000;sync();speak(t('sayBoard'));prefetch()}
+function boardTurn(){const B=T.board;if(!B)return;B.turn++;B.mode=B.nextMode||pickBoardMode();B.nextMode=null;B.msg=null;B.moved=[];
+  if(B.mode==='hl'&&!(T.cur&&T.cur.year)&&!(T.anchor&&T.anchor.year)){for(let i=0;i<10;i++){const a=drawSong();if(a&&a.year){T.anchor=a;break}}}
+  if(T.pre&&T.pre.mode!==B.mode)T.pre=null;nextRound()}
+function queueMove(u,delta){const B=T.board;const from=u.pos||0;const to=Math.max(0,Math.min(B.len-1,from+delta));if(to===from)return;const a=B.anim.get(u.id);B.anim.set(u.id,{cur:a?a.cur:from,to});u.pos=to}
+function boardMove(){const B=T.board,cm=B.mode;T.phase='board';B.sub='move';B.anim=new Map();B.moved=[];B.evBuilt=false;B.msg=null;audio.volume=.35;
+  T.units.forEach(u=>{const d=(u.score||0)-(u._s0||0);let st=Math.round(d*(STEP_MUL[cm]||1));st=Math.max(-2,Math.min(6,st));
+    if(u.boost&&st>0){st*=2;u.boost=false;u.boosted=true}else u.boosted=false;if(st)queueMove(u,st);B.moved.push({id:u.id,st})});
+  if(!B.nextMode)B.nextMode=pickBoardMode();
+  B.nextStep=now()+400;sync();if(!B.anim.size)boardSettle()}
+function boardSettle(){const B=T.board;B.anim=new Map();
+  const fin=[...T.units.values()].filter(u=>(u.pos||0)>=B.len-1);if(fin.length){B.winner=fin[0].id;crowd('cheer');return endGame()}
+  if(!B.evBuilt){B.evBuilt=true;B.events=B.moved.filter(m=>m.st).map(m=>m.id).filter(id=>{const u=T.units.get(id);return u&&SQUARES[B.sq[u.pos||0]]})}
+  boardNextEvent()}
+function boardNextEvent(){const B=T.board;const id=B.events.shift();
+  if(!id){B.sub='idle';T.deadline=now()+5000;sync();return}
+  const u=T.units.get(id);const def=SQUARES[B.sq[u.pos||0]];if(!def)return boardNextEvent();
+  const r=def.fn(u)||{};B.msg={em:def.em,txt:t(r.k,Object.assign({u:uName(u)},r.o||{})),color:u.color};B.anim=new Map();
+  (r.moves||[]).forEach(([uid,d])=>{const x=T.units.get(uid);if(x)queueMove(x,d)});
+  (r.set||[]).forEach(([uid,pos])=>{const x=T.units.get(uid);if(x&&x.pos!==pos){B.anim.set(uid,{cur:x.pos,to:pos});x.pos=pos}});
+  sfx(r.k==='sq_back'?'lose':'coin');crowd(r.k==='sq_back'||r.k==='sq_swap'||r.k==='sq_magnet'?'aww':'clap');
+  B.sub='event';T.deadline=now()+3400;sync();speak(B.msg.txt)}
+function boardTick(){const B=T.board;if(!B)return;const tn=now();
+  if(B.sub==='intro'||B.sub==='idle'){if(tn>=T.deadline)boardTurn();return}
+  if(B.sub==='event'){if(tn>=T.deadline){if(B.anim.size){B.sub='move';B.nextStep=tn;sync()}else boardNextEvent()}return}
+  if(B.sub==='move'){if(tn<B.nextStep)return;B.nextStep=tn+300;let any=false;
+    B.anim.forEach(a=>{if(a.cur!==a.to){a.cur+=a.to>a.cur?1:-1;any=true}});
+    if(any){sfx('stamp');renderTV()}else boardSettle()}}
 
 /* =========================================================
    TV — weergave
@@ -3952,10 +4141,10 @@ function updTimer(){const c=document.getElementById('tmrc'),tx=document.getEleme
   if(tx)tx.textContent=Math.ceil(rem/1000);if(qb)qb.style.width=(f*100)+'%';
   const bf=document.getElementById('bfrem');if(bf&&T.buzz)bf.textContent=Math.ceil(Math.max(0,T.buzz.until-now())/1000)}
 const heartStr=u=>u.out?'💀':'❤️'.repeat(Math.max(0,u.lives))+'🖤'.repeat(Math.max(0,3-u.lives));
-function evLabel(){return T.ev?`<div class="pill evpill">🎪 ${t('partN',{i:T.ev.idx+1,n:T.ev.list.length})}</div>`:''}
+function evLabel(){return T.ev?`<div class="pill evpill">🎪 ${t('partN',{i:T.ev.idx+1,n:T.ev.list.length})}</div>`:isBoard()&&T.board?`<div class="pill evpill">🎲 ${t('turnN',{n:T.board.turn})}</div>`:''}
 function tvHead(extra=''){const s=T.settings,cm=curMode();
   const left=cardMode()?`🃏 ${t('round',{n:T.segRound})}`:`${modeEm(cm)} ${t('m_'+cm)}`;
-  const goal=cardMode()?t('firstTo',{n:s.target}):cm==='bingo'?t('bingoGoal'):cm==='battle'?stageName():t('roundsOf',{n:T.segRound,m:segRounds()});
+  const goal=isBoard()?t('boardGoal',{n:T.settings.boardLen}):cardMode()?t('firstTo',{n:s.target}):cm==='bingo'?t('bingoGoal'):cm==='battle'?stageName():t('roundsOf',{n:T.segRound,m:segRounds()});
   const x2=mult()>1?'<div class="pill x2">×2</div>':'';
   return `<header class="tvtop">${evLabel()}<div class="pill">${left}</div>${x2}<div class="goal">${goal}</div>${s.play==='coop'?'<div class="lives" id="lives"></div>':''}${extra}</header>`}
 function srcLabel(){const s=T.settings;if(s.src==='live')return T.live?'🎧 <b>'+esc(T.live.name)+'</b>':'🎧 '+t('liveNone');
@@ -3963,7 +4152,8 @@ function srcLabel(){const s=T.settings;if(s.src==='live')return T.live?'🎧 <b>
   return '🎵 <b>'+s.genres.map(g=>t('g_'+g)).join(', ')+'</b><br>📅 <b>'+s.decades.map(decLabel).join('  ')+'</b>'}
 function setSummary(){const s=T.settings;
   const play=s.play==='teams'?t('nTeams',{n:s.teams}):t(s.play);let goal;
-  if(s.mode==='evening')goal=s.evModes.map(m=>modeEm(m)+' '+t('m_'+m)).join(' → ')+' · '+t('roundsN',{n:s.evRounds})+' '+t('perPart');
+  if(s.mode==='board')goal=t('boardLenN',{n:s.boardLen})+' · '+s.boardModes.map(m=>modeEm(m)).join(' ');
+  else if(s.mode==='evening')goal=s.evModes.map(m=>modeEm(m)+' '+t('m_'+m)).join(' → ')+' · '+t('roundsN',{n:s.evRounds})+' '+t('perPart');
   else if(s.mode==='hitster')goal=t('firstTo',{n:s.target})+(s.quick?' · ⚡ '+t('quickEvery',{n:s.quick}):'');
   else if(s.mode==='bingo')goal=t('bingoSizeN',{n:s.bingo});else if(s.mode==='battle')goal=t('battleN',{n:s.battleSize});else goal=t('roundsN',{n:s.rounds});
   const extras=[s.lives&&s.play!=='coop'?'💀 '+t('lastStanding'):'',s.double?'×2 '+(s.double===1?t('dblLast'):t('dblLast3')):''].filter(Boolean).join(' · ');
@@ -4054,6 +4244,7 @@ function tvScreen(){const s=T.settings;
   case 'round':return roundScreen();
   case 'reveal':return revealScreen();
   case 'battle':return battleScreen();
+  case 'board':return boardScreen();
   case 'quickintro':return `<div class="tv col"><div class="big-center"><div class="zap">${t('quickTitle')}</div><div class="sub">${t('quickSub')}</div></div></div>`;
   case 'quick':{const Q=T.quick,it=Q.list[Q.i],sh=Q.sub==='show';return `<div class="tv col"><header class="tvtop qhead"><div class="pill">${t('quickN',{i:Q.i+1,n:Q.list.length})}</div><div class="goal">${t('whatTitle')}</div></header><div class="qbarw"><div id="qbar"${sh?' style="width:0"':''}></div></div>
     <div class="qstage">${vinylHTML(sh?'✓':'⚡',!sh,'1.1s')}
@@ -4071,7 +4262,7 @@ function tvScreen(){const s=T.settings;
     return `<div class="tv col endv"><div class="center"><h1 class="wintitle">${title}</h1>${rec}</div><div class="end-body"><div class="podium" id="podium"></div><div class="awards" id="awards"></div></div><div class="hint center">${t('hostAgain')}</div></div>`}
   case 'error':return `<div class="tv col"><div class="big-center"><div class="crown">😵</div><h1 class="wintitle" style="font-size:6vh">${t('oops')}</h1><div class="sub">${esc(T.msg)}</div><div class="hint">${t('hostRetry')}</div></div></div>`;
   }return ''}
-function podiumHTML(){const rk=ranking().slice(0,3);if(!rk.length)return '';const order=rk.length===1?[0]:rk.length===2?[1,0]:[1,0,2];const h=[86,64,48];const lbl=cardMode()?'🃏':'⭐';
+function podiumHTML(){const rk=ranking().slice(0,3);if(!rk.length)return '';const order=rk.length===1?[0]:rk.length===2?[1,0]:[1,0,2];const h=[86,64,48];const lbl=isBoard()?'📍':cardMode()?'🃏':'⭐';
   return order.map(i=>{const u=rk[i];return `<div class="pod"><div class="em">${u.emoji}</div><div class="nm">${esc(uName(u))}</div><div class="col" style="--c:${u.color};height:${h[i]}%;animation-delay:${(.3+(2-i)*.35).toFixed(2)}s">${i+1}<small>${unitScore(u)} ${lbl}</small></div></div>`}).join('')}
 function awardsHTML(){const A=(T.awards||[]).slice();const hf=T.hitflop;let h='';
   if(hf&&hf.hit)h+=`<div class="award hf" style="--c:#ffd23f;animation-delay:1.2s"><span class="ae">🔥</span><div><b>${t('hitNight')}</b><span>${esc(hf.hit.title)}</span><small>${esc(hf.hit.artist)} · ${hf.hit.avg.toFixed(1)}⭐</small></div></div>`;
@@ -4094,9 +4285,10 @@ function tvUpdate(){const set=(id,h)=>{const e=document.getElementById(id);if(e)
   set('chips',chipsHTML());set('results',resultsHTML());set('scores',scoresHTML());
   set('dealgrid',[...T.units.values()].filter(u=>u.timeline[0]).map((u,i)=>{const c=u.timeline[0];return `<div class="dcard" style="--c:${u.color};animation-delay:${(i*.18).toFixed(2)}s"><div class="who">${u.emoji} ${esc(uName(u))}</div><div class="y">${c.year}</div><div class="t">${esc(c.title)}</div></div>`}).join(''));
   if(T.phase==='bingo'&&T.bingo){const B=T.bingo;set('bgrids',[...T.units.values()].map(u=>{const mk=B.marks.get(u.id)||new Set();return `<div class="bg-unit" style="--c:${u.color}"><div class="bg-g" style="--n:${B.size}">${Array.from({length:B.size*B.size},(_,i)=>`<i class="${mk.has(i)?'on':''}"></i>`).join('')}</div><span>${u.emoji} ${esc(uName(u))}</span></div>`}).join(''))}
+  if(T.phase==='board')updPawns();
   updTimer();updCorner()}
 let cornerCode='';
-function updCorner(){const c=document.getElementById('corner');if(!c)return;const show=T.unlocked&&T.code&&!['lobby','boot'].includes(T.phase);c.hidden=!show;if(!show)return;
+function updCorner(){updPause();const c=document.getElementById('corner');if(!c)return;const show=T.unlocked&&T.code&&!['lobby','boot'].includes(T.phase);c.hidden=!show;if(!show)return;
   if(cornerCode!==T.code+LANG){cornerCode=T.code+LANG;c.innerHTML=`<div id="cqr"></div><div><b>${T.code}</b><small>${t('cornerHint')}</small></div>`;const q=document.getElementById('cqr');if(q&&window.QRCode){try{new QRCode(q,{text:T.joinUrl,width:96,height:96,colorDark:'#0b0618',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.L})}catch(e){}}}
   const off=[...T.players.values()].filter(p=>!p.online);const w=document.getElementById('cwarn');const txt=off.length?'📵 '+off.map(p=>esc(p.name)).join(', ')+' — '+t('scanBack'):'';
   if(w){if(w.dataset.txt!==txt){w.dataset.txt=txt;w.innerHTML=txt;w.hidden=!txt}}
@@ -4105,8 +4297,8 @@ function renderTV(){if(MODE!=='tv')return;LANG=T.settings.lang;const app=$('#app
   if(!T.unlocked){if(tvKey!=='unlock'+LANG){tvKey='unlock'+LANG;app.innerHTML=unlockHTML();const b=$('#unlockBtn');if(b&&b.focus)b.focus()}return}
   const cm=curMode();
   const key=[T.phase,T.round,T.segRound,T.ev?T.ev.idx:'',T.quick?T.quick.i+T.quick.sub:'',T.bingo?T.bingo.i+T.bingo.sub:'',T.buzz?T.buzz.by:'',T.fake?T.fake.sub:'',T.herd?T.herd.playing:'',T.vibe?T.vibe.sub:'',
-    T.battle?T.battle.sub+T.battle.duel+T.battle.side:'',T.settings.mode,cm,T.settings.play,LANG,['error','boot'].includes(T.phase)?T.msg:'',T.phase==='deal'&&T.anchor?'a':''].join('|');
-  if(key!==tvKey){tvKey=key;app.innerHTML=tvScreen();afterTV()}
+    T.battle?T.battle.sub+T.battle.duel+T.battle.side:'',T.board?T.board.sub+T.board.turn+(T.board.msg?T.board.msg.txt:''):'',T.settings.mode,cm,T.settings.play,LANG,['error','boot'].includes(T.phase)?T.msg:'',T.phase==='deal'&&T.anchor?'a':''].join('|');
+  if(key!==tvKey){tvKey=key;let h;try{h=tvScreen()}catch(e){console.warn('tvScreen',e);tvKey='';h=`<div class="tv col"><div class="big-center">${vinylHTML('♪',true,'5s')}</div></div>`}app.innerHTML=h;afterTV()}
   tvUpdate()}
 function floatReact(p,e){const fx=document.getElementById('fx');if(!fx||!fx.appendChild)return;const d=document.createElement('div');d.className='react';d.style.left=(6+Math.random()*86)+'%';d.style.setProperty('--c',p.color);d.innerHTML=`<span>${e}</span><small>${esc(p.name)}</small>`;fx.appendChild(d);setTimeout(()=>d.remove(),3300)}
 function unlock(){if(T.unlocked)return;T.unlocked=true;
@@ -4130,17 +4322,41 @@ function startPeer(code){
 function tvInit(){
   document.body.classList.add('is-tv');
   const saved=store.get('dt_settings',null);if(saved){applySettings(saved);if(T.settings.src==='live')T.settings.src='mix'}
-  applyTheme(T.settings.theme);
+  applyTheme(T.settings.theme);applyZoom();
   ['corner','cwarn','welcome'].forEach(id=>{if(!document.getElementById(id)||!document.getElementById(id).parentNode){}});
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('[data-act="unlock"]'))unlock()});
   document.addEventListener('keydown',e=>{const k=e.key;
     if(!T.unlocked){if(k==='Enter'||k===' '||k==='MediaPlayPause'){e.preventDefault();unlock()}return}
-    if((k==='Enter'||k==='n'||k==='N')&&['reveal','quickend','end','segintro'].includes(T.phase))hostNext()});
+    if(k==='p'||k==='P'||k==='MediaPlayPause'||k==='Pause'){togglePause();return}
+    if(T.paused)return;
+    if((k==='Enter'||k==='n'||k==='N')&&['reveal','quickend','end','segintro','board'].includes(T.phase))hostNext()});
   setInterval(tick,250);
   if(!window.Peer){T.phase='error';T.msg=t('errPeerLib');renderTV();return}
   const keep=store.get('dt_tvcode',null);const code=ss.get('dt_tv')||(keep&&Date.now()-keep.ts<12*3600e3?keep.code:null)||genCode();
   startPeer(code);renderTV();
 }
+
+/* ---------- bordspel & pauze (TV) ---------- */
+const BOARD_C=10;
+function boardXY(i,len){const R=Math.ceil(len/BOARD_C);const r=Math.floor(i/BOARD_C);let c=i%BOARD_C;if(r%2===1)c=BOARD_C-1-c;return {x:(c+.5)/BOARD_C*100,y:(R-1-r+.5)/R*100}}
+function sqLegend(){return Object.keys(SQUARES).map(k=>`<span>${SQUARES[k].em} ${t('sqn_'+k)}</span>`).join('')}
+function boardScreen(){const B=T.board;const R=Math.ceil(B.len/BOARD_C);
+  const tiles=B.sq.map((k,i)=>{const p=boardXY(i,B.len);const def=SQUARES[k];const lbl=k==='start'?'🚩':k==='finish'?'🏁':def?def.em:'';
+    return `<div class="bsq ${k} ${def?'special':''}" style="left:${p.x}%;top:${p.y}%;width:${100/BOARD_C}%;height:${100/R}%;--h:${Math.round(i/B.len*300)}"><div><b>${lbl}</b><small>${i+1}</small></div></div>`}).join('');
+  const pawns=[...T.units.values()].map(u=>`<div class="pawn" id="pw-${u.id}" style="--c:${u.color}"><span>${u.emoji}</span></div>`).join('');
+  let banner='';
+  if(B.sub==='intro')banner=`<div class="bbanner"><b>🎲 ${t('m_board')}!</b><span>${t('boardIntro')}</span><div class="legend">${sqLegend()}</div><span class="nextch">${t('nextChallenge')} ${modeEm(B.nextMode)} <b>${t('m_'+B.nextMode)}</b></span></div>`;
+  else if(B.msg&&(B.sub==='event'||B.sub==='move'))banner=`<div class="bbanner ev" style="--c:${B.msg.color}"><div class="bev">${B.msg.em}</div><b>${esc(B.msg.txt)}</b></div>`;
+  else if(B.sub==='idle')banner=`<div class="bbanner sm"><span class="nextch">${t('nextChallenge')} ${modeEm(B.nextMode)} <b>${t('m_'+B.nextMode)}</b> · ${t('hostNextTurn')}</span></div>`;
+  return `<div class="tv col">${tvHead()}<div class="boardwrap"><div class="board" style="width:min(100%,${(64*BOARD_C/R).toFixed(1)}vh);aspect-ratio:${BOARD_C}/${R}">${tiles}${pawns}</div></div><footer id="bchips" class="chips"></footer>${banner}</div>`}
+function updPawns(){const B=T.board;if(!B)return;const groups={};
+  T.units.forEach(u=>{const a=B.anim.get(u.id);const i=a?a.cur:(u.pos||0);(groups[i]=groups[i]||[]).push(u)});
+  const R=Math.ceil(B.len/BOARD_C);
+  Object.entries(groups).forEach(([i,us])=>{const p=boardXY(+i,B.len);us.forEach((u,k)=>{const el=document.getElementById('pw-'+u.id);if(!el||!el.style)return;const off=us.length>1?(k-(us.length-1)/2)*(100/BOARD_C)*.32:0;
+    el.style.left=(p.x+off)+'%';el.style.top=(p.y-(us.length>1?(k%2)*(100/R)*.18:0))+'%';el.classList&&el.classList.toggle('moving',!!B.anim.get(u.id)&&B.anim.get(u.id).cur!==B.anim.get(u.id).to)})});
+  const bc=document.getElementById('bchips');if(bc)bc.innerHTML=[...T.units.values()].sort((a,b)=>(b.pos||0)-(a.pos||0)).map(u=>{const mv=(B.moved||[]).find(m=>m.id===u.id);const st=mv&&mv.st&&B.sub!=='intro'?`<b class="${mv.st>0?'ok':'bad'}">${mv.st>0?'+':''}${mv.st}${u.boosted?' ⚡':''}</b>`:'';
+    return `<div class="chip done" style="--c:${u.color}">${u.emoji} ${esc(uName(u))} · 📍${(u.pos||0)+1} ${st}${u.boost?' ⚡':''}</div>`}).join('')}
+function updPause(){const o=document.getElementById('pauseov');if(!o)return;const on=!!T.paused&&T.unlocked;if(on&&o.hidden)o.innerHTML=`<div class="pausebox"><div class="pz">⏸</div><h1 class="wintitle">${t('pauseT')}</h1><div class="sub">${t('pauseSub')}</div></div>`;o.hidden=!on}
 
 /* =========================================================
    TELEFOON — controller
@@ -4176,10 +4392,11 @@ function openConn(){
 }
 function setLost(on){if(on&&!P.lost)P.lostAt=now();P.lost=on;if(!on)P.fails=0;const l=document.getElementById('lostov');if(l){l.hidden=!on;if(!on)l.dataset.k=''}updLost()}
 function updLost(){const l=document.getElementById('lostov');if(!l||!P.lost)return;const long=now()-P.lostAt>6000;const k=long+LANG;if(l.dataset.k===k)return;l.dataset.k=k;l.innerHTML=`<div class="lostbox"><div class="em">📡</div><b>${t('connLost')}</b><p>${long?t('lostLong'):t('lostShort')}</p><button class="btn big" data-act="reconnect">🔄 ${t('reconnect')}</button></div>`}
-let rT=null;function retry(ms){if(rT)return;rT=setTimeout(()=>{rT=null;if(P.conn&&P.conn.open)return;phoneConnect(P.fails>2&&P.fails%3===0)},ms)}
+let rT=null;function retry(ms){if(rT||P.kicked)return;rT=setTimeout(()=>{rT=null;if(P.conn&&P.conn.open)return;phoneConnect(P.fails>2&&P.fails%3===0)},ms)}
 function onPhoneMsg(m){
   if(!m)return;
   if(m.t==='full'){P.connecting=false;P.status=t('gameFull');renderPhone();return}
+  if(m.t==='kicked'){P.kicked=true;P.joined=false;P.connecting=false;store.set('dt_sess',null);ss.set('dt_joined','');try{P.conn&&P.conn.close()}catch(e){}P.status='';const app=$('#app');if(app)app.innerHTML=`<div class="ph"><div class="hero"><div class="em">👋</div><h2>${t('kickedT')}</h2><p>${t('kickedSub')}</p></div><button class="btn big" data-act="unkick">${t('rejoinAgain')}</button></div>`;['reactbar','lostov','pauseovp'].forEach(id=>{const e=document.getElementById(id);if(e)e.hidden=true});return}
   if(m.t!=='state')return;
   const first=!P.joined;
   P.joined=true;P.connecting=false;if(P.lost)setLost(false);ss.set('dt_joined',P.code);store.set('dt_sess',{code:P.code,name:P.name,emoji:P.emoji,ts:Date.now()});
@@ -4197,6 +4414,7 @@ function onPhoneMsg(m){
   if(m.unit&&m.unit.out&&prev&&prev.unit&&!prev.unit.out)buzz([200,100,400]);
 }
 function mountChrome(){if(!document.getElementById('reactbar')){const d=document.createElement('div');d.id='reactbar';d.className='reactbar';d.innerHTML=REACTS.map(e=>`<button data-act="react" data-v="${e}">${e}</button>`).join('');document.body.appendChild(d)}
+  if(!document.getElementById('pauseovp')){const z=document.createElement('div');z.id='pauseovp';z.className='lostov';z.hidden=true;document.body.appendChild(z)}
   if(!document.getElementById('lostov')){const l=document.createElement('div');l.id='lostov';l.className='lostov';l.hidden=true;document.body.appendChild(l)}}
 function doJoin(){
   const n=(P.name||'').trim();
@@ -4221,6 +4439,7 @@ function phKey(v){const a=v.ans||{};let k=[v.phase,v.round,v.me.host,v.lang,v.mo
   if(v.phase==='quick')k+='|'+v.quick.i+v.quick.sub+'|'+(v.quick.mine!=null);
   if(v.phase==='bingo')k+='|'+v.bingo.sub+'|'+(v.bingo.winner?1:0);
   if(v.phase==='battle'&&v.battle)k+='|'+v.battle.sub+v.battle.duel+'|'+(v.battle.pred!=null)+(v.battle.vote!=null);
+  if(v.phase==='board'&&v.board)k+='|'+v.board.sub+v.board.turn+'|'+(v.board.msg?v.board.msg.txt:'');
   if(v.phase==='error')k+='|'+v.msg;
   return k}
 function joinHTML(){const back=sessOk&&SESS.name&&!P.connecting?`<button class="rejoin" data-act="rejoin"><span class="em">${SESS.emoji||'🎵'}</span><div><b>${t('rejoinBtn',{n:esc(SESS.name)})}</b><small>${t('rejoinSub',{c:SESS.code})}</small></div><span class="go">▶</span></button>`:'';
@@ -4250,21 +4469,22 @@ function hostLobby(){return `<div class="hero sm"><h2>👑 ${t('youLead')}</h2><
     <div id="plive"><div id="linfo"></div><button class="btn cyan" data-act="lchart" style="width:100%">🔥 ${t('liveChart')}</button>
       <div class="row" style="margin-top:8px"><input id="lq" placeholder="${t('liveSearchPh')}" autocomplete="off" enterkeyhint="search"><button class="btn cyan" data-act="lsearch">🔍</button></div>
       <div id="lsug" class="chipset" style="margin-top:8px"></div><div id="lres" class="lres" style="margin-top:8px"></div><p class="small" style="margin-top:6px">${t('liveNote')}</p></div>
-    <h4>🌟 ${t('fame')}</h4><div id="sfame" class="chipset"></div><p class="small" id="sfametip"></p>
+    <h4>🌟 ${t('fame')}</h4><div id="sfame" class="chipset"></div><p class="small" id="sfametip"></p><div id="sheard" class="row small"></div>
   </div>
   <div class="sec"><h3>${t('rules')}</h3><div id="srules"></div></div>
-  <div class="sec"><h3>${t('look')}</h3><h4>${t('theme')}</h4><div id="stheme" class="chipset"></div><h4>${t('language')}</h4><div id="slang" class="chipset"></div><h4>${t('sound')}</h4><div id="svoice" class="chipset"></div></div>
+  <div class="sec"><h3>${t('look')}</h3><h4>${t('theme')}</h4><div id="stheme" class="chipset"></div><h4>${t('language')}</h4><div id="slang" class="chipset"></div><h4>${t('sound')}</h4><div id="svoice" class="chipset"></div><h4>📺 ${t('textSize')}</h4><div id="stext" class="chipset"></div></div>
   <div class="sec" id="secTeam"><h3>${t('yourTeam')}</h3><div id="steam" class="chipset"></div></div>
-  <div class="sec"><h3>${t('players')}</h3><div id="ppl" class="plist"></div></div>
+  <div class="sec"><h3>${t('players')}</h3><p class="small">${t('manageTip')}</p><div id="pman" class="pman"></div></div>
   <p id="poolinfo" class="center"></p><button class="btn big" id="startBtn" data-act="start">▶ ${t('start')}</button>`}
 function guestLobby(v){return `<div class="hero"><div class="em">${v.me.emoji}</div><h2>${t('inGame')}</h2><p>${t('waitLeader')}</p></div><div class="sec"><div id="lobsum"></div></div>
   <div class="sec" id="secTeam"><h3>${t('yourTeam')}</h3><div id="steam" class="chipset"></div></div><div class="sec"><h3>${t('players')}</h3><div id="ppl" class="plist"></div></div>`}
 function topBar(v){const me=v.me,u=v.unit;if(!u)return `<div class="ptop" style="--c:${me.color}"><span class="me">${me.emoji} ${esc(me.name)}${me.host?' 👑':''}</span></div>`;
-  const right=v.cardMode?`<span class="cn">🃏 <b id="pcards">${u.timeline.length}</b>/${v.target}</span><span class="cn">🪙 <b id="pcoins">${u.coins}</b></span>`:`<span class="cn">⭐ <b id="pscore">${u.score}</b></span>`;
+  const right=v.baseMode==='board'?`<span class="cn">📍 <b id="ppos">${(u.pos||0)+1}</b>/${v.boardLen}${u.boost?' ⚡':''}</span>`:v.cardMode?`<span class="cn">🃏 <b id="pcards">${u.timeline.length}</b>/${v.target}</span><span class="cn">🪙 <b id="pcoins">${u.coins}</b></span>`:`<span class="cn">⭐ <b id="pscore">${u.score}</b></span>`;
+  const pz=me.host&&['round','reveal','quick','bingo','battle','segintro','board','quickend'].includes(v.phase)?`<button class="pzbtn" data-act="pause">⏸</button>`:'';
   const lives=v.lives?`<span class="cn" id="plives">${u.out?'💀':'❤️'.repeat(Math.max(0,u.lives))}</span>`:'';
   const x2=v.mult>1?'<span class="cn x2s">×2</span>':'';
   const who=u.team||v.play==='coop'?`${u.emoji} ${esc(u.name)} <small>· ${me.emoji} ${esc(me.name)}${me.host?' 👑':''}</small>`:`${me.emoji} ${esc(me.name)}${me.host?' 👑':''}`;
-  return `<div class="ptop" style="--c:${u.color}"><span class="me">${who}</span>${x2}${lives}${right}</div>`}
+  return `<div class="ptop" style="--c:${u.color}"><span class="me">${who}</span>${x2}${lives}${right}${pz}</div>`}
 function roundPhone(v){const H=v.me.host,u=v.unit,a=v.ans||{},m=v.mode,me=v.me;
   const teamNote=v.play!=='solo'?`<div class="note">${t('teamTip')}</div>`:'';
   const byNote=n=>n&&n!==me.name?`<div class="note">${t('teamChose',{n:esc(n)})}</div>`:'';
@@ -4325,6 +4545,7 @@ function phScreen(v){const me=v.me,H=me.host,u=v.unit;
   if(u&&u.out&&['round','battle'].includes(v.phase))return W(`<div class="hero"><div class="em">💀</div><h2>${t('youOut')}</h2><p>${t('youOutSub')}</p></div><div class="sec"><div id="ppl" class="plist"></div></div>`);
   switch(v.phase){
   case 'boot':case 'lobby':return W(H?hostLobby():guestLobby(v));
+  case 'board':return W(boardPhone(v));
   case 'segintro':return W(`<div class="hero"><div class="em">${modeEm(v.mode)}</div><p>🎪 ${t('partN',{i:v.ev.i+1,n:v.ev.n})}</p><h2>${t('m_'+v.mode)}</h2></div><div class="sec"><p>${t('md_'+v.mode)}</p></div>${H?`<button class="btn big" data-act="next" style="margin-top:auto">${t('startPart')}</button>`:''}`);
   case 'deal':if(v.anchor)return W(`<div class="hero"><div class="em">↕️</div><h2>${t('startCard')}</h2><p>${t('hlExplain')}</p></div><div class="tcard big" style="--c:${decCol(v.anchor.year)}"><b>${v.anchor.year}</b><span>${esc(v.anchor.title)}<br><small>${esc(v.anchor.artist)}</small></span></div>`);
     return W(`<div class="hero"><div class="em">🃏</div><h2>${t('yourStart')}</h2><p>${t('yourStartSub')}</p></div><div id="mytl" class="tl"></div>`);
@@ -4364,7 +4585,7 @@ function phScreen(v){const me=v.me,H=me.host,u=v.unit;
     if(v.play==='coop')title=v.coopWon?t('coopWin'):t('coopLose');else title=w?(v.unit&&w.id===v.unit.id?t('youWin'):t('wins',{n:esc(w.name)})):t('end');
     const rec=v.record?`<p class="center">${t('scoreN',{n:v.record.score})} · ${v.record.isNew?t('newRecord'):t('record',{n:v.record.old})}</p>`:'';
     const hf=v.hitflop;const hfh=hf?`<div class="sec">${hf.hit?`<div class="hrow win"><span>🔥</span><span class="n"><b>${t('hitNight')}</b><br>${esc(hf.hit.title)} — ${esc(hf.hit.artist)}</span><b>${hf.hit.avg.toFixed(1)}⭐</b></div>`:''}${hf.flop?`<div class="hrow"><span>💩</span><span class="n"><b>${t('flopNight')}</b><br>${esc(hf.flop.title)} — ${esc(hf.flop.artist)}</span><b>${hf.flop.avg.toFixed(1)}⭐</b></div>`:''}</div>`:'';
-    return W(`<div class="hero"><div class="em">${v.play==='coop'?(v.coopWon?'🏆':'💔'):w?w.emoji:'🏆'}</div><h2>${title}</h2></div>${rec}<div id="rank"></div>${hfh}<h3>${t('awardsT')}</h3><div id="awl" style="display:flex;flex-direction:column;gap:8px"></div>${nextBtn(t('again'))}`)}
+    return W(`<div class="hero"><div class="em">${v.play==='coop'?(v.coopWon?'🏆':'💔'):w?w.emoji:'🏆'}</div><h2>${title}</h2></div>${rec}<div id="rank"></div>${hfh}<h3>${t('awardsT')}</h3><div id="awl" style="display:flex;flex-direction:column;gap:8px"></div>${`<button class="btn big cyan" data-act="share">📤 ${t('share')}</button>`+nextBtn(t('again'))}`)}
   case 'error':return W(`<div class="hero"><div class="em">😵</div><h2>${t('oops')}</h2><p>${esc(v.msg)}</p></div>${H?`<button class="btn big" data-act="next">${t('tryAgain')}</button><button class="btn ghost big" data-act="lobby">${t('backStart')}</button>`:''}`);
   }return W('')}
 function localPool(s){if(s.src==='pack')return SONGS.filter(x=>[...s.pack].some(c=>x.tags.includes(c))).length;if(s.src==='live')return P.v&&P.v.live?P.v.live.n:0;return SONGS.filter(x=>[...x.tags].some(c=>s.genres.includes(c))&&s.decades.includes(decade(x.year))).length}
@@ -4375,6 +4596,7 @@ function lobbyUpdate(v){const set=(id,h)=>{const e=document.getElementById(id);i
   if(!v.me.host){set('lobsum',`<b>${modeEm(v.baseMode)} ${t('m_'+v.baseMode)}</b><br><span class="small">${t('md_'+v.baseMode)}</span><br>👥 ${v.play==='teams'?t('nTeams',{n:v.teams}):t(v.play)}`);return}
   if(!s)return;
   set('smode',MODES.map(([id,em])=>`<button class="modecard ${s.mode===id?'on':''} ${id==='evening'?'wide':''}" data-act="set" data-k="mode" data-v="${id}"><span class="me">${em}</span><b>${t('m_'+id)}</b><small>${t('md_'+id)}</small></button>`).join(''));
+  if(s.mode==='board'){set('sev',`<h4>${t('boardModesLbl')}</h4><div class="chipset">${BOARD_MODES.map(m=>`<button class="tg ${s.boardModes.includes(m)?'on':''}" data-act="bm" data-v="${m}">${modeEm(m)} ${t('m_'+m)}</button>`).join('')}</div><h4>${t('boardLenLbl')}</h4><div class="chipset">${[20,30,40].map(n=>`<button class="tg ${s.boardLen===n?'on':''}" data-act="set" data-k="boardLen" data-v="${n}">${t('boardLenN',{n})}</button>`).join('')}</div><p class="small">${t('boardTip')}</p>`)}else
   set('sev',s.mode==='evening'?`<h4>${t('evParts')}</h4><div class="chipset">${EV_MODES.map(m=>`<button class="tg ${s.evModes.includes(m)?'on':''}" data-act="ev" data-v="${m}">${modeEm(m)} ${t('m_'+m)}</button>`).join('')}</div><h4>${t('evRoundsLbl')}</h4><div class="chipset">${[3,4,5].map(n=>`<button class="tg ${s.evRounds===n?'on':''}" data-act="set" data-k="evRounds" data-v="${n}">${t('roundsN',{n})}</button>`).join('')}</div><p class="small">${t('evTip')}</p>`:'');
   const noCoop=!COOP_OK.includes(s.mode);
   set('splay',['solo','teams','coop'].map(id=>`<button class="tg ${s.play===id?'on':''}" data-act="set" data-k="play" data-v="${id}" ${id==='coop'&&noCoop?'disabled':''}>${{solo:'🙋',teams:'👥',coop:'🤝'}[id]} ${t(id)}</button>`).join('')+(noCoop?`<p class="small" style="width:100%">${t('coopNA')}</p>`:s.play==='coop'?`<p class="small" style="width:100%">${t('coopTip')}</p>`:''));
@@ -4392,16 +4614,19 @@ function lobbyUpdate(v){const set=(id,h)=>{const e=document.getElementById(id);i
   if(m==='hitster')rules=`<h4>${t('targetLbl')}</h4><div class="chipset">${chips('target',[5,8,10,15],n=>t('cardsN',{n}))}</div><h4>${t('quickLbl')}</h4><div class="chipset">${chips('quick',[0,3,4,6],n=>n?t('quickEvery',{n}):t('quickOff'))}</div>`;
   else if(m==='bingo')rules=`<h4>${t('bingoSize')}</h4><div class="chipset">${chips('bingo',[3,4],n=>n+'×'+n)}</div>`;
   else if(m==='battle')rules=`<h4>${t('battleSizeLbl')}</h4><div class="chipset">${chips('battleSize',[8,16],n=>t('battleN',{n}))}</div>`;
-  else if(m!=='evening')rules=`<h4>${t('roundsLbl')}</h4><div class="chipset">${chips('rounds',[5,10,15,20],n=>t('roundsN',{n}))}</div>`;
+  else if(m!=='evening'&&m!=='board')rules=`<h4>${t('roundsLbl')}</h4><div class="chipset">${chips('rounds',[5,10,15,20],n=>t('roundsN',{n}))}</div>`;
   rules+=`<h4>${t('timeLbl')}</h4><div class="chipset">${chips('time',m==='bingo'?[15,20,30]:[20,30,45],n=>t('timeN',{n}))}</div>`;
-  const livesAble=s.play!=='coop'&&(m==='evening'||LIVES_OK.includes(m));
+  const livesAble=s.play!=='coop'&&m!=='board'&&(m==='evening'||LIVES_OK.includes(m));
   if(livesAble)rules+=`<h4>💀 ${t('lastStanding')}</h4><div class="chipset">${chips('lives',[0,3],n=>n?t('livesN',{n}):t('off'))}</div>`;
-  const dblAble=!['bingo','hitster'].includes(m);
+  const dblAble=!['bingo','hitster','board'].includes(m);
   if(dblAble)rules+=`<h4>×2 ${t('doublePts')}</h4><div class="chipset">${chips('double',[0,1,3],n=>n===0?t('off'):n===1?t('dblLast'):t('dblLast3'))}</div>`;
   set('srules',`<p class="small">${t('md_'+m)}</p>`+rules+(livesAble&&s.lives?`<p class="small">${t('livesTip')}</p>`:'')+(dblAble&&s.double?`<p class="small">${t(m==='evening'?'dblTipEv':'dblTip')}</p>`:''));
   set('sfame',['hits','mix','all'].map(f=>`<button class="tg ${s.fame===f?'on':''}" data-act="set" data-k="fame" data-v="${f}">${t('fameIco_'+f)} ${t('fame_'+f)}</button>`).join(''));set('sfametip',t('fameTip_'+s.fame));
   set('stheme',THEMES.map(([id,em])=>`<button class="tg ${s.theme===id?'on':''}" data-act="set" data-k="theme" data-v="${id}">${em} ${t('th_'+id)}</button>`).join(''));
   set('slang',LANGS.map(([id,fl,nm])=>`<button class="tg ${s.lang===id?'on':''}" data-act="set" data-k="lang" data-v="${id}">${fl} ${nm}</button>`).join(''));
+  set('stext',['S','M','L'].map(z=>`<button class="tg ${s.textSize===z?'on':''}" data-act="set" data-k="textSize" data-v="${z}">${t('ts_'+z)}</button>`).join(''));
+  set('sheard',v.heard?`<span style="flex:1">${t('heardN',{h:v.heard,n:v.pool})}</span><button class="tg" data-act="resetHeard">🔄 ${t('resetHeard')}</button>`:'');
+  set('pman',v.players.map(p=>{const tm=TEAMS.find(x=>x[0]===p.team);const me=p.id===v.me.id;return `<div class="prow ${p.online?'':'off'}" style="--c:${p.color}"><span class="e">${p.emoji}</span><span class="n">${esc(p.name)}${p.host?' 👑':''}${me?' <small>('+t('you')+')</small>':''}${p.online?'':' 📵'}</span>${s.play==='teams'?`<button class="tg team ${tm?'on':''}" style="--c:${tm?tm[1]:'#888'}" data-act="pteam" data-v="${p.id}">${tm?tm[2]:'❔'}</button>`:''}${me?'':`<button class="tg" data-act="mkhost" data-v="${p.id}" ${p.online?'':'disabled'}>👑</button><button class="tg kick ${P.kickArm===p.id?'armed':''}" data-act="pkick" data-v="${p.id}">${P.kickArm===p.id?t('kickSure'):'✖'}</button>`}</div>`}).join(''));
   set('svoice',`<button class="tg ${s.voice?'on':''}" data-act="tog" data-v="voice">${s.voice?'🔊':'🔇'} ${t('announcer')}</button><button class="tg ${s.crowd?'on':''}" data-act="tog" data-v="crowd">${s.crowd?'👏':'🔇'} ${t('crowdSounds')}</button>`);
   const n=v.pool;set('poolinfo',s.src==='live'&&!v.live?t('liveNone'):t('poolN',{n}));
   const need=m==='bingo'?(s.bingo===4?28:16):m==='battle'?s.battleSize+2:m==='evening'?12:8;const sb=document.getElementById('startBtn');if(sb)sb.disabled=n<need;
@@ -4412,12 +4637,14 @@ function phUpdate(v){const me=v.me,u=v.unit;const set=(id,h)=>{const e=document.
   set('ppl',v.players.map(p=>{const pu=v.units.find(x=>x.id===p.unit);const dn=pu&&pu.done===2;return `<div class="pp ${p.online?'':'off'}" style="--c:${p.color};--tc:${tcol(p)}"><span class="e">${p.emoji}</span>${esc(p.name)}${p.host?' 👑':''}${v.play==='teams'&&p.team?'<i></i>':''}${dn?' ✅':''}${p.online?'':' 📵'}${pu&&pu.out?' 💀':''}</div>`}).join(''));
   if(u)set('mytl',u.timeline.map(c=>`<div class="tcard ${v.song&&c.title===v.song.title&&c.year===v.song.year?'new':''}" style="--c:${decCol(c.year)}"><b>${c.year}</b><span>${esc(c.title)}<br><small>${esc(c.artist)}</small></span></div>`).join(''));
   const rk=v.ranking||(v.phase==='quickend'?v.units.slice().sort((a,b)=>b.score-a.score||b.coins-a.coins):null);
-  if(rk)set('rank',rk.map((x,i)=>`<div class="rankrow" style="--c:${x.color};animation-delay:${(i*.08).toFixed(2)}s"><span class="pos">${i+1}</span><span>${x.emoji}</span><span class="n">${esc(x.name)}${x.out?' 💀':''}</span><span>${v.cardMode?'🃏':'⭐'} ${x.score}</span>${v.cardMode?`<span class="gold">🪙 ${x.coins}</span>`:''}</div>`).join(''));
+  if(rk)set('rank',rk.map((x,i)=>`<div class="rankrow" style="--c:${x.color};animation-delay:${(i*.08).toFixed(2)}s"><span class="pos">${i+1}</span><span>${x.emoji}</span><span class="n">${esc(x.name)}${x.out?' 💀':''}</span><span>${v.baseMode==='board'?'📍':v.cardMode?'🃏':'⭐'} ${x.score}</span>${v.cardMode?`<span class="gold">🪙 ${x.coins}</span>`:''}</div>`).join(''));
   if(v.awards)set('awl',v.awards.length?v.awards.map((a,i)=>`<div class="awardrow ${a.pid===me.id?'mine':''}" style="--c:${a.color};animation-delay:${(i*.12).toFixed(2)}s"><span class="ae">${a.em}</span><div><b>${esc(a.title)}</b><small>${a.emoji} ${esc(a.name)} · ${esc(a.d)}</small></div></div>`).join(''):`<p>${t('awardsNone')}</p>`);
   if(v.bingo){const B=v.bingo;const mk=new Set(B.marks);const col=u?u.color:'#ffd23f';
     set('bgrid',B.cells.map((c,i)=>`<button class="cell ${mk.has(i)?'on':''} ${mk.has(i)&&!P.prevMarks.has(i)?'just':''}" style="--c:${col}" data-act="cell" data-i="${i}" ${mk.has(i)?'disabled':''}><b>${esc(c.title)}</b><small>${esc(c.artist)}</small></button>`).join('')+'<div id="block"></div>');
     P.prevMarks=mk;set('bsong',B.song?`${t('thatWas')} <b>${esc(B.song.title)}</b> — ${esc(B.song.artist)}`:'');updLock()}
-  if(v.phase==='lobby'||v.phase==='boot')lobbyUpdate(v)}
+  if(v.phase==='lobby'||v.phase==='boot')lobbyUpdate(v);
+  const pp=document.getElementById('ppos');if(pp&&u)pp.textContent=(u.pos||0)+1;
+  updPausePhone(v)}
 function updLock(){const b=document.getElementById('block');if(!b)return;const rem=P.lockUntil-now();b.innerHTML=rem>0?`<div class="lockov">🔒 ${Math.ceil(rem/1000)}</div>`:'';if(rem>0)b.style.cssText='position:absolute;inset:0';else b.style.cssText=''}
 function renderPhone(){if(MODE!=='phone')return;const app=$('#app');if(!app)return;
   if(!P.joined){LANG=P.lang;P.key='';app.innerHTML=joinHTML();return}
@@ -4467,6 +4694,14 @@ function phoneClick(e){const b=e.target.closest&&e.target.closest('[data-act]');
   case 'lload':send({t:'lload',id:b.dataset.v});return;
   case 'lclear':send({t:'lclear'});return;
   case 'start':if(v&&!v.tvReady){const w=document.getElementById('tvwarn');if(w)w.innerHTML=`<div class="lost">${t('pressTvFirst')}</div>`}send({t:'start'});b.disabled=true;setTimeout(()=>{b.disabled=false},3000);return;
+  case 'pause':send({t:'pause'});return;
+  case 'share':shareResults(v);return;
+  case 'unkick':P.kicked=false;renderPhone();return;
+  case 'resetHeard':send({t:'resetHeard'});return;
+  case 'mkhost':send({t:'mkhost',id:b.dataset.v});return;
+  case 'pkick':if(P.kickArm===b.dataset.v){send({t:'kick',id:b.dataset.v});P.kickArm=null}else{P.kickArm=b.dataset.v;setTimeout(()=>{if(P.kickArm===b.dataset.v){P.kickArm=null;if(v)phUpdate(v)}},3000)}phUpdate(v);return;
+  case 'pteam':{const p=v.players.find(x=>x.id===b.dataset.v);if(!p)return;const ids=TEAMS.slice(0,(v.settings&&v.settings.teams)||2).map(x=>x[0]);const i=ids.indexOf(p.team);send({t:'setteam',id:p.id,team:ids[(i+1)%ids.length]});return}
+  case 'bm':{if(!v||!v.settings)return;const s=S();const e=new Set(s.boardModes);e.has(b.dataset.v)?e.delete(b.dataset.v):e.add(b.dataset.v);if(e.size<2)return;s.boardModes=BOARD_MODES.filter(x=>e.has(x));pushSettings(s);return}
   case 'next':case 'replay':case 'skip':case 'lobby':send({t:a});if(a==='next'||a==='skip'){b.disabled=true;setTimeout(()=>{b.disabled=false},2000)}return;
   }}
 function phoneInit(){
@@ -4477,6 +4712,7 @@ function phoneInit(){
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&P.joined){wake();if(!P.conn||!P.conn.open){setLost(true);retry(200)}}});
   window.addEventListener('online',()=>{if(P.joined&&(!P.conn||!P.conn.open))phoneConnect(true)});
   setInterval(()=>{const v=P.v;if(v){
+    if(v.paused){if(P.pzRem==null)P.pzRem=[P.deadline-now(),(P.bdeadline||0)-now()];P.deadline=now()+P.pzRem[0];P.bdeadline=now()+P.pzRem[1]}else P.pzRem=null;
     const b=document.getElementById('pbar');if(b&&!v.buzz){const tot=v.phase==='quick'?QUICK_MS:v.phase==='bingo'?(v.bingo&&v.bingo.sub==='show'?SHOW_MS:Math.min(v.time||30,30)*1000):v.phase==='battle'?(v.battle&&v.battle.sub==='duel'?DUEL_CLIP*2+Math.max(12,Math.min(20,v.time||30))*1000:25000):v.mode==='fake'&&v.fake&&v.fake.sub==='vote'?25000:v.mode==='fake'?((v.time||30)+20)*1000:v.mode==='herd'?Math.max(45,(v.time||30)+28)*1000:v.mode==='vibe'&&v.vibe&&v.vibe.sub==='pick'?25000:v.mode==='vibe'?Math.max(25,v.time||30)*1000:Math.max(v.mode==='chip'?20:0,v.time||30)*1000;
       const rem=Math.max(0,P.deadline-now());b.style.width=Math.min(100,rem/tot*100)+'%';b.classList.toggle('hot',rem<5000)}
     const bb=document.getElementById('bbar');if(bb){const rem=Math.max(0,P.bdeadline-now());bb.style.width=Math.min(100,rem/BUZZ_MS*100)+'%';bb.classList.toggle('hot',rem<3000)}
@@ -4487,6 +4723,28 @@ function phoneInit(){
 }
 setupIcons();
 if(MODE==='tv')tvInit();else phoneInit();
+
+/* ---------- bordspel, pauze & delen (telefoon) ---------- */
+function boardPhone(v){const B=v.board||{};const H=v.me.host;const nb=H&&(B.sub==='intro'||B.sub==='idle')?`<button class="btn big" data-act="next" style="margin-top:auto">${t('nextTurn')}</button>`:'';
+  const st=B.steps?`<div class="verdict ${B.steps>0?'ok':'bad'}">${B.steps>0?'+':''}${B.steps} ${t('squaresWord')}</div>`:'';
+  const msg=B.msg?`<div class="evcard"><span>${B.msg.em}</span><b>${esc(B.msg.txt)}</b></div>`:'';
+  const nxt=B.next&&(B.sub==='intro'||B.sub==='idle')?`<div class="sec"><p>${t('nextChallenge')}</p><h3>${modeEm(B.next)} ${t('m_'+B.next)}</h3><p class="small">${t('md_'+B.next)}</p></div>`:'';
+  return `<div class="hero"><div class="em">🎲</div><h2>${t('lookBoard')}</h2><p>${t('yourPos2',{p:(B.pos||0)+1,n:B.len})}</p></div>${B.sub!=='intro'?st:`<p class="center">${t('boardIntro')}</p>`}${B.boost?`<div class="note">⚡ ${t('boostOn')}</div>`:''}${msg}${nxt}${nb}`}
+function updPausePhone(v){const o=document.getElementById('pauseovp');if(!o)return;const on=!!v.paused;const k=on+'|'+v.me.host+LANG;if(o.dataset.k!==k){o.dataset.k=k;o.innerHTML=on?`<div class="lostbox"><div class="em">⏸</div><b>${t('pauseT')}</b><p>${t('pauseSub')}</p>${v.me.host?`<button class="btn big" data-act="pause">${t('resume')}</button>`:''}</div>`:''}o.hidden=!on}
+function shareResults(v){try{const W=1080,Hh=1350;const c=document.createElement('canvas');c.width=W;c.height=Hh;const x=c.getContext('2d');if(!x)return;
+  const g=x.createLinearGradient(0,0,W,Hh);g.addColorStop(0,'#2a0f4d');g.addColorStop(.55,'#0b0618');g.addColorStop(1,'#3b0a45');x.fillStyle=g;x.fillRect(0,0,W,Hh);
+  const F=(w,s)=>`${w} ${s}px "DM Sans", "Segoe UI", system-ui, sans-serif`;x.textAlign='center';x.fillStyle='#ff3d9a';x.font=F(900,74);x.fillText('🎶 Draaitafel',W/2,120);
+  x.fillStyle='#b9abd9';x.font=F(600,34);x.fillText(new Date().toLocaleDateString(v.lang==='en'?'en-GB':'nl-BE',{day:'numeric',month:'long',year:'numeric'})+' · '+t('m_'+(v.baseMode||v.mode)),W/2,175);
+  const rk=v.ranking||[];const w=rk[0];x.fillStyle='#ffd23f';x.font=F(900,64);x.fillText(v.play==='coop'?(v.coopWon?t('coopWin'):t('coopLose')):w?t('wins',{n:w.name}):t('end'),W/2,280);
+  x.textAlign='left';let y=370;const lbl=v.baseMode==='board'?'📍':v.cardMode?'🃏':'⭐';
+  rk.slice(0,6).forEach((u,i)=>{x.fillStyle='rgba(255,255,255,.08)';x.fillRect(90,y-58,900,84);x.fillStyle=u.color;x.fillRect(90,y-58,14,84);x.fillStyle='#fff';x.font=F(800,44);x.fillText(`${['🥇','🥈','🥉'][i]||(i+1)+'.'} ${u.emoji} ${u.name}`,130,y);x.textAlign='right';x.fillText(`${u.score} ${lbl}`,960,y);x.textAlign='left';y+=100});
+  y+=20;const aw=(v.awards||[]).slice(0,4);if(aw.length){x.fillStyle='#ffd23f';x.font=F(800,40);x.fillText('🏅 '+t('awardsT').replace(/🏅\s*/,''),90,y);y+=60;
+    aw.forEach(a=>{x.fillStyle='#fff';x.font=F(700,34);x.fillText(`${a.em} ${a.title}: ${a.emoji} ${a.name}`,110,y);y+=52})}
+  const hf=v.hitflop;if(hf&&hf.hit&&y<Hh-120){y+=20;x.fillStyle='#ffd23f';x.font=F(700,34);x.fillText(`🔥 ${t('hitNight')}: ${hf.hit.title}`,90,y);y+=50;if(hf.flop){x.fillStyle='#b9abd9';x.fillText(`💩 ${t('flopNight')}: ${hf.flop.title}`,90,y)}}
+  x.textAlign='center';x.fillStyle='#b9abd9';x.font=F(600,30);x.fillText('🎶 '+location.host+location.pathname.replace(/index\.html$/,''),W/2,Hh-60);
+  c.toBlob(b=>{if(!b)return;const f=new File([b],'draaitafel-uitslag.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:t('shareTitle')}).catch(()=>{})}
+    else{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='draaitafel-uitslag.png';document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),500)}},'image/png')}catch(e){}}
 </script>
 </body>
 </html>
