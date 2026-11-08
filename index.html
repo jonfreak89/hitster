@@ -1,0 +1,1035 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Draaitafel</title>
+<meta name="theme-color" content="#0b0618">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Unbounded:wght@600;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0b0618;--ink:#f6f1ff;--mute:#b9abd9;--pink:#ff3d9a;--cyan:#22d3ee;--yel:#ffd23f;--grn:#3ee08f;--red:#ff5a5f;--glass:rgba(255,255,255,.07);--line:rgba(255,255,255,.14);--hd:'Unbounded',system-ui,sans-serif;--bd:'DM Sans',system-ui,sans-serif}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--bd);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+body.is-tv{overflow:hidden;cursor:default}
+#bg{position:fixed;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(120% 80% at 50% 120%,#2a0f4d 0,#0b0618 60%)}
+#bg i{position:absolute;width:60vmax;height:60vmax;border-radius:50%;filter:blur(80px);opacity:.33;animation:drift 22s ease-in-out infinite alternate}
+#bg i:nth-child(1){background:var(--pink);left:-20vmax;top:-25vmax}
+#bg i:nth-child(2){background:var(--cyan);right:-25vmax;top:10vmax;animation-delay:-7s;opacity:.2}
+#bg i:nth-child(3){background:#7c3aed;left:20vmax;bottom:-35vmax;animation-delay:-14s}
+@keyframes drift{to{transform:translate(8vmax,6vmax) scale(1.15)}}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+h1,h2,h3,.hd{font-family:var(--hd)}
+.logo{display:flex;align-items:center;gap:.4em}
+.logo h1{font-size:inherit;font-weight:900;letter-spacing:-.02em}
+.logo h1 span{color:var(--pink)}
+.mini-vinyl{width:1em;height:1em;flex:none;border-radius:50%;background:radial-gradient(circle,var(--yel) 0 17%,#111 18% 21%,transparent 22%),repeating-radial-gradient(circle,#151515 0 2px,#2a2a2a 2px 4px);animation:spin 2.4s linear infinite;box-shadow:0 0 0 2px rgba(255,255,255,.08)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pop{from{transform:scale(.3);opacity:0}}
+@keyframes bob{to{transform:translateY(-8%) rotate(6deg)}}
+.btn{font:700 1rem var(--bd);border:0;border-radius:16px;padding:14px 18px;background:linear-gradient(135deg,var(--pink),#ff7a59);color:#fff;cursor:pointer;box-shadow:0 8px 24px -8px rgba(255,61,154,.6);transition:transform .1s,opacity .2s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.35;box-shadow:none}
+.btn.big{width:100%;font-size:1.15rem;padding:18px}
+.btn.ghost{background:var(--glass);box-shadow:none;border:1px solid var(--line)}
+.btn.cyan{background:linear-gradient(135deg,var(--cyan),#3b82f6);box-shadow:0 8px 24px -8px rgba(34,211,238,.6)}
+.ok{color:var(--grn);font-weight:800}.bad{color:var(--red);font-weight:800}.gold{color:var(--yel);font-weight:800}
+
+/* ---------- TV ---------- */
+.tv{height:100vh;width:100vw;padding:4vh 5vw;display:flex;font-size:2.2vh}
+.col{flex-direction:column}
+.unlock{flex-direction:column;align-items:center;justify-content:center;gap:4vh;text-align:center}
+.unlock .logo{font-size:11vh}
+.unlock .btn{font-size:4vh;padding:2.5vh 6vh;border-radius:3vh}
+.unlock .btn:focus{outline:.6vh solid var(--yel);outline-offset:.6vh}
+.lobby{gap:5vw;align-items:center}
+.lob-left{flex:1.1;display:flex;flex-direction:column;gap:3vh;min-width:0}
+.lob-left .logo{font-size:10vh}
+.tag{font-size:3vh;color:var(--mute)}
+.qrbox{display:flex;gap:3vh;align-items:center;background:var(--glass);border:1px solid var(--line);border-radius:3vh;padding:3vh}
+#qr{width:30vh;height:30vh;background:#fff;border-radius:2vh;padding:1.5vh;flex:none}
+#qr img,#qr canvas{width:100%!important;height:100%!important;display:block}
+.lbl{font-size:2vh;color:var(--mute);text-transform:uppercase;letter-spacing:.15em;margin-top:1vh}
+.url{font-size:2.3vh;word-break:break-all;color:var(--cyan);font-weight:700}
+.code{font:900 9vh/1 var(--hd);letter-spacing:.12em;color:var(--yel);text-shadow:0 0 4vh rgba(255,210,63,.4)}
+.lob-right{flex:1;display:flex;flex-direction:column;gap:2.2vh;min-width:0}
+.lob-right h2{font-size:4vh}
+.pgrid{display:flex;flex-wrap:wrap;gap:1.6vh;min-height:8vh}
+.pbub{display:flex;align-items:center;gap:1.2vh;padding:1vh 2.2vh 1vh 1vh;border-radius:99px;background:rgba(255,255,255,.08);border:.3vh solid var(--c);font-weight:800;font-size:2.8vh;animation:pop .5s cubic-bezier(.3,1.6,.5,1) both}
+.pbub .em{font-size:3.6vh;width:6vh;height:6vh;display:grid;place-items:center;background:var(--c);border-radius:50%}
+.pbub.off{opacity:.4}
+.empty{color:var(--mute);font-size:3vh}
+.setsum,.rules{background:var(--glass);border:1px solid var(--line);border-radius:2vh;padding:2vh 2.4vh;font-size:2.3vh;line-height:1.65;color:var(--mute)}
+.setsum b,.rules b{color:var(--ink)}
+.hint{color:var(--mute);font-size:2.3vh}
+.tvtop{display:flex;align-items:center;gap:2vw}
+.pill{font:800 3vh var(--hd);background:var(--glass);border:1px solid var(--line);padding:1.2vh 2.6vh;border-radius:99px;white-space:nowrap}
+.goal{color:var(--mute);font-size:2.6vh;flex:1}
+.goal b{color:var(--ink)}
+.timer{width:13vh;height:13vh;position:relative;flex:none}
+.timer svg{width:100%;height:100%;transform:rotate(-90deg)}
+.timer circle{fill:none;stroke-width:8}
+.timer .bgc{stroke:rgba(255,255,255,.12)}
+#tmrc{stroke:var(--cyan);stroke-linecap:round;stroke-dasharray:283;transition:stroke-dashoffset .25s linear,stroke .3s}
+#tmrc.hot{stroke:var(--red)}
+#tmrt{position:absolute;inset:0;display:grid;place-items:center;font:900 4.5vh var(--hd)}
+.stage{flex:1;display:flex;align-items:center;justify-content:center;gap:5vw;min-height:0}
+.deck{position:relative;width:50vh;height:50vh;flex:none}
+.deck::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;background:conic-gradient(from 20deg,transparent 0 8%,rgba(255,255,255,.13) 12%,transparent 18% 52%,rgba(255,255,255,.08) 60%,transparent 68%)}
+.vinyl{position:absolute;inset:0;border-radius:50%;background:repeating-radial-gradient(circle,#121212 0 .35vh,#202020 .35vh .7vh);box-shadow:0 3vh 8vh rgba(0,0,0,.6),0 0 0 .8vh #0a0a0a}
+.vinyl.spin{animation:spin 1.8s linear infinite}
+.vinyl .label{position:absolute;inset:32%;border-radius:50%;background:conic-gradient(var(--pink),var(--yel),var(--cyan),var(--pink));display:grid;place-items:center;font:900 7vh var(--hd);color:#fff;text-shadow:0 .4vh 1vh rgba(0,0,0,.45)}
+.arm{position:absolute;right:-5vh;top:-4vh;width:4vh;height:34vh;transform-origin:50% 3vh;transform:rotate(24deg);z-index:2}
+.arm::before{content:'';position:absolute;left:50%;top:0;width:1vh;height:100%;margin-left:-.5vh;background:linear-gradient(#eee,#888);border-radius:1vh}
+.arm::after{content:'';position:absolute;left:50%;top:0;width:6vh;height:6vh;margin:-3vh 0 0 -3vh;border-radius:50%;background:radial-gradient(circle,#ddd,#555)}
+.arm i{position:absolute;bottom:-2vh;left:50%;width:3vh;height:5vh;margin-left:-1.5vh;background:#bbb;border-radius:.6vh}
+.eq{display:flex;align-items:center;gap:.8vh;height:30vh}
+.eq i{width:1.4vh;height:100%;border-radius:1vh;background:linear-gradient(var(--pink),var(--cyan));animation:eq .8s ease-in-out infinite alternate}
+@keyframes eq{0%{transform:scaleY(.12)}100%{transform:scaleY(1)}}
+.ask{text-align:center;font-size:2.8vh;color:var(--mute);margin:1vh 0 2vh}
+.ask b{color:var(--yel);font-family:var(--hd);font-size:4vh;display:block;margin-bottom:.6vh}
+.chips{display:flex;flex-wrap:wrap;gap:1.2vh;justify-content:center;min-height:6vh}
+.chip{padding:1vh 2vh;border-radius:99px;background:var(--glass);border:.3vh solid rgba(255,255,255,.15);font-weight:700;font-size:2.5vh;transition:all .3s}
+.chip.done{border-color:var(--c);background:rgba(255,255,255,.14)}
+.reveal{gap:5vw;align-items:center}
+.rv-card{flex:none;width:46vh;background:linear-gradient(160deg,#fff,#efe7ff);color:#1a0b33;border-radius:3vh;padding:3vh;box-shadow:0 4vh 10vh rgba(0,0,0,.5);animation:flip 1s cubic-bezier(.2,.9,.3,1.2) both;text-align:center}
+@keyframes flip{from{transform:perspective(120vh) rotateY(100deg) scale(.8);opacity:0}}
+.rv-card img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:2vh;display:block;background:#ddd}
+.rv-card .year{font:900 10vh/1 var(--hd);margin-top:2vh;background:linear-gradient(90deg,var(--pink),#7c3aed);-webkit-background-clip:text;background-clip:text;color:transparent}
+.rv-card .ttl{font:800 3.2vh var(--hd);margin-top:1vh}
+.rv-card .art{font-size:2.7vh;color:#5b4a7a;margin-top:.5vh}
+.rv-side{flex:1;display:flex;flex-direction:column;gap:2vh;min-width:0}
+.rv-side h2{font-size:4vh}
+.bonusline{font-size:2.6vh;color:var(--mute)}
+.res{display:flex;flex-direction:column;gap:1vh}
+.rrow{display:flex;align-items:center;gap:1.6vh;background:var(--glass);border:1px solid var(--line);border-left:.8vh solid var(--c);border-radius:1.6vh;padding:1.1vh 2vh;font-size:2.6vh;animation:slidein .5s both}
+.rrow .em{font-size:3.2vh}.rrow .nm{font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@keyframes slidein{from{transform:translateX(6vh);opacity:0}}
+.scores{display:flex;flex-direction:column;gap:1.1vh}
+.srow{display:grid;grid-template-columns:5vh minmax(0,16vh) 1fr auto auto;align-items:center;gap:1.4vh;font-size:2.5vh}
+.sem{font-size:3.2vh}.snm{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sbar{display:flex;gap:.5vh}
+.sbar i{flex:1;max-width:3.5vh;height:3vh;border-radius:.6vh;box-shadow:inset 0 -.4vh 0 rgba(0,0,0,.25)}
+.sbar i.e{background:rgba(255,255,255,.08);box-shadow:none}
+.snum{font-weight:800;font-family:var(--hd)}.scoin{color:var(--yel);font-weight:700}
+.qhead .pill{background:linear-gradient(135deg,var(--yel),#ff7a59);color:#1a0b33;border:0}
+.qbarw{height:2vh;background:rgba(255,255,255,.1);border-radius:1vh;overflow:hidden;margin:2vh 0}
+#qbar{height:100%;width:100%;background:linear-gradient(90deg,var(--yel),var(--pink));border-radius:1vh;transition:width .25s linear}
+.qstage{flex:1;display:flex;gap:4vw;align-items:center;min-height:0}
+.qstage .deck{width:36vh;height:36vh}
+.qopts{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:2vh}
+.qopt{background:var(--glass);border:.3vh solid var(--line);border-radius:2vh;padding:2.6vh;font:800 3vh var(--hd);display:flex;gap:2vh;align-items:center;transition:all .4s;min-width:0}
+.qopt .ltr{width:6vh;height:6vh;border-radius:1.4vh;display:grid;place-items:center;flex:none;color:#1a0b33}
+.qopt.right{border-color:var(--grn);background:rgba(62,224,143,.2);transform:scale(1.04)}
+.qopt.dim{opacity:.28}
+.L0{background:var(--pink)}.L1{background:var(--cyan)}.L2{background:var(--yel)}.L3{background:var(--grn)}
+.big-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3vh;min-height:0}
+.zap{font:900 15vh/1 var(--hd);background:linear-gradient(90deg,var(--yel),var(--pink),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;animation:zap .5s ease-in-out infinite alternate}
+@keyframes zap{to{transform:scale(1.06) rotate(-2deg)}}
+.sub{font-size:3.2vh;color:var(--mute)}
+.wintitle{font:900 9vh/1.05 var(--hd)}
+.crown{font-size:15vh;animation:bob 1.2s ease-in-out infinite alternate}
+.panel{background:var(--glass);border:1px solid var(--line);border-radius:3vh;padding:3vh;width:min(110vh,90vw)}
+.deal-grid{display:flex;flex-wrap:wrap;gap:2vh;justify-content:center}
+.dcard{background:#fff;color:#1a0b33;border-radius:2vh;padding:2vh 3vh;text-align:center;min-width:24vh;max-width:34vh;animation:pop .6s both;border-top:1.2vh solid var(--c)}
+.dcard .who{font-size:2.4vh;font-weight:800}.dcard .y{font:900 6vh var(--hd)}.dcard .t{font-size:2vh;font-weight:700}
+
+/* ---------- PHONE ---------- */
+.ph{max-width:520px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));min-height:100vh;display:flex;flex-direction:column;gap:14px}
+.ph h2{font-size:1.35rem;line-height:1.2}
+.ph h3{font-size:.95rem}
+.ph p{color:var(--mute)}
+.ph label{font-weight:700;font-size:.9rem;color:var(--mute);margin-top:6px}
+.ph input{font:600 1.1rem var(--bd);padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);width:100%;outline:none}
+.ph input:focus{border-color:var(--cyan)}
+.codein{text-transform:uppercase;letter-spacing:.3em;font-family:var(--hd)!important;text-align:center;font-size:1.6rem!important}
+.join .logo{font-size:2.4rem;justify-content:center;margin:24px 0 4px}
+.emojis{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.emojis button{font-size:1.45rem;aspect-ratio:1;border-radius:12px;border:2px solid transparent;background:rgba(255,255,255,.06)}
+.emojis button.on{border-color:var(--yel);background:rgba(255,210,63,.15)}
+.status{text-align:center;min-height:1.4em}
+.ptop{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:rgba(20,10,40,.85);border:1px solid var(--line);border-left:6px solid var(--c);position:sticky;top:8px;z-index:5}
+.ptop .me{font-weight:800;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ptop .cn{font-weight:800;font-family:var(--hd);font-size:.92rem;white-space:nowrap}
+.lost{background:var(--red);color:#fff;padding:8px 12px;border-radius:12px;text-align:center;font-weight:700;font-size:.9rem}
+.sec{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.sec.dim{opacity:.4;pointer-events:none}
+.chipset{display:flex;flex-wrap:wrap;gap:8px}
+.tg{font:700 .95rem var(--bd);padding:10px 14px;border-radius:99px;border:2px solid var(--line);background:transparent;color:var(--mute)}
+.tg.on{border-color:var(--cyan);background:rgba(34,211,238,.15);color:var(--ink)}
+.row{display:flex;gap:8px;align-items:center}
+.row input{flex:1;min-width:0}
+.plist{display:flex;flex-wrap:wrap;gap:8px}
+.pp{padding:5px 12px 5px 5px;border-radius:99px;background:rgba(255,255,255,.07);display:flex;gap:6px;align-items:center;font-weight:700;font-size:.9rem;border:2px solid var(--c)}
+.pp.off{opacity:.4}
+.pp .e{width:28px;height:28px;border-radius:50%;background:var(--c);display:grid;place-items:center}
+.hero{text-align:center;padding:18px 0 4px}
+.hero .em{font-size:4.5rem;animation:bob 1.4s ease-in-out infinite alternate;display:inline-block}
+.pbarw{height:8px;border-radius:8px;background:rgba(255,255,255,.1);overflow:hidden;flex:none}
+#pbar{height:100%;width:100%;background:linear-gradient(90deg,var(--cyan),var(--pink));transition:width .2s linear}
+#pbar.hot{background:var(--red)}
+.tl{display:flex;flex-direction:column;gap:6px}
+.slot{border:2px dashed rgba(255,255,255,.22);border-radius:14px;padding:12px;color:var(--mute);font:700 .95rem var(--bd);background:transparent;text-align:center;transition:all .15s}
+.slot.sel{border-style:solid;border-color:var(--yel);background:rgba(255,210,63,.14);color:var(--ink);padding:18px;font-size:1.05rem}
+.tcard{display:flex;align-items:center;gap:12px;background:#fff;color:#1a0b33;border-radius:14px;padding:10px 12px;border-left:8px solid var(--c)}
+.tcard b{font:900 1.3rem var(--hd);min-width:3.2em}
+.tcard span{font-size:.88rem;line-height:1.25;font-weight:700}
+.tcard small{font-weight:500;color:#5b4a7a}
+.tcard.new{animation:pop .6s both;box-shadow:0 0 0 3px var(--yel)}
+.opts{display:grid;gap:10px}
+.opt{font:800 1.05rem var(--bd);padding:18px 16px;border-radius:16px;border:0;color:#1a0b33;text-align:left;display:flex;gap:12px;align-items:center;transition:opacity .2s}
+.opt .ltr{font-family:var(--hd);width:34px;height:34px;border-radius:10px;background:rgba(0,0,0,.15);display:grid;place-items:center;flex:none}
+.o0{background:var(--pink);color:#fff}.o1{background:var(--cyan)}.o2{background:var(--yel)}.o3{background:var(--grn)}
+.opt.picked{outline:4px solid #fff;outline-offset:2px}
+.opt.dim{opacity:.3}
+.verdict{text-align:center;font:900 1.8rem var(--hd);padding:8px 0}
+.songcard{background:#fff;color:#1a0b33;border-radius:20px;padding:14px;display:flex;gap:14px;align-items:center}
+.songcard img{width:84px;height:84px;border-radius:12px;object-fit:cover;flex:none;background:#ddd}
+.songcard .y{font:900 2rem/1 var(--hd);color:var(--pink)}
+.songcard .t{font-weight:800}.songcard .a{color:#5b4a7a;font-size:.9rem}
+.links{display:flex;gap:8px}
+.links a{flex:1;text-align:center;padding:12px;border-radius:14px;font-weight:800;text-decoration:none;color:#fff;font-size:.95rem}
+.sp{background:#1db954}.dzl{background:#a238ff}
+.hostctl{display:flex;gap:8px;margin-top:auto}
+.hostctl .btn{flex:1;font-size:.9rem;padding:12px}
+.mini-tl{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.mini-tl .tcard{flex:none;flex-direction:column;align-items:flex-start;gap:2px;width:122px;padding:8px 10px;border-left:0;border-top:6px solid var(--c)}
+.mini-tl .tcard b{font-size:1.1rem}
+.mini-tl .tcard span{font-size:.72rem}
+.rankrow{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:var(--glass);border-left:6px solid var(--c);font-weight:700;margin-bottom:6px}
+.rankrow .pos{font:900 1.1rem var(--hd);width:24px}
+.rankrow .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="bg"><i></i><i></i><i></i></div>
+<div id="app"></div>
+<canvas id="confetti"></canvas>
+<script>
+'use strict';
+/* =========================================================
+   DRAAITAFEL — muziekquiz: TV = speelbord, telefoons = controllers
+   Muziek: gratis 30s-fragmenten via de openbare Deezer API
+   Verbinding: PeerJS (WebRTC), gratis openbare koppelserver
+   ========================================================= */
+const PREFIX='draaitafel-v1-';
+const GENRES=[['p','Pop'],['r','Rock'],['d','Dance'],['h','Hiphop & R&B'],['n','Nederlandstalig'],['b','Belgisch'],['f','Film & Disney']];
+const DECADES=[1960,1970,1980,1990,2000,2010,2020];
+const DEC_COL={1960:'#f59e0b',1970:'#f97316',1980:'#ff3d9a',1990:'#a855f7',2000:'#3b82f6',2010:'#22d3ee',2020:'#3ee08f'};
+const EMOJIS=['🦊','🐸','🐼','🦄','🐙','🐯','🦖','🐧','🤖','👽','🎸','🍕','🌵','🐝','🦉','🐳'];
+const COLORS=['#ff3d9a','#22d3ee','#ffd23f','#3ee08f','#a78bfa','#fb923c','#f472b6','#60a5fa','#facc15','#34d399','#e879f9','#38bdf8'];
+const QUICK_MS=12000;
+
+/* Titel|Artiest|Jaar|tags  (p pop, r rock, d dance, h hiphop/r&b/soul, n nederlandstalig, b belgisch, f film/disney) */
+const RAW=`
+Stand by Me|Ben E. King|1961|h
+Can't Help Falling in Love|Elvis Presley|1961|pf
+Hit the Road Jack|Ray Charles|1961|h
+Kom van dat dak af|Peter Koelewijn|1961|n
+Twist and Shout|The Beatles|1963|pr
+She Loves You|The Beatles|1963|p
+Ring of Fire|Johnny Cash|1963|p
+Oh, Pretty Woman|Roy Orbison|1964|pr
+The House of the Rising Sun|The Animals|1964|r
+Supercalifragilisticexpialidocious|Julie Andrews|1964|f
+(I Can't Get No) Satisfaction|The Rolling Stones|1965|r
+My Generation|The Who|1965|r
+Unchained Melody|The Righteous Brothers|1965|p
+Paint It Black|The Rolling Stones|1966|r
+Good Vibrations|The Beach Boys|1966|p
+Welterusten mijnheer de president|Boudewijn de Groot|1966|n
+Respect|Aretha Franklin|1967|h
+What a Wonderful World|Louis Armstrong|1967|p
+Light My Fire|The Doors|1967|r
+Ain't No Mountain High Enough|Marvin Gaye & Tammi Terrell|1967|h
+The Bare Necessities|Phil Harris|1967|f
+Hey Jude|The Beatles|1968|pr
+Mrs. Robinson|Simon & Garfunkel|1968|p
+Born to Be Wild|Steppenwolf|1968|r
+Proud Mary|Creedence Clearwater Revival|1969|r
+Venus|Shocking Blue|1969|pr
+Space Oddity|David Bowie|1969|pr
+Suspicious Minds|Elvis Presley|1969|p
+Sugar, Sugar|The Archies|1969|p
+Let It Be|The Beatles|1970|pr
+Bridge over Troubled Water|Simon & Garfunkel|1970|p
+Imagine|John Lennon|1971|p
+Stairway to Heaven|Led Zeppelin|1971|r
+Smoke on the Water|Deep Purple|1972|r
+Superstition|Stevie Wonder|1972|h
+Radar Love|Golden Earring|1973|r
+Killing Me Softly with His Song|Roberta Flack|1973|h
+Waterloo|ABBA|1974|p
+Sweet Home Alabama|Lynyrd Skynyrd|1974|r
+Het dorp|Wim Sonneveld|1974|n
+Bohemian Rhapsody|Queen|1975|r
+Mamma Mia|ABBA|1975|p
+Born to Run|Bruce Springsteen|1975|r
+Ding-a-dong|Teach-In|1975|p
+Dancing Queen|ABBA|1976|pd
+Daddy Cool|Boney M.|1976|d
+We Will Rock You|Queen|1977|r
+Stayin' Alive|Bee Gees|1977|pd
+Heroes|David Bowie|1977|r
+Ça plane pour moi|Plastic Bertrand|1977|rb
+Oerend hard|Normaal|1977|nr
+Le Freak|Chic|1978|d
+I Will Survive|Gloria Gaynor|1978|d
+Y.M.C.A.|Village People|1978|d
+September|Earth, Wind & Fire|1978|dh
+Rivers of Babylon|Boney M.|1978|d
+You're the One That I Want|John Travolta & Olivia Newton-John|1978|pf
+Highway to Hell|AC/DC|1979|r
+Another Brick in the Wall, Pt. 2|Pink Floyd|1979|r
+Video Killed the Radio Star|The Buggles|1979|p
+London Calling|The Clash|1979|r
+Another One Bites the Dust|Queen|1980|r
+Back in Black|AC/DC|1980|r
+Call Me|Blondie|1980|pf
+Amsterdam|Maggie MacNeal|1980|n
+Under Pressure|Queen & David Bowie|1981|r
+Tainted Love|Soft Cell|1981|p
+Don't You Want Me|The Human League|1981|p
+Kids in America|Kim Wilde|1981|p
+Don't Stop Believin'|Journey|1981|r
+Zij gelooft in mij|André Hazes|1981|n
+Eye of the Tiger|Survivor|1982|rf
+Africa|Toto|1982|r
+Hungry Like the Wolf|Duran Duran|1982|p
+Twilight Zone|Golden Earring|1982|r
+Billie Jean|Michael Jackson|1983|p
+Every Breath You Take|The Police|1983|pr
+Sweet Dreams (Are Made of This)|Eurythmics|1983|p
+Girls Just Want to Have Fun|Cyndi Lauper|1983|p
+Karma Chameleon|Culture Club|1983|p
+Relax|Frankie Goes to Hollywood|1983|pd
+Like a Virgin|Madonna|1984|p
+Wake Me Up Before You Go-Go|Wham!|1984|p
+Last Christmas|Wham!|1984|p
+Careless Whisper|George Michael|1984|p
+Footloose|Kenny Loggins|1984|pf
+Ghostbusters|Ray Parker Jr.|1984|pf
+Smalltown Boy|Bronski Beat|1984|pd
+Born in the U.S.A.|Bruce Springsteen|1984|r
+Do They Know It's Christmas?|Band Aid|1984|p
+Material Girl|Madonna|1985|p
+We Are the World|USA for Africa|1985|p
+Running Up That Hill|Kate Bush|1985|p
+Livin' on a Prayer|Bon Jovi|1986|r
+The Final Countdown|Europe|1986|r
+Walk Like an Egyptian|The Bangles|1986|p
+Never Gonna Give You Up|Rick Astley|1987|p
+With or Without You|U2|1987|r
+I Wanna Dance with Somebody|Whitney Houston|1987|p
+Bad|Michael Jackson|1987|p
+Push It|Salt-N-Pepa|1987|h
+Fast Car|Tracy Chapman|1988|p
+Don't Worry Be Happy|Bobby McFerrin|1988|p
+Like a Prayer|Madonna|1989|p
+Pump Up the Jam|Technotronic|1989|db
+Love Shack|The B-52's|1989|p
+Under the Sea|Samuel E. Wright|1989|f
+Ice Ice Baby|Vanilla Ice|1990|h
+U Can't Touch This|MC Hammer|1990|h
+Vogue|Madonna|1990|pd
+Nothing Compares 2 U|Sinéad O'Connor|1990|p
+Enjoy the Silence|Depeche Mode|1990|p
+Daar gaat ze|Clouseau|1990|nb
+Smells Like Teen Spirit|Nirvana|1991|r
+Losing My Religion|R.E.M.|1991|r
+Black or White|Michael Jackson|1991|p
+Get Ready for This|2 Unlimited|1991|d
+Geef het op|Clouseau|1991|nb
+Beauty and the Beast|Celine Dion & Peabo Bryson|1991|f
+I Will Always Love You|Whitney Houston|1992|pf
+Rhythm Is a Dancer|Snap!|1992|d
+Under the Bridge|Red Hot Chili Peppers|1992|r
+Creep|Radiohead|1992|r
+Killing in the Name|Rage Against the Machine|1992|r
+Mia|Gorki|1992|nbr
+A Whole New World|Brad Kane & Lea Salonga|1992|f
+What Is Love|Haddaway|1993|d
+Mr. Vain|Culture Beat|1993|d
+No Limit|2 Unlimited|1993|d
+Dromen zijn bedrog|Marco Borsato|1994|n
+Zombie|The Cranberries|1994|r
+Basket Case|Green Day|1994|r
+Kiss from a Rose|Seal|1994|p
+Suds & Soda|dEUS|1994|rb
+Circle of Life|Carmen Twillie|1994|f
+Hakuna Matata|Nathan Lane|1994|f
+Wonderwall|Oasis|1995|r
+Gangsta's Paradise|Coolio|1995|h
+Children|Robert Miles|1995|d
+Insomnia|Faithless|1995|d
+Waterfalls|TLC|1995|h
+Het is een nacht|Guus Meeuwis & Vagant|1995|n
+You've Got a Friend in Me|Randy Newman|1995|f
+Colors of the Wind|Vanessa Williams|1995|f
+Wannabe|Spice Girls|1996|p
+Freed from Desire|Gala|1996|d
+Bailando|Paradisio|1996|db
+15 miljoen mensen|Fluitsma & Van Tijn|1996|n
+Barbie Girl|Aqua|1997|pd
+My Heart Will Go On|Céline Dion|1997|pf
+Torn|Natalie Imbruglia|1997|p
+Bitter Sweet Symphony|The Verve|1997|r
+Song 2|Blur|1997|r
+Everybody (Backstreet's Back)|Backstreet Boys|1997|p
+Truly Madly Deeply|Savage Garden|1997|p
+Avond|Boudewijn de Groot|1997|n
+...Baby One More Time|Britney Spears|1998|p
+Believe|Cher|1998|pd
+Pretty Fly (For a White Guy)|The Offspring|1998|r
+I Want It That Way|Backstreet Boys|1999|p
+Livin' la Vida Loca|Ricky Martin|1999|p
+Mambo No. 5|Lou Bega|1999|p
+No Scrubs|TLC|1999|h
+Sandstorm|Darude|1999|d
+Instant Street|dEUS|1999|rb
+Bye Bye Bye|NSYNC|2000|p
+Oops!...I Did It Again|Britney Spears|2000|p
+It's My Life|Bon Jovi|2000|r
+Beautiful Day|U2|2000|r
+Who Let the Dogs Out|Baha Men|2000|p
+Yellow|Coldplay|2000|r
+Ms. Jackson|OutKast|2000|h
+Stan|Eminem|2000|h
+Mad About You|Hooverphonic|2000|pb
+Can't Get You Out of My Head|Kylie Minogue|2001|pd
+Murder on the Dancefloor|Sophie Ellis-Bextor|2001|pd
+Get the Party Started|P!nk|2001|p
+Lose Yourself|Eminem|2002|hf
+Without Me|Eminem|2002|h
+Complicated|Avril Lavigne|2002|pr
+Dilemma|Nelly|2002|h
+Cry Me a River|Justin Timberlake|2002|p
+The Ketchup Song (Aserejé)|Las Ketchup|2002|pd
+Désenchantée|Kate Ryan|2002|db
+Bloed, zweet en tranen|André Hazes|2002|n
+Hey Ya!|OutKast|2003|h
+Crazy in Love|Beyoncé|2003|h
+In da Club|50 Cent|2003|h
+Seven Nation Army|The White Stripes|2003|r
+Numb|Linkin Park|2003|r
+Toxic|Britney Spears|2004|p
+Boulevard of Broken Dreams|Green Day|2004|r
+Somewhere Only We Know|Keane|2004|r
+Feel Good Inc.|Gorillaz|2005|ph
+Hollaback Girl|Gwen Stefani|2005|p
+Bad Day|Daniel Powter|2005|p
+Hung Up|Madonna|2005|pd
+Hips Don't Lie|Shakira|2006|p
+Crazy|Gnarls Barkley|2006|h
+Rehab|Amy Winehouse|2006|h
+SexyBack|Justin Timberlake|2006|p
+Chasing Cars|Snow Patrol|2006|r
+Rood|Marco Borsato|2006|n
+Umbrella|Rihanna|2007|h
+Apologize|Timbaland|2007|p
+Bleeding Love|Leona Lewis|2007|p
+Poker Face|Lady Gaga|2008|pd
+Viva la Vida|Coldplay|2008|r
+Single Ladies (Put a Ring on It)|Beyoncé|2008|h
+Hot n Cold|Katy Perry|2008|p
+Love Story|Taylor Swift|2008|p
+Mercy|Duffy|2008|p
+Use Somebody|Kings of Leon|2008|r
+I Gotta Feeling|Black Eyed Peas|2009|pd
+Bad Romance|Lady Gaga|2009|pd
+Tik Tok|Kesha|2009|pd
+Alors on danse|Stromae|2009|db
+Ayo Technology|Milow|2009|pb
+Rolling in the Deep|Adele|2010|p
+Someone Like You|Adele|2011|p
+Party Rock Anthem|LMFAO|2011|d
+Moves Like Jagger|Maroon 5|2011|p
+Somebody That I Used to Know|Gotye|2011|pb
+We Are Young|fun.|2011|p
+Titanium|David Guetta|2011|d
+Levels|Avicii|2011|d
+Feel So Close|Calvin Harris|2011|d
+Mag ik dan bij jou|Claudia de Breij|2011|n
+Gangnam Style|PSY|2012|pd
+Diamonds|Rihanna|2012|p
+Radioactive|Imagine Dragons|2012|r
+Get Lucky|Daft Punk|2013|d
+Wake Me Up|Avicii|2013|d
+Happy|Pharrell Williams|2013|pf
+Royals|Lorde|2013|p
+Counting Stars|OneRepublic|2013|p
+Wrecking Ball|Miley Cyrus|2013|p
+Roar|Katy Perry|2013|p
+Take Me to Church|Hozier|2013|r
+Papaoutai|Stromae|2013|pb
+Formidable|Stromae|2013|pb
+Let It Go|Idina Menzel|2013|f
+Do You Want to Build a Snowman?|Kristen Bell|2013|f
+Shake It Off|Taylor Swift|2014|p
+Uptown Funk|Mark Ronson|2014|pd
+All About That Bass|Meghan Trainor|2014|p
+Thinking Out Loud|Ed Sheeran|2014|p
+Are You with Me|Lost Frequencies|2014|db
+Everything Is Awesome|Tegan and Sara|2014|f
+Hello|Adele|2015|p
+See You Again|Wiz Khalifa|2015|hf
+Lean On|Major Lazer|2015|d
+Reality|Lost Frequencies|2015|db
+Can't Stop the Feeling!|Justin Timberlake|2016|pf
+Cheap Thrills|Sia|2016|p
+Closer|The Chainsmokers|2016|d
+Rockabye|Clean Bandit|2016|pd
+How Far I'll Go|Auli'i Cravalho|2016|f
+You're Welcome|Dwayne Johnson|2016|f
+Baby Shark|Pinkfong|2016|f
+Despacito|Luis Fonsi|2017|p
+Shape of You|Ed Sheeran|2017|p
+Havana|Camila Cabello|2017|p
+Believer|Imagine Dragons|2017|r
+Thunder|Imagine Dragons|2017|r
+Zoutelande|BLØF|2017|n
+Remember Me|Miguel|2017|f
+Shallow|Lady Gaga|2018|pf
+Sweet but Psycho|Ava Max|2018|p
+Someone You Loved|Lewis Capaldi|2018|p
+Tout oublier|Angèle|2018|pb
+Als het avond is|Suzan & Freek|2018|n
+Bad Guy|Billie Eilish|2019|p
+Dance Monkey|Tones and I|2019|p
+Señorita|Shawn Mendes|2019|p
+Blinding Lights|The Weeknd|2019|p
+Arcade|Duncan Laurence|2019|p
+Balance ton quoi|Angèle|2019|pb
+Into the Unknown|Idina Menzel|2019|f
+Levitating|Dua Lipa|2020|pd
+Heat Waves|Glass Animals|2020|p
+Save Your Tears|The Weeknd|2020|p
+Dynamite|BTS|2020|p
+drivers license|Olivia Rodrigo|2021|p
+good 4 u|Olivia Rodrigo|2021|pr
+Stay|The Kid LAROI|2021|p
+Montero (Call Me by Your Name)|Lil Nas X|2021|h
+Bad Habits|Ed Sheeran|2021|p
+Easy On Me|Adele|2021|p
+Zitti e buoni|Måneskin|2021|r
+We Don't Talk About Bruno|Carolina Gaitán|2021|f
+As It Was|Harry Styles|2022|p
+Anti-Hero|Taylor Swift|2022|p
+Calm Down|Rema|2022|ph
+Unholy|Sam Smith|2022|p
+De diepte|S10|2022|n
+Kill Bill|SZA|2022|h
+Flowers|Miley Cyrus|2023|p
+Vampire|Olivia Rodrigo|2023|pr
+Houdini|Dua Lipa|2023|pd
+Tattoo|Loreen|2023|p
+Paint The Town Red|Doja Cat|2023|h
+Lose Control|Teddy Swims|2023|p
+Espresso|Sabrina Carpenter|2024|p
+Beautiful Things|Benson Boone|2024|p
+Birds of a Feather|Billie Eilish|2024|p
+Die With A Smile|Lady Gaga|2024|p
+APT.|ROSÉ|2024|p
+Europapa|Joost|2024|nd
+`;
+const SONGS=RAW.trim().split('\n').map((l,i)=>{const [title,artist,year,tags]=l.split('|');return {key:'s'+i,title:title.trim(),artist:artist.trim(),year:+year,tags:(tags||'p').trim()}});
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ø/g,'o').replace(/\$/g,'s').replace(/&/g,' and ').replace(/\(.*?\)|\[.*?\]/g,' ').replace(/[^a-z0-9]+/g,' ').trim();
+const decade=y=>Math.floor(y/10)*10;
+const decLabel=d=>"'"+String(d).slice(2,4)+'s';
+const decCol=y=>DEC_COL[decade(y)]||'#999';
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const ss={get(k){try{return sessionStorage.getItem(k)}catch(e){return null}},set(k,v){try{sessionStorage.setItem(k,v)}catch(e){}}};
+const spot=s=>'https://open.spotify.com/search/'+encodeURIComponent(s.title+' '+s.artist);
+const dzr=s=>'https://www.deezer.com/search/'+encodeURIComponent(s.title+' '+s.artist);
+const bars=n=>Array.from({length:n},(_,i)=>`<i style="animation-delay:${-((i*137)%900)/1000}s;animation-duration:${(0.55+((i*53)%50)/100).toFixed(2)}s"></i>`).join('');
+function confetti(){const c=$('#confetti'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;const cols=['#ff3d9a','#22d3ee','#ffd23f','#3ee08f','#a78bfa'];const ps=Array.from({length:180},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.6,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,s:6+Math.random()*8,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:rnd(cols)}));const t0=performance.now();(function f(t){x.clearRect(0,0,c.width,c.height);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.03;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});if(t-t0<6000)requestAnimationFrame(f);else x.clearRect(0,0,c.width,c.height)})(t0)}
+
+const params=new URLSearchParams(location.search);
+const MODE=(params.has('r')||params.has('join'))?'phone':'tv';
+
+/* =========================================================
+   DEEZER (JSONP, geen sleutel nodig)
+   ========================================================= */
+let dzN=0;
+function dz(path,prm={}){return new Promise((res,rej)=>{const cb='__dz'+(++dzN);const s=document.createElement('script');let done=false;
+  const fin=()=>{done=true;clearTimeout(t);window[cb]=function(){};s.remove()};
+  const t=setTimeout(()=>{if(!done){fin();rej(new Error('timeout'))}},9000);
+  window[cb]=d=>{if(done)return;fin();if(d&&d.error)rej(new Error('deezer:'+(d.error.message||'fout')));else res(d)};
+  const q=new URLSearchParams(Object.assign({},prm,{output:'jsonp',callback:cb}));
+  s.src='https://api.deezer.com'+path+'?'+q.toString();
+  s.onerror=()=>{if(!done){fin();rej(new Error('net'))}};
+  document.head.appendChild(s)})}
+const BAD=/\b(karaoke|instrumental|made famous|tribute|cover|live|remix|sped up|slowed|8-bit|8 bit|lullaby|piano version|acoustic|re-recorded)\b/i;
+function scoreHit(r,song){
+  const tt=norm(r.title_short||r.title),st=norm(song.title);
+  const ta=norm(r.artist&&r.artist.name),sa=norm(song.artist.split(/ & | feat\.? | ft\. /i)[0]);
+  const tm=tt===st?3:((tt&&st&&(tt.includes(st)||st.includes(tt)))?2:0);
+  const am=ta===sa?3:((ta&&sa&&(ta.includes(sa)||sa.includes(ta)))?2:0);
+  const raw=(r.title||'')+' '+((r.album&&r.album.title)||'');
+  const bad=(BAD.test(raw)&&!BAD.test(song.title))?1:0;
+  return {s:tm*2+am*2-bad*5,tm,am};
+}
+const trackCache=new Map();
+async function resolveTrack(song){
+  if(trackCache.has(song.key))return trackCache.get(song.key);
+  let out=null;
+  if(song.dzId){
+    const t=await dz('/track/'+song.dzId);
+    if(t&&t.preview){const rd=t.release_date||(t.album&&t.album.release_date)||'';out={preview:t.preview,cover:(t.album&&(t.album.cover_xl||t.album.cover_big))||song.cover,link:t.link,year:rd?+rd.slice(0,4):null}}
+  }else{
+    const cleanT=song.title.replace(/\(.*?\)/g,'').trim()||song.title;
+    const firstA=song.artist.split(/ & | feat/i)[0];
+    const qs=[`artist:"${firstA}" track:"${cleanT}"`,`${cleanT} ${song.artist}`];
+    if(song.tags.includes('f'))qs.push(cleanT);
+    let netFails=0;
+    for(const q of qs){
+      let d;try{d=await dz('/search',{q,limit:15})}catch(e){if(e.message==='net'||e.message==='timeout')netFails++;continue}
+      const hits=((d&&d.data)||[]).filter(r=>r.preview&&r.readable!==false);
+      let best=null,bs=-99;
+      for(const r of hits){const k=scoreHit(r,song);if(!k.tm)continue;if(!k.am&&!song.tags.includes('f'))continue;if(k.s>bs){bs=k.s;best=r}}
+      if(best){out={preview:best.preview,cover:best.album&&(best.album.cover_xl||best.album.cover_big),link:best.link};break}
+    }
+    if(!out&&netFails===qs.length)throw new Error('net');
+  }
+  if(out)trackCache.set(song.key,out);
+  return out;
+}
+
+/* =========================================================
+   TV — speelbord en spelleiding
+   ========================================================= */
+const T={code:null,peer:null,players:new Map(),phase:'boot',msg:'',unlocked:false,joinUrl:'',
+  settings:{genres:GENRES.map(g=>g[0]),decades:DECADES.slice(),target:10,time:30,quick:4},
+  custom:null,customName:'',plStatus:'',used:new Set(),round:0,sinceQuick:0,cur:null,roundStart:0,deadline:0,bonusQ:null,quick:null,qTimer:null};
+const audio=new Audio();audio.preload='auto';audio.loop=true;
+let actx=null,tvKey='',fadeTok=0;
+const CH='ABCDEFGHJKMNPQRSTUVWXYZ23456789'.split('');
+const genCode=()=>Array.from({length:4},()=>rnd(CH)).join('');
+
+function sfx(kind){if(!actx)return;const seq={join:[[660,.08],[880,.12]],start:[[523,.08],[659,.08],[784,.14]],win:[[523,.1],[659,.1],[784,.1],[1047,.28]],lose:[[300,.18],[220,.32]],quick:[[880,.06],[880,.06],[1320,.22]],coin:[[988,.07],[1319,.16]],end:[[523,.12],[659,.12],[784,.12],[1047,.12],[1319,.45]]}[kind];if(!seq)return;
+  try{let t=actx.currentTime;seq.forEach(([f,d])=>{const o=actx.createOscillator(),g=actx.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.22,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+d+.02);t+=d*.9})}catch(e){}}
+function playAudio(url,offset){fadeTok++;audio.pause();audio.src=url+(offset?'#t='+offset:'');audio.volume=1;const pr=audio.play();if(pr&&pr.catch)pr.catch(err=>{if(err&&err.name==='NotAllowedError'){T.unlocked=false;tvKey='';renderTV()}})}
+function fadeOut(){const tok=++fadeTok;const iv=setInterval(()=>{if(tok!==fadeTok){clearInterval(iv);return}audio.volume=Math.max(0,audio.volume-.08);if(audio.volume<=.01){clearInterval(iv);audio.pause();audio.volume=1}},120)}
+
+function pool(){if(T.custom)return T.custom;const g=T.settings.genres,d=T.settings.decades;return SONGS.filter(s=>[...s.tags].some(t=>g.includes(t))&&d.includes(decade(s.year)))}
+function card(s){return {key:s.key,title:s.title,artist:s.artist,year:s.year,cover:s.cover||null}}
+function insertCard(p,s){p.timeline.push(card(s));p.timeline.sort((a,b)=>a.year-b.year)}
+function drawSong(){const p=pool();const held=new Set();T.players.forEach(pl=>pl.timeline.forEach(c=>held.add(c.key)));
+  let c=p.filter(s=>!T.used.has(s.key)&&!held.has(s.key));if(!c.length){T.used.clear();c=p.filter(s=>!held.has(s.key))}
+  if(!c.length)return null;const s=rnd(c);T.used.add(s.key);return s}
+async function getPlayableSong(){let net=0;for(let i=0;i<8;i++){const s=drawSong();if(!s)return null;let d=null;
+  try{d=await resolveTrack(s)}catch(e){if(++net>=3)throw e;continue}
+  if(!d||!d.preview)continue;const year=s.year||d.year;if(!year)continue;if(!s.year)s.year=year;
+  return Object.assign({},s,{preview:d.preview,cover:d.cover||s.cover,link:d.link,year})}return null}
+async function dealCard(p){const s=T.custom?await getPlayableSong():drawSong();if(s)p.timeline=[card(s)]}
+function makeQ(song,type){const all=T.custom||SONGS;const f=type==='title'?'title':'artist';const correct=song[f];const seen=new Set([norm(correct)]);
+  const near=shuffle(all.filter(s=>s.key!==song.key&&s.year&&Math.abs(s.year-song.year)<=12));const opts=[correct];
+  for(const s of near.concat(shuffle(all))){if(opts.length>=4)break;const v=s[f];const k=norm(v);if(!k||seen.has(k))continue;seen.add(k);opts.push(v)}
+  return {type,options:shuffle(opts),answer:correct}}
+const online=()=>[...T.players.values()].filter(p=>p.online);
+const ranking=()=>[...T.players.values()].sort((a,b)=>b.timeline.length-a.timeline.length||b.coins-a.coins);
+
+async function startGame(){
+  if(!['lobby','end'].includes(T.phase))return;
+  if(pool().length<8){T.plStatus='Te weinig nummers met deze keuzes.';sync();return}
+  T.used.clear();T.round=0;T.sinceQuick=0;
+  T.players.forEach(p=>{p.timeline=[];p.coins=2;p.ans=null;p.res=null});
+  T.phase='deal';sfx('start');sync();
+  try{for(const p of T.players.values())await dealCard(p)}catch(e){return fail('Kan Deezer niet bereiken. Check de internetverbinding van de TV.')}
+  sync();await wait(4500);if(T.phase==='deal')nextRound();
+}
+async function nextRound(){
+  clearTimeout(T.qTimer);
+  if(T.settings.quick&&T.sinceQuick>=T.settings.quick){T.sinceQuick=0;return startQuick()}
+  T.sinceQuick++;T.round++;T.phase='loading';audio.pause();sync();
+  let s;try{s=await getPlayableSong()}catch(e){return fail('Kan Deezer niet bereiken. Check de internetverbinding van de TV.')}
+  if(T.phase!=='loading')return;
+  if(!s)return fail('Geen speelbare nummers gevonden met deze keuzes.');
+  T.cur=s;
+  const type=s.tags&&s.tags.includes('f')?'title':(Math.random()<.5?'title':'artist');
+  T.bonusQ=makeQ(s,type);
+  T.players.forEach(p=>{p.ans={slot:null,bonus:null,tb:0};p.res=null});
+  T.phase='round';T.roundStart=performance.now();T.deadline=T.roundStart+T.settings.time*1000;
+  playAudio(s.preview,0);sync();
+}
+function reveal(){
+  const s=T.cur,q=T.bonusQ;T.phase='reveal';audio.volume=.55;
+  const correct=[...T.players.values()].filter(p=>p.ans&&p.ans.bonus&&norm(p.ans.bonus)===norm(q.answer)).sort((a,b)=>a.ans.tb-b.ans.tb);
+  const fastest=correct[0];
+  T.players.forEach(p=>{const a=p.ans||{};const tl=p.timeline;let ok=false;
+    if(a.slot!=null){const i=a.slot;ok=(i===0||tl[i-1].year<=s.year)&&(i===tl.length||tl[i].year>=s.year)}
+    const bOk=correct.includes(p);const gained=bOk?(p===fastest?2:1):0;p.coins+=gained;
+    if(ok)insertCard(p,s);
+    p.res={ok,bOk,gained,fastest:bOk&&p===fastest,rescued:false,placed:a.slot!=null}});
+  sfx([...T.players.values()].some(p=>p.res.ok)?'win':'lose');sync();
+}
+function winners(){return [...T.players.values()].filter(p=>p.timeline.length>=T.settings.target)}
+function hostNext(){
+  if(T.phase==='reveal'||T.phase==='quickend'){if(winners().length)return endGame();nextRound()}
+  else if(T.phase==='end')toLobby();
+  else if(T.phase==='error'){const any=[...T.players.values()].some(p=>p.timeline.length);if(any)nextRound();else toLobby()}
+}
+function endGame(){T.phase='end';fadeOut();sfx('end');sync()}
+function toLobby(){clearTimeout(T.qTimer);T.phase='lobby';T.msg='';audio.pause();for(const [id,p] of T.players){if(!p.online)T.players.delete(id);else{p.ans=null;p.res=null}}fixHost();sync()}
+function fail(m){T.phase='error';T.msg=m;audio.pause();sync()}
+async function startQuick(){
+  T.phase='quickintro';audio.pause();sfx('quick');sync();const t0=performance.now();let list;
+  try{const r=await Promise.all([0,1,2,3,4].map(()=>getPlayableSong()));list=r.filter(Boolean)}catch(e){return fail('Kan Deezer niet bereiken. Check de internetverbinding van de TV.')}
+  await wait(Math.max(0,3500-(performance.now()-t0)));
+  if(T.phase!=='quickintro')return;
+  if(list.length<2){T.sinceQuick=0;return nextRound()}
+  T.quick={list:list.map(s=>({s,q:makeQ(s,'title')})),i:-1,sub:'play',ans:new Map(),res:new Map()};
+  quickNext();
+}
+function quickNext(){
+  const Q=T.quick;if(!Q||!['quick','quickintro'].includes(T.phase))return;
+  Q.i++;if(Q.i>=Q.list.length){T.phase='quickend';fadeOut();sync();return}
+  Q.sub='play';Q.ans=new Map();Q.res=new Map();T.phase='quick';T.roundStart=performance.now();T.deadline=T.roundStart+QUICK_MS;
+  playAudio(Q.list[Q.i].s.preview,6);sync();
+}
+function quickShow(){
+  const Q=T.quick;if(!Q||Q.sub!=='play')return;Q.sub='show';const it=Q.list[Q.i];
+  const ok=[...Q.ans.entries()].filter(([,a])=>a.c===it.q.answer).sort((a,b)=>a[1].t-b[1].t);
+  ok.forEach(([id],i)=>{const p=T.players.get(id);if(!p)return;const g=i===0?2:1;p.coins+=g;Q.res.set(id,g)});
+  audio.volume=.5;sfx(ok.length?'coin':'lose');sync();
+  clearTimeout(T.qTimer);T.qTimer=setTimeout(quickNext,4000);
+}
+function tick(){
+  const now=performance.now();
+  if(T.phase==='round'){const on=online();const all=on.length>0&&on.every(p=>p.ans&&p.ans.slot!=null&&p.ans.bonus!=null);if(now>=T.deadline||all)reveal();else updTimer()}
+  else if(T.phase==='quick'&&T.quick&&T.quick.sub==='play'){const on=online();const all=on.length>0&&on.every(p=>T.quick.ans.has(p.id));if(now>=T.deadline||all)quickShow();else updTimer()}
+}
+function fixHost(){const h=[...T.players.values()].filter(p=>p.host&&p.online);if(h.length)return;T.players.forEach(p=>p.host=false);const f=online()[0];if(f)f.host=true}
+function applySettings(n){const s=T.settings;if(!n)return;
+  if(Array.isArray(n.genres)){const g=n.genres.filter(x=>GENRES.some(G=>G[0]===x));if(g.length)s.genres=g}
+  if(Array.isArray(n.decades)){const d=n.decades.map(Number).filter(x=>DECADES.includes(x));if(d.length)s.decades=d}
+  if([5,8,10,15].includes(+n.target))s.target=+n.target;
+  if([20,30,45].includes(+n.time))s.time=+n.time;
+  if([0,3,4,6].includes(+n.quick))s.quick=+n.quick}
+async function loadPlaylist(url){
+  const m=String(url||'').match(/playlist\/(\d+)/)||String(url||'').match(/^\s*(\d{4,})\s*$/);
+  if(!m){T.plStatus='Link niet herkend. Gebruik een link zoals deezer.com/nl/playlist/123456 (geen korte link).';sync();return}
+  T.plStatus='Playlist laden…';sync();
+  try{const info=await dz('/playlist/'+m[1]);const d=await dz('/playlist/'+m[1]+'/tracks',{limit:400});
+    const songs=((d&&d.data)||[]).filter(t=>t.readable!==false&&t.preview).map(t=>({key:'dz'+t.id,dzId:t.id,title:t.title_short||t.title,artist:(t.artist&&t.artist.name)||'?',year:null,tags:'',cover:t.album&&t.album.cover_big}));
+    if(songs.length<8){T.plStatus='Te weinig speelbare nummers in deze playlist ('+songs.length+').';sync();return}
+    T.custom=songs;T.customName=info.title||'Playlist';T.plStatus='';sync();
+  }catch(e){T.plStatus='Kon de playlist niet laden. Is hij openbaar?';sync()}
+}
+function onConn(conn){
+  conn.on('data',m=>onMsg(conn,m));
+  conn.on('close',()=>{for(const p of T.players.values())if(p.conn===conn){p.online=false;fixHost();sync()}});
+  conn.on('error',()=>{});
+}
+function onMsg(conn,m){
+  if(!m||typeof m!=='object')return;
+  if(m.t==='join'){
+    const name=String(m.name||'Speler').trim().slice(0,14)||'Speler';const emoji=EMOJIS.includes(m.emoji)?m.emoji:'🎵';
+    let p=T.players.get(m.id);
+    if(!p){const same=[...T.players.values()].find(x=>!x.online&&norm(x.name)===norm(name));
+      if(same){T.players.delete(same.id);same.id=String(m.id);T.players.set(same.id,same);p=same}}
+    if(!p){
+      if(T.players.size>=12){try{conn.send({t:'full'})}catch(e){}return}
+      const used=new Set([...T.players.values()].map(x=>x.color));
+      p={id:String(m.id),name,emoji,color:COLORS.find(c=>!used.has(c))||rnd(COLORS),timeline:[],coins:2,host:false,ans:null,res:null,online:true};
+      T.players.set(p.id,p);
+      if(!['lobby','end','boot'].includes(T.phase))dealCard(p).then(sync).catch(()=>{});
+      if(T.phase==='round')p.ans={slot:null,bonus:null,tb:0};
+      sfx('join');
+    }else{p.name=name;p.emoji=emoji}
+    if(p.conn&&p.conn!==conn){const old=p.conn;p.conn=null;try{old.close()}catch(e){}}
+    p.conn=conn;p.online=true;fixHost();sync();return;
+  }
+  const p=[...T.players.values()].find(x=>x.conn===conn);if(!p)return;
+  const now=performance.now();
+  switch(m.t){
+    case 'place':if(T.phase==='round'&&p.ans&&p.ans.slot==null&&Number.isInteger(m.slot)&&m.slot>=0&&m.slot<=p.timeline.length){p.ans.slot=m.slot;sync()}return;
+    case 'bonus':if(T.phase==='round'&&p.ans&&p.ans.bonus==null&&(m.choice===''||T.bonusQ.options.includes(m.choice))){p.ans.bonus=m.choice;p.ans.tb=now-T.roundStart;sync()}return;
+    case 'quick':if(T.phase==='quick'&&T.quick&&T.quick.sub==='play'&&!T.quick.ans.has(p.id)&&T.quick.list[T.quick.i].q.options.includes(m.choice)){T.quick.ans.set(p.id,{c:m.choice,t:now-T.roundStart});sync()}return;
+    case 'rescue':if(T.phase==='reveal'&&p.res&&!p.res.ok&&!p.res.rescued&&p.coins>=3){p.coins-=3;insertCard(p,T.cur);p.res.rescued=true;sfx('coin');sync()}return;
+  }
+  if(!p.host)return;
+  switch(m.t){
+    case 'settings':if(['lobby','end'].includes(T.phase)){applySettings(m.settings);sync()}break;
+    case 'playlist':if(['lobby','end'].includes(T.phase))loadPlaylist(m.url);break;
+    case 'clearPlaylist':T.custom=null;T.customName='';T.plStatus='';sync();break;
+    case 'start':startGame();break;
+    case 'next':hostNext();break;
+    case 'lobby':toLobby();break;
+    case 'replay':if(['round','reveal'].includes(T.phase)){audio.currentTime=0;audio.play().catch(()=>{})}break;
+    case 'skip':if(T.phase==='round'){T.round--;T.sinceQuick=Math.max(0,T.sinceQuick-1);nextRound()}break;
+  }
+}
+function pub(p){return {id:p.id,name:p.name,emoji:p.emoji,color:p.color,cards:p.timeline.length,coins:p.coins,online:!!p.online,host:p.host,done:doneState(p)}}
+function doneState(p){if(T.phase==='round'){const a=p.ans;if(!a)return 0;return (a.slot!=null?1:0)+(a.bonus!=null?1:0)}if(T.phase==='quick'&&T.quick)return T.quick.ans.has(p.id)?2:0;return 0}
+function view(p){
+  const v={t:'state',phase:T.phase,code:T.code,msg:T.msg,round:T.round,target:T.settings.target,time:T.settings.time,tvReady:T.unlocked,
+    me:{id:p.id,name:p.name,emoji:p.emoji,color:p.color,coins:p.coins,host:p.host,timeline:p.timeline.map(c=>({title:c.title,artist:c.artist,year:c.year}))},
+    players:[...T.players.values()].map(pub)};
+  if(p.host){v.settings=T.settings;v.pool=pool().length;v.custom=T.custom?{name:T.customName,n:T.custom.length}:null;v.plStatus=T.plStatus}
+  const rem=Math.max(0,T.deadline-performance.now());
+  if(T.phase==='round'){v.remaining=rem;v.q={type:T.bonusQ.type,options:T.bonusQ.options};v.ans=p.ans?{slot:p.ans.slot,bonus:p.ans.bonus}:null}
+  if(T.phase==='reveal'){const s=T.cur;v.song={title:s.title,artist:s.artist,year:s.year,cover:s.cover};v.res=p.res;v.q={type:T.bonusQ.type,answer:T.bonusQ.answer};v.ans=p.ans?{bonus:p.ans.bonus}:null;v.canRescue=!!(p.res&&!p.res.ok&&!p.res.rescued&&p.coins>=3)}
+  if(T.phase==='quick'&&T.quick){const Q=T.quick,it=Q.list[Q.i],sh=Q.sub==='show',a=Q.ans.get(p.id);
+    v.quick={i:Q.i,n:Q.list.length,sub:Q.sub,options:it.q.options,mine:a?a.c:null,answer:sh?it.q.answer:null,gained:sh?(Q.res.get(p.id)||0):0,song:sh?{title:it.s.title,artist:it.s.artist,year:it.s.year}:null};v.remaining=rem}
+  if(T.phase==='end')v.ranking=ranking().map(pub);
+  return v;
+}
+function sync(){renderTV();for(const p of T.players.values()){if(p.online&&p.conn&&p.conn.open){try{p.conn.send(view(p))}catch(e){}}}}
+
+/* ---------- TV rendering ---------- */
+function shortUrl(){return (location.host+location.pathname).replace(/index\.html$/,'')+'?r='+T.code}
+function timerSVG(){return `<div class="timer"><svg viewBox="0 0 100 100"><circle class="bgc" cx="50" cy="50" r="45"/><circle id="tmrc" cx="50" cy="50" r="45"/></svg><div id="tmrt"></div></div>`}
+function updTimer(){const c=document.getElementById('tmrc'),tx=document.getElementById('tmrt'),qb=document.getElementById('qbar');if(!c&&!qb)return;
+  const total=T.phase==='quick'?QUICK_MS:T.settings.time*1000;const rem=Math.max(0,T.deadline-performance.now());const f=rem/total;
+  if(c){c.style.strokeDashoffset=String(283*(1-f));c.classList.toggle('hot',rem<5000)}
+  if(tx)tx.textContent=Math.ceil(rem/1000);if(qb)qb.style.width=(f*100)+'%'}
+function setSummary(){const s=T.settings;
+  const src=T.custom?`🎧 Playlist: <b>${esc(T.customName)}</b>`:`🎵 <b>${GENRES.filter(g=>s.genres.includes(g[0])).map(g=>g[1]).join(', ')}</b><br>📅 <b>${s.decades.map(decLabel).join('  ')}</b>`;
+  return `${src}<br>🏁 Eerste tot <b>${s.target}</b> kaarten · ⏱ <b>${s.time}s</b> per ronde · ⚡ ${s.quick?'snelvuur elke <b>'+s.quick+'</b> rondes':'geen snelvuur'}<br>💿 <b>${pool().length}</b> nummers in de mix`}
+function scoresHTML(){return ranking().map(p=>`<div class="srow" style="--c:${p.color}"><span class="sem">${p.emoji}</span><span class="snm">${esc(p.name)}</span><span class="sbar">${p.timeline.map(c=>`<i style="background:${decCol(c.year)}"></i>`).join('')}${'<i class="e"></i>'.repeat(Math.max(0,T.settings.target-p.timeline.length))}</span><span class="snum">${p.timeline.length}/${T.settings.target}</span><span class="scoin">🪙${p.coins}</span></div>`).join('')}
+function resultsHTML(){return [...T.players.values()].filter(p=>p.res).map((p,i)=>{const r=p.res;
+  const pl=r.ok?'<span class="ok">🃏 Kaart erbij!</span>':r.rescued?'<span class="gold">🛟 Gered</span>':r.placed?'<span class="bad">❌ Ernaast</span>':'<span class="bad">⏱ Te laat</span>';
+  const bn=r.gained?`<span class="gold">&nbsp;+${r.gained}🪙${r.fastest?' ⚡':''}</span>`:'';
+  return `<div class="rrow" style="--c:${p.color};animation-delay:${(i*.12).toFixed(2)}s"><span class="em">${p.emoji}</span><span class="nm">${esc(p.name)}</span>${pl}${bn}</div>`}).join('')}
+function quickWinners(){const Q=T.quick;if(!Q)return '';const w=[...Q.res.entries()].sort((a,b)=>b[1]-a[1]).map(([id,g])=>{const p=T.players.get(id);return p?`${p.emoji} ${esc(p.name)} <span class="gold">+${g}</span>`:''}).filter(Boolean);return w.length?w.join(' &nbsp; '):'Niemand had het goed 😅'}
+function unlockHTML(){return `<div class="tv unlock" data-act="unlock"><div class="logo"><div class="mini-vinyl"></div><h1>Draai<span>tafel</span></h1></div><p class="tag">Dit scherm is het speelbord. Zet het geluid aan 🔊</p><button id="unlockBtn" class="btn" data-act="unlock">▶ Druk op OK om te starten</button><p class="hint">Ben je een telefoon? <a href="?join" style="color:var(--cyan)">Doe hier mee</a></p></div>`}
+function tvScreen(){const s=T.settings;
+  switch(T.phase){
+  case 'boot':return `<div class="tv col"><div class="big-center"><div class="logo" style="font-size:9vh"><div class="mini-vinyl"></div><h1>Draai<span>tafel</span></h1></div><div class="sub">${esc(T.msg||'Verbinden met de koppelserver…')}</div></div></div>`;
+  case 'lobby':return `<div class="tv lobby"><div class="lob-left"><div class="logo"><div class="mini-vinyl"></div><h1>Draai<span>tafel</span></h1></div><p class="tag">De muziekquiz voor de hele bank 🎶</p>
+    <div class="qrbox"><div id="qr"></div><div style="min-width:0"><div class="lbl">Scan met je telefoon of ga naar</div><div class="url">${esc(shortUrl())}</div><div class="lbl">Code</div><div class="code">${T.code}</div></div></div>
+    <div class="rules">🎧 Luister naar het fragment · 📍 leg het op je telefoon op de juiste plek in je <b>tijdlijn</b> · 🃏 goed = kaart erbij<br>❓ Bonusvraag = <b>munten 🪙</b> · 🛟 3 munten = foute kaart toch redden · ⚡ snelvuur tussendoor</div></div>
+    <div class="lob-right"><h2>Spelers <span id="pcount"></span></h2><div id="tvPlayers" class="pgrid"></div><div id="setSum" class="setsum"></div><div class="hint">👑 De spelleider kiest de muziek en start het spel op de telefoon</div></div></div>`;
+  case 'deal':return `<div class="tv col"><div class="big-center"><div class="sub">Iedereen krijgt een startkaart</div><h1 class="wintitle">🃏 Kaarten schudden…</h1><div id="dealgrid" class="deal-grid"></div></div></div>`;
+  case 'loading':return `<div class="tv col"><header class="tvtop"><div class="pill">Ronde ${T.round}</div><div class="goal">Eerste tot <b>${s.target}</b> kaarten wint</div></header><div class="big-center"><div class="deck" style="width:38vh;height:38vh"><div class="vinyl spin" style="animation-duration:5s"><div class="label">♪</div></div></div><div class="sub">Nummer zoeken…</div></div></div>`;
+  case 'round':{const q=T.bonusQ;return `<div class="tv col"><header class="tvtop"><div class="pill">Ronde ${T.round}</div><div class="goal">Eerste tot <b>${s.target}</b> kaarten wint</div>${timerSVG()}</header>
+    <main class="stage"><div class="eq">${bars(12)}</div><div class="deck"><div class="vinyl spin"><div class="label">?</div></div><div class="arm"><i></i></div></div><div class="eq">${bars(12)}</div></main>
+    <div class="ask"><b>Uit welk jaar komt dit?</b>Leg het nummer op je telefoon in je tijdlijn &nbsp;·&nbsp; Bonus: ${q.type==='title'?'hoe heet het nummer?':'wie zingt dit?'}</div><footer id="chips" class="chips"></footer></div>`}
+  case 'reveal':{const c=T.cur,q=T.bonusQ;return `<div class="tv reveal"><div class="rv-card">${c.cover?`<img src="${esc(c.cover)}" alt="" onerror="this.remove()">`:''}<div class="year">${c.year}</div><div class="ttl">${esc(c.title)}</div><div class="art">${esc(c.artist)}</div></div>
+    <div class="rv-side"><h2>Hoe deed iedereen het?</h2><div class="bonusline">Bonusvraag (${q.type==='title'?'titel':'artiest'}): <b class="gold">${esc(q.answer)}</b></div><div id="results" class="res"></div><div id="scores" class="scores"></div><div class="hint">Spelleider: tik op <b>Volgende ▶</b></div></div></div>`}
+  case 'quickintro':return `<div class="tv col"><div class="big-center"><div class="zap">⚡ SNELVUUR ⚡</div><div class="sub">5 korte fragmenten · raad de titel · snelste goed = +2 🪙 · goed = +1 🪙</div></div></div>`;
+  case 'quick':{const Q=T.quick,it=Q.list[Q.i],sh=Q.sub==='show';return `<div class="tv col"><header class="tvtop qhead"><div class="pill">⚡ Snelvuur ${Q.i+1}/${Q.list.length}</div><div class="goal">Hoe heet dit nummer?</div></header><div class="qbarw"><div id="qbar"${sh?' style="width:0"':''}></div></div>
+    <div class="qstage"><div class="deck"><div class="vinyl ${sh?'':'spin'}" style="animation-duration:1.1s"><div class="label">${sh?'✓':'⚡'}</div></div></div>
+    <div class="qopts">${it.q.options.map((o,i)=>`<div class="qopt ${sh?(o===it.q.answer?'right':'dim'):''}"><span class="ltr L${i}">${'ABCD'[i]}</span><span>${esc(o)}</span></div>`).join('')}</div></div>
+    ${sh?`<div class="ask"><b>${esc(it.s.title)} — ${esc(it.s.artist)} (${it.s.year})</b>${quickWinners()}</div>`:''}<footer id="chips" class="chips"></footer></div>`}
+  case 'quickend':return `<div class="tv col"><div class="big-center"><h1 class="wintitle">⚡ Snelvuur klaar!</h1><div id="scores" class="scores panel"></div><div class="hint">Spelleider: tik op <b>Volgende ▶</b></div></div></div>`;
+  case 'end':{const w=ranking()[0];return `<div class="tv col"><div class="big-center"><div class="crown">${w?w.emoji:'🏆'}</div><h1 class="wintitle">${w?esc(w.name)+' wint!':'Einde'}</h1><div class="sub">${w?w.timeline.length+' kaarten · '+w.coins+' 🪙':''}</div><div id="scores" class="scores panel"></div><div class="hint">Spelleider: tik op <b>Nog een spel</b></div></div></div>`}
+  case 'error':return `<div class="tv col"><div class="big-center"><div class="crown">😵</div><h1 class="wintitle" style="font-size:6vh">Oeps</h1><div class="sub">${esc(T.msg)}</div><div class="hint">De spelleider kan het opnieuw proberen op de telefoon</div></div></div>`;
+  }return ''}
+function afterTV(){
+  if(T.phase==='lobby'){const q=document.getElementById('qr');if(q){if(window.QRCode){try{new QRCode(q,{text:T.joinUrl,width:256,height:256,colorDark:'#0b0618',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M})}catch(e){}}else q.innerHTML='<div style="color:#1a0b33;display:grid;place-items:center;height:100%;text-align:center;font-weight:800">Gebruik de link →</div>'}}
+  if(T.phase==='end')confetti();
+}
+function tvUpdate(){const pl=[...T.players.values()];const set=(id,h)=>{const e=document.getElementById(id);if(e)e.innerHTML=h};
+  set('tvPlayers',pl.length?pl.map(p=>`<div class="pbub ${p.online?'':'off'}" style="--c:${p.color}"><span class="em">${p.emoji}</span><span>${esc(p.name)}${p.host?' 👑':''}</span></div>`).join(''):'<div class="empty">Nog niemand… scan de code! 📱</div>');
+  set('pcount',pl.length?'('+pl.length+')':'');
+  set('setSum',setSummary());
+  set('chips',pl.filter(p=>p.online).map(p=>{const d=doneState(p);const st=T.phase==='quick'?(d?'✅':'🤔'):(d===2?'✅':d===1?'📍':'🤔');return `<div class="chip ${d===2?'done':''}" style="--c:${p.color}">${p.emoji} ${esc(p.name)} ${st}</div>`}).join(''));
+  set('results',resultsHTML());set('scores',scoresHTML());
+  set('dealgrid',pl.filter(p=>p.timeline[0]).map((p,i)=>{const c=p.timeline[0];return `<div class="dcard" style="--c:${p.color};animation-delay:${(i*.15).toFixed(2)}s"><div class="who">${p.emoji} ${esc(p.name)}</div><div class="y">${c.year}</div><div class="t">${esc(c.title)}</div></div>`}).join(''));
+  updTimer()}
+function renderTV(){if(MODE!=='tv')return;const app=$('#app');
+  if(!T.unlocked){if(tvKey!=='unlock'){tvKey='unlock';app.innerHTML=unlockHTML();const b=$('#unlockBtn');if(b)b.focus()}return}
+  const key=[T.phase,T.round,T.quick?T.quick.i+T.quick.sub:'',['error','boot'].includes(T.phase)?T.msg:''].join('|');
+  if(key!==tvKey){tvKey=key;app.innerHTML=tvScreen();afterTV()}
+  tvUpdate()}
+function unlock(){if(T.unlocked)return;T.unlocked=true;
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume()}catch(e){}
+  try{const el=document.documentElement;const fn=el.requestFullscreen||el.webkitRequestFullscreen;if(fn){const r=fn.call(el);if(r&&r.catch)r.catch(()=>{})}}catch(e){}
+  if(audio.src&&['round','quick','reveal'].includes(T.phase))audio.play().catch(()=>{});
+  tvKey='';sync()}
+function startPeer(code){
+  T.code=code;T.joinUrl=location.origin+location.pathname+'?r='+code;
+  const peer=new Peer(PREFIX+code);T.peer=peer;
+  peer.on('open',()=>{ss.set('dt_tv',code);if(T.phase==='boot')T.phase='lobby';T.msg='';tvKey='';sync()});
+  peer.on('connection',onConn);
+  peer.on('disconnected',()=>{setTimeout(()=>{if(!peer.destroyed&&peer.disconnected){try{peer.reconnect()}catch(e){}}},1500)});
+  peer.on('error',e=>{
+    if(e.type==='unavailable-id'){peer.destroy();startPeer(genCode())}
+    else if(e.type==='browser-incompatible'){fail('Deze browser ondersteunt geen WebRTC. Probeer een andere browser op de TV.')}
+    else if(['network','server-error','socket-error','socket-closed'].includes(e.type)){if(T.phase==='boot'){T.msg='Geen verbinding met de koppelserver… ik blijf proberen';renderTV()}setTimeout(()=>{if(!peer.destroyed&&!peer.open){try{peer.reconnect()}catch(x){}}},3000)}
+  });
+}
+function tvInit(){
+  document.body.classList.add('is-tv');
+  document.addEventListener('click',e=>{if(e.target.closest('[data-act="unlock"]'))unlock()});
+  document.addEventListener('keydown',e=>{const k=e.key;
+    if(!T.unlocked){if(k==='Enter'||k===' '||k==='MediaPlayPause'){e.preventDefault();unlock()}return}
+    if((k==='Enter'||k==='n'||k==='N')&&['reveal','quickend','end'].includes(T.phase))hostNext()});
+  setInterval(tick,250);
+  if(!window.Peer){T.phase='error';T.msg='Kon de verbindingsbibliotheek niet laden. Check de internetverbinding van de TV.';renderTV();return}
+  startPeer(ss.get('dt_tv')||genCode());renderTV();
+}
+
+/* =========================================================
+   TELEFOON — controller
+   ========================================================= */
+let pid=ss.get('dt_id');if(!pid){pid='p'+Math.random().toString(36).slice(2,10);ss.set('dt_id',pid)}
+const P={code:(params.get('r')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4),urlCode:!!params.get('r'),id:pid,name:store.get('dt_name',''),emoji:store.get('dt_emoji',rnd(EMOJIS)),
+  peer:null,conn:null,v:null,joined:false,connecting:false,lost:false,status:'',sel:null,deadline:0,key:''};
+let wl=null;async function wake(){try{if('wakeLock' in navigator&&(!wl||wl.released))wl=await navigator.wakeLock.request('screen')}catch(e){}}
+const send=m=>{if(P.conn&&P.conn.open){try{P.conn.send(m)}catch(e){}}};
+const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}};
+function phoneConnect(){
+  if(P.peer&&!P.peer.destroyed){if(P.peer.open)openConn();else if(P.peer.disconnected){try{P.peer.reconnect()}catch(e){}}return}
+  const peer=new Peer();P.peer=peer;
+  peer.on('open',()=>openConn());
+  peer.on('disconnected',()=>{setTimeout(()=>{if(!peer.destroyed&&peer.disconnected){try{peer.reconnect()}catch(e){}}},1500)});
+  peer.on('error',e=>{
+    if(P.joined){P.lost=true;renderPhone();retry(3000);return}
+    P.connecting=false;
+    P.status=e.type==='peer-unavailable'?'Geen spel gevonden met code '+P.code+'. Staat de TV op het startscherm?':e.type==='browser-incompatible'?'Deze browser ondersteunt geen WebRTC.':'Verbindingsprobleem ('+e.type+'). Probeer opnieuw.';
+    renderPhone()});
+}
+function openConn(){
+  const old=P.conn;P.conn=null;if(old){try{old.close()}catch(e){}}
+  const c=P.peer.connect(PREFIX+P.code,{reliable:true});P.conn=c;
+  c.on('open',()=>{if(P.conn!==c)return;P.lost=false;c.send({t:'join',id:P.id,name:P.name,emoji:P.emoji})});
+  c.on('data',m=>{if(P.conn===c)onPhoneMsg(m)});
+  c.on('close',()=>{if(P.conn===c&&P.joined){P.lost=true;renderPhone();retry(1500)}});
+  c.on('error',()=>{});
+  setTimeout(()=>{if(P.conn===c&&!c.open){if(P.joined){P.lost=true;renderPhone();retry(2000)}else if(P.connecting){P.connecting=false;P.status='Geen antwoord van de TV. Zelfde wifi? Probeer opnieuw.';renderPhone()}}},10000);
+}
+let rT=null;function retry(ms){if(rT)return;rT=setTimeout(()=>{rT=null;if(P.conn&&P.conn.open)return;phoneConnect()},ms)}
+function onPhoneMsg(m){
+  if(!m)return;
+  if(m.t==='full'){P.connecting=false;P.status='Het spel zit vol (max 12 spelers).';renderPhone();return}
+  if(m.t!=='state')return;
+  P.joined=true;P.connecting=false;P.lost=false;ss.set('dt_joined',P.code);
+  if(m.remaining!=null)P.deadline=performance.now()+m.remaining;
+  const prev=P.v&&P.v.phase;P.v=m;renderPhone();
+  if(m.phase==='reveal'&&prev!=='reveal'){try{navigator.vibrate&&navigator.vibrate(m.res&&m.res.ok?[60,60,60]:250)}catch(e){}}
+  if(m.phase==='end'&&prev!=='end')confetti();
+}
+function doJoin(){
+  const n=(P.name||'').trim();
+  if(!n){P.status='Vul je naam in 🙂';renderPhone();return}
+  if(!/^[A-Z0-9]{4}$/.test(P.code)){P.status='De code heeft 4 tekens (zie de TV).';renderPhone();return}
+  if(!window.Peer){P.status='Kon de verbindingsbibliotheek niet laden. Check je internet.';renderPhone();return}
+  P.name=n.slice(0,14);store.set('dt_name',P.name);
+  try{history.replaceState(null,'','?r='+P.code)}catch(e){}
+  P.connecting=true;P.status='';renderPhone();wake();phoneConnect();
+}
+function phKey(v){let k=v.phase+'|'+v.round+'|'+v.me.host;
+  if(v.phase==='round')k+='|'+(v.ans?(v.ans.slot==null?'place':v.ans.bonus==null?'bonus':'done'):'x');
+  if(v.phase==='reveal')k+='|'+(v.res&&v.res.rescued)+'|'+v.canRescue;
+  if(v.phase==='quick')k+='|'+v.quick.i+v.quick.sub+'|'+(v.quick.mine!=null);
+  if(v.phase==='error')k+='|'+v.msg;
+  return k}
+function joinHTML(){return `<div class="ph join"><div class="logo"><div class="mini-vinyl"></div><h1>Draai<span>tafel</span></h1></div><p style="text-align:center">Doe mee met de muziekquiz op de TV 🎶</p>
+  ${P.urlCode?'':`<label for="jcode">Code op de TV</label><input id="jcode" class="codein" maxlength="4" autocomplete="off" autocapitalize="characters" value="${esc(P.code)}">`}
+  <label for="jname">Jouw naam</label><input id="jname" maxlength="14" autocomplete="nickname" value="${esc(P.name)}" placeholder="bv. Papa">
+  <label>Kies je icoon</label><div class="emojis">${EMOJIS.map(e=>`<button class="${e===P.emoji?'on':''}" data-act="emoji" data-v="${e}">${e}</button>`).join('')}</div>
+  <button class="btn big" data-act="join" ${P.connecting?'disabled':''}>${P.connecting?'Verbinden…':'Meedoen ▶'}</button><p class="status">${esc(P.status)}</p></div>`}
+function placeTL(tl){let h='';for(let i=0;i<=tl.length;i++){
+  const l=tl.length===0?'Hier':i===0?`⬆ Vóór ${tl[0].year}`:i===tl.length?`⬇ Na ${tl[i-1].year}`:`↕ Tussen ${tl[i-1].year} en ${tl[i].year}`;
+  h+=`<button class="slot" data-act="slot" data-i="${i}" data-l="${esc(l)}">${esc(l)}</button>`;
+  if(i<tl.length){const c=tl[i];h+=`<div class="tcard" style="--c:${decCol(c.year)}"><b>${c.year}</b><span>${esc(c.title)}<br><small>${esc(c.artist)}</small></span></div>`}}
+  return h}
+const hostCtl=()=>`<div class="hostctl"><button class="btn ghost" data-act="replay">🔁 Opnieuw</button><button class="btn ghost" data-act="skip">⏭ Ander nummer</button></div>`;
+const optBtns=(opts,act,mine)=>opts.map((o,i)=>`<button class="opt o${i} ${mine!=null?(mine===o?'picked':'dim'):''}" data-act="${act}" data-v="${esc(o)}" ${mine!=null?'disabled':''}><span class="ltr">${'ABCD'[i]}</span><span>${esc(o)}</span></button>`).join('');
+function hostLobby(){return `<div class="hero" style="padding:4px 0"><h2>👑 Jij bent de spelleider</h2><p>Kies wat jullie willen horen</p></div><div id="tvwarn"></div>
+  <div class="sec" id="secG"><h3>Genres</h3><div id="sgen" class="chipset"></div></div>
+  <div class="sec" id="secD"><h3>Decennia</h3><div id="sdec" class="chipset"></div></div>
+  <div class="sec"><h3>Winnen bij</h3><div id="star" class="chipset"></div><h3>Tijd per ronde</h3><div id="stime" class="chipset"></div><h3>⚡ Snelvuur-ronde</h3><div id="squick" class="chipset"></div></div>
+  <div class="sec"><h3>🎧 Of: eigen Deezer-playlist</h3><div class="row"><input id="plurl" placeholder="deezer.com/…/playlist/123…" inputmode="url" autocomplete="off"><button class="btn cyan" data-act="plload">Laad</button></div><div id="plinfo"></div><p style="font-size:.8rem">Moet openbaar zijn. Jaartallen komen dan van Deezer en kunnen bij remasters afwijken.</p></div>
+  <div class="sec"><h3>Spelers</h3><div id="ppl" class="plist"></div></div>
+  <p id="poolinfo" style="text-align:center"></p><button class="btn big" id="startBtn" data-act="start">▶ Start het spel</button>`}
+function phScreen(v){const me=v.me,H=me.host;
+  const top=`<div class="ptop" style="--c:${me.color}"><span class="me">${me.emoji} ${esc(me.name)}${H?' 👑':''}</span><span class="cn">🃏 <b id="pcards">${me.timeline.length}</b>/${v.target}</span><span class="cn">🪙 <b id="pcoins">${me.coins}</b></span></div><div id="lost" class="lost" hidden>Verbinding kwijt… opnieuw verbinden</div>`;
+  const W=h=>`<div class="ph">${top}${h}</div>`;
+  const nextBtn=(t='Volgende ▶')=>H?`<button class="btn big" data-act="next" style="margin-top:auto">${t}</button>`:'<p style="text-align:center;margin-top:auto">Wachten op de spelleider…</p>';
+  switch(v.phase){
+  case 'boot':case 'lobby':return W(H?hostLobby():`<div class="hero"><div class="em">${me.emoji}</div><h2>Je zit erin!</h2><p>Wachten tot de spelleider start…</p></div><div class="sec"><h3>Spelers</h3><div id="ppl" class="plist"></div></div>`);
+  case 'deal':return W(`<div class="hero"><div class="em">🃏</div><h2>Je startkaart</h2><p>Dit jaar ligt al in je tijdlijn</p></div><div id="mytl" class="tl"></div>`);
+  case 'loading':return W(`<div class="hero"><div class="em">🎵</div><h2>Nummer zoeken…</h2><p>Luister zo goed naar de TV!</p></div>`);
+  case 'round':{const a=v.ans||{};
+    if(a.slot==null)return W(`<div><h2>Uit welk jaar komt dit?</h2><p>Tik op de juiste plek in je tijdlijn</p></div><div class="pbarw"><div id="pbar"></div></div><div class="tl">${placeTL(me.timeline)}</div><button class="btn big" id="placeBtn" data-act="place" disabled>Leg neer</button>${H?hostCtl():''}`);
+    if(a.bonus==null)return W(`<div class="pbarw"><div id="pbar"></div></div><div><p>📍 Gelegd! Nu de bonusvraag:</p><h2>${v.q.type==='title'?'Hoe heet dit nummer?':'Wie zingt dit?'}</h2></div><div class="opts">${optBtns(v.q.options,'bonus',null)}</div><button class="btn ghost" data-act="bonus" data-v="">🤷 Geen idee</button><p style="font-size:.85rem;text-align:center">Goed = +1 🪙 · snelste goed = +2 🪙</p>${H?hostCtl():''}`);
+    return W(`<div class="pbarw"><div id="pbar"></div></div><div class="hero"><div class="em">🎧</div><h2>Klaar!</h2><p>Wachten op de anderen…</p></div><div class="sec"><div id="ppl" class="plist"></div></div>${H?hostCtl():''}`)}
+  case 'reveal':{const r=v.res||{},s=v.song;
+    const verdict=r.ok?'<div class="verdict ok">🃏 Goed gelegd!</div>':r.rescued?'<div class="verdict gold">🛟 Kaart gered!</div>':r.placed?'<div class="verdict bad">❌ Ernaast!</div>':'<div class="verdict bad">⏱ Te laat!</div>';
+    const answered=v.ans&&v.ans.bonus;
+    const bonus=answered?(r.bOk?`<p class="ok" style="text-align:center">Bonus goed! +${r.gained} 🪙${r.fastest?' ⚡ snelste!':''}</p>`:`<p style="text-align:center">Bonus fout — het was <b>${esc(v.q.answer)}</b></p>`):`<p style="text-align:center">Bonus: <b>${esc(v.q.answer)}</b></p>`;
+    return W(`${verdict}<div class="songcard">${s.cover?`<img src="${esc(s.cover)}" alt="" onerror="this.remove()">`:''}<div><div class="y">${s.year}</div><div class="t">${esc(s.title)}</div><div class="a">${esc(s.artist)}</div></div></div>${bonus}
+      ${v.canRescue?'<button class="btn big cyan" data-act="rescue">🛟 Red deze kaart voor 3 🪙</button>':''}
+      <div class="links"><a class="sp" target="_blank" rel="noopener" href="${spot(s)}">▶ Spotify</a><a class="dzl" target="_blank" rel="noopener" href="${dzr(s)}">▶ Deezer</a></div>
+      <h3>Jouw tijdlijn</h3><div id="mytl" class="mini-tl"></div>${nextBtn()}`)}
+  case 'quickintro':return W(`<div class="hero"><div class="em">⚡</div><h2>Snelvuur!</h2><p>5 korte fragmenten. Tik zo snel mogelijk de juiste titel.</p></div>`);
+  case 'quick':{const Q=v.quick;
+    if(Q.sub==='play')return W(`<div><p>⚡ Snelvuur ${Q.i+1}/${Q.n}</p><h2>Hoe heet dit nummer?</h2></div><div class="pbarw"><div id="pbar"></div></div><div class="opts">${optBtns(Q.options,'quick',Q.mine)}</div>${Q.mine!=null?'<p style="text-align:center">Antwoord gegeven — even wachten…</p>':''}`);
+    const ok=Q.mine===Q.answer;
+    return W(`<div class="verdict ${Q.mine==null?'bad':ok?'ok':'bad'}">${Q.mine==null?'⏱ Te laat':ok?'✅ Goed!':'❌ Fout'}</div>${Q.gained?`<p class="gold" style="text-align:center;font-size:1.3rem">+${Q.gained} 🪙</p>`:''}<div class="songcard"><div><div class="y">${Q.song.year}</div><div class="t">${esc(Q.song.title)}</div><div class="a">${esc(Q.song.artist)}</div></div></div>`)}
+  case 'quickend':return W(`<div class="hero"><div class="em">⚡</div><h2>Snelvuur klaar!</h2></div><div id="rank"></div>${nextBtn()}`);
+  case 'end':{const w=v.ranking&&v.ranking[0];return W(`<div class="hero"><div class="em">${w?w.emoji:'🏆'}</div><h2>${w?esc(w.name)+' wint!':'Einde'}</h2></div><div id="rank"></div>${nextBtn('🔁 Nog een spel')}`)}
+  case 'error':return W(`<div class="hero"><div class="em">😵</div><h2>Oeps</h2><p>${esc(v.msg)}</p></div>${H?'<button class="btn big" data-act="next">Opnieuw proberen</button><button class="btn ghost big" data-act="lobby">Terug naar start</button>':''}`);
+  }return W('')}
+function phUpdate(v){const me=v.me;const set=(id,h)=>{const e=document.getElementById(id);if(e)e.innerHTML=h};
+  const pc=document.getElementById('pcoins');if(pc)pc.textContent=me.coins;
+  const pk=document.getElementById('pcards');if(pk)pk.textContent=me.timeline.length;
+  const lost=document.getElementById('lost');if(lost)lost.hidden=!P.lost;
+  set('ppl',v.players.map(p=>`<div class="pp ${p.online?'':'off'}" style="--c:${p.color}"><span class="e">${p.emoji}</span>${esc(p.name)}${p.host?' 👑':''}${p.done===2?' ✅':''}</div>`).join(''));
+  set('mytl',me.timeline.map(c=>`<div class="tcard ${v.song&&c.title===v.song.title&&c.year===v.song.year?'new':''}" style="--c:${decCol(c.year)}"><b>${c.year}</b><span>${esc(c.title)}<br><small>${esc(c.artist)}</small></span></div>`).join(''));
+  const rk=v.ranking||(v.phase==='quickend'?v.players.slice().sort((a,b)=>b.cards-a.cards||b.coins-a.coins):null);
+  if(rk)set('rank',rk.map((p,i)=>`<div class="rankrow" style="--c:${p.color}"><span class="pos">${i+1}</span><span>${p.emoji}</span><span class="n">${esc(p.name)}</span><span>🃏 ${p.cards}</span><span class="gold">🪙 ${p.coins}</span></div>`).join(''));
+  if(v.settings){const s=v.settings;
+    set('sgen',GENRES.map(([k,l])=>`<button class="tg ${s.genres.includes(k)?'on':''}" data-act="g" data-v="${k}">${l}</button>`).join(''));
+    set('sdec',DECADES.map(d=>`<button class="tg ${s.decades.includes(d)?'on':''}" data-act="d" data-v="${d}">${decLabel(d)}</button>`).join(''));
+    set('star',[5,8,10,15].map(n=>`<button class="tg ${s.target===n?'on':''}" data-act="set" data-k="target" data-v="${n}">${n} kaarten</button>`).join(''));
+    set('stime',[20,30,45].map(n=>`<button class="tg ${s.time===n?'on':''}" data-act="set" data-k="time" data-v="${n}">${n} sec</button>`).join(''));
+    set('squick',[[0,'Uit'],[3,'Elke 3 rondes'],[4,'Elke 4'],[6,'Elke 6']].map(([n,l])=>`<button class="tg ${s.quick===n?'on':''}" data-act="set" data-k="quick" data-v="${n}">${l}</button>`).join(''));
+    ['secG','secD'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('dim',!!v.custom)});
+    set('plinfo',(v.custom?`<div class="row"><span style="flex:1">🎧 <b>${esc(v.custom.name)}</b> (${v.custom.n} nummers)</span><button class="btn ghost" data-act="plclear">✕ Wissen</button></div>`:'')+(v.plStatus?`<p>${esc(v.plStatus)}</p>`:''));
+    const n=v.custom?v.custom.n:v.pool;set('poolinfo',`💿 <b>${n}</b> nummers in de mix`);
+    const sb=document.getElementById('startBtn');if(sb)sb.disabled=n<8;
+    set('tvwarn',v.tvReady?'':'<div class="lost">📺 Druk eerst op OK op de TV (voor het geluid)</div>');
+  }}
+function renderPhone(){if(MODE!=='phone')return;const app=$('#app');
+  if(!P.joined){P.key='';app.innerHTML=joinHTML();return}
+  const v=P.v;const k=phKey(v);
+  if(k!==P.key){P.key=k;P.sel=null;app.innerHTML=phScreen(v);window.scrollTo(0,0)}
+  phUpdate(v)}
+function localPool(s){return SONGS.filter(x=>[...x.tags].some(t=>s.genres.includes(t))&&s.decades.includes(decade(x.year))).length}
+function pushSettings(s){const v=P.v;v.settings=s;if(!v.custom)v.pool=localPool(s);phUpdate(v);send({t:'settings',settings:s})}
+function phoneClick(e){const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const a=b.dataset.act,v=P.v;buzz();
+  switch(a){
+  case 'emoji':P.emoji=b.dataset.v;store.set('dt_emoji',P.emoji);renderPhone();return;
+  case 'join':doJoin();return;
+  case 'slot':P.sel=+b.dataset.i;document.querySelectorAll('.slot').forEach(s=>{s.classList.toggle('sel',s===b);s.textContent=s===b?'🎵 Hier leggen':s.dataset.l});{const pb=document.getElementById('placeBtn');if(pb)pb.disabled=false}return;
+  case 'place':if(P.sel!=null){send({t:'place',slot:P.sel});b.disabled=true}return;
+  case 'bonus':case 'quick':send({t:a,choice:b.dataset.v});b.parentElement.querySelectorAll('.opt').forEach(o=>{o.disabled=true;o.classList.add(o===b?'picked':'dim')});return;
+  case 'rescue':send({t:'rescue'});b.disabled=true;return;
+  case 'g':{if(!v||!v.settings)return;const s=Object.assign({},v.settings);const g=new Set(s.genres);g.has(b.dataset.v)?g.delete(b.dataset.v):g.add(b.dataset.v);if(!g.size)return;s.genres=[...g];pushSettings(s);return}
+  case 'd':{if(!v||!v.settings)return;const s=Object.assign({},v.settings);const d=new Set(s.decades);const x=+b.dataset.v;d.has(x)?d.delete(x):d.add(x);if(!d.size)return;s.decades=[...d].sort();pushSettings(s);return}
+  case 'set':{if(!v||!v.settings)return;const s=Object.assign({},v.settings);s[b.dataset.k]=+b.dataset.v;pushSettings(s);return}
+  case 'plload':{const i=document.getElementById('plurl');send({t:'playlist',url:i?i.value:''});return}
+  case 'plclear':send({t:'clearPlaylist'});return;
+  case 'start':if(v&&!v.tvReady){set_tvwarn();}send({t:'start'});b.disabled=true;setTimeout(()=>{b.disabled=false},3000);return;
+  case 'next':case 'replay':case 'skip':case 'lobby':send({t:a});if(a==='next'){b.disabled=true;setTimeout(()=>{b.disabled=false},2500)}return;
+  }}
+function set_tvwarn(){const e=document.getElementById('tvwarn');if(e)e.innerHTML='<div class="lost">📺 Druk eerst op OK op de TV, anders is er geen geluid</div>'}
+function phoneInit(){
+  document.addEventListener('click',phoneClick);
+  document.addEventListener('input',e=>{if(e.target.id==='jname')P.name=e.target.value;if(e.target.id==='jcode'){e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');P.code=e.target.value}});
+  document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!P.joined&&(e.target.id==='jname'||e.target.id==='jcode'))doJoin()});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&P.joined){wake();if(!P.conn||!P.conn.open)retry(300)}});
+  setInterval(()=>{if(!P.v)return;const b=document.getElementById('pbar');if(!b)return;const tot=P.v.phase==='quick'?QUICK_MS:(P.v.time||30)*1000;const rem=Math.max(0,P.deadline-performance.now());b.style.width=(rem/tot*100)+'%';b.classList.toggle('hot',rem<5000)},200);
+  renderPhone();
+  if(P.code&&P.name&&ss.get('dt_joined')===P.code)doJoin();
+}
+
+if(MODE==='tv')tvInit();else phoneInit();
+</script>
+</body>
+</html>
