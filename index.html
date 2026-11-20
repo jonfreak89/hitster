@@ -665,6 +665,7 @@ details.look summary{cursor:pointer;font-weight:800;font-size:1.05rem;list-style
 .modecard{position:relative}.wishn{position:absolute;right:4px;top:4px;font-style:normal;font-size:.68rem;background:var(--yel);color:#201000;border-radius:99px;padding:1px 6px;font-weight:800}
 .wishg{display:flex;flex-wrap:wrap;gap:6px}.wishg .tg{font-size:.8rem;padding:6px 10px}
 .packgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.pack{min-width:0}.pack div{min-width:0;overflow-wrap:anywhere;hyphens:auto}.pack>span{flex:none}
+body.viarelay .ptop .me::after{content:' 📡';font-size:.7em;opacity:.7}
 </style>
 </head>
 <body>
@@ -1037,7 +1038,7 @@ Object.assign(I18N.nl,I18N_ADD7.nl);Object.assign(I18N.vl,I18N_ADD7.nl,I18N_ADD7
 
 /* ---------- v7b: presentator, presets, thema's ---------- */
 const I18N_ADD8={
-nl:{th_strand:"Strand",th_rock:"Rock",th_kerst:"Kerst",eveningShort:"Een mix van spelvormen",wishT:"Wat wil jij spelen?",wishTip:"Tik je favoriet aan. De spelleider ziet wat iedereen wil.",
+nl:{th_strand:"Strand",th_rock:"Rock",th_kerst:"Kerst",tryRelay:"Rechtstreeks lukt niet op dit netwerk. Ik probeer een omweg…",eveningShort:"Een mix van spelvormen",wishT:"Wat wil jij spelen?",wishTip:"Tik je favoriet aan. De spelleider ziet wat iedereen wil.",
 rules_board:"🎲 Elke beurt een andere muziekuitdaging. Goed antwoorden = vakjes vooruit. Speciale vakjes: ⭐ +2 · 🚀 +4 · ⚡ volgende worp dubbel · ⬅️ 3 terug · 🎲 dobbelsteen · 🔄 wissel met de leider · 🧲 trek de leider terug · 💣 iedereen 2 terug. Wie eerst op 🏁 staat, wint!",mascotLbl:"DJ Plaat (presentator)",volLbl:"Volume van de muziek",
 presetsLbl:"Snel kiezen:",pre_party:"Feestje",pre_family:"Familie",pre_expert:"Kenners",pre_short:"Kort",pre_random:"Verras me",
 sndLbl:"Lawaai maken op tv",howtoT:"Zo werkt het",howtoHint:"We beginnen zo · de spelleider kan meteen starten",howtoGo:"Begrepen, start!",howtoWait:"De spelleider start zo het spel…",
@@ -1061,7 +1062,7 @@ dj_some:"Schoon gedaan!|Niet slecht!|Het wordt spannend.|Zo, punten erbij!|Goed 
 dj_blunder:"Amai, dat was er ver naast!|Twintig jaar ernaast? Dat doet zeer.|Hebt ge onder een steen gelegen?",
 dj_pause:"Pauze! Tijd voor een pintje.|Efkes bekomen…",wishT:"Wat wilt gij spelen?",wishTip:"Tik uw favoriet aan. De spelleider ziet wat iedereen wil.",
 dj_tips:"Tip: de spelleider kiest alles op zijn gsm, in 3 stapjes.|Wist ge dat ge met de P-toets kunt pauzeren?|Probeer eens het Bordspel: een race over het bord!|In de lobby kunt ge lawaai maken met de toeters op uw gsm.|Geen goesting om te kiezen? Tik op 'Verras me'.|Verbinding kwijt? Scan de code opnieuw en ge doet gewoon verder.|Met 'Artiestenavond' speelt ge alleen nummers van uw favoriete artiest.|Nieuw: Tijdmachine, Platenhoes, Typ het! en Op een rij.|Hoe meer zielen, hoe meer vreugd. Er kunnen 12 spelers mee.|Na elk nummer kunt ge sterren geven. Op het einde ziet ge de hit van de avond."},
-en:{th_strand:"Beach",th_rock:"Rock",th_kerst:"Christmas",eveningShort:"A mix of game modes",wishT:"What do you want to play?",wishTip:"Tap your favourite. The game leader sees what everyone wants.",
+en:{th_strand:"Beach",th_rock:"Rock",th_kerst:"Christmas",tryRelay:"A direct link fails on this network. Trying a detour…",eveningShort:"A mix of game modes",wishT:"What do you want to play?",wishTip:"Tap your favourite. The game leader sees what everyone wants.",
 rules_board:"🎲 Every turn is a different music challenge. Good answers = squares forward. Special squares: ⭐ +2 · 🚀 +4 · ⚡ next move double · ⬅️ 3 back · 🎲 dice · 🔄 swap with the leader · 🧲 pull the leader back · 💣 everyone 2 back. First to 🏁 wins!",mascotLbl:"DJ Vinyl (host)",volLbl:"Music volume",
 presetsLbl:"Quick pick:",pre_party:"Party",pre_family:"Family",pre_expert:"Experts",pre_short:"Short",pre_random:"Surprise me",
 sndLbl:"Make noise on the TV",howtoT:"How it works",howtoHint:"Starting in a moment · the game leader can start right away",howtoGo:"Got it, start!",howtoWait:"The game leader will start in a moment…",
@@ -5790,6 +5791,44 @@ function revealTm(){const M=T.tm;if(!M)return;T.phase='reveal';setVol(.55);let a
     u.res={guess:a.year,d,pts,stage:sg};if(pts)anyOk=true;maxErr=Math.max(maxErr,d);credit(a.by,d<=1,{ms:a.t,year:M.year,err:d,title:M.songs[0].title});if(d===0)stat(a.by,'exact');if(coop?d>5:!base)loseLife(u)});
   afterReveal(anyOk,maxErr)}
 
+/* ---------- reserveweg: als rechtstreeks (WebRTC) niet lukt, via gratis openbare MQTT-servers ---------- */
+const RELAYS=['wss://mqtt.eclipseprojects.io/mqtt','wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt','wss://test.mosquitto.org:8081/mqtt'];
+const RTOPIC=c=>'draaitafel2/'+c;
+const relayOK=()=>typeof WebSocket!=='undefined'&&typeof TextEncoder!=='undefined'&&typeof NO_RELAY==='undefined';
+function Mq(url,h){const te=new TextEncoder(),td=new TextDecoder();let ws=null,buf=new Uint8Array(0),ready=false,dead=false,pingT=null,pid=1;
+  const str=s=>{const b=te.encode(s);const o=new Uint8Array(b.length+2);o[0]=b.length>>8;o[1]=b.length&255;o.set(b,2);return o};
+  const pkt=(head,parts)=>{let n=0;parts.forEach(p=>n+=p.length);const len=[];let x=n;do{let d=x%128;x=Math.floor(x/128);if(x>0)d|=128;len.push(d)}while(x>0);
+    const o=new Uint8Array(1+len.length+n);o[0]=head;o.set(len,1);let i=1+len.length;parts.forEach(p=>{o.set(p,i);i+=p.length});return o};
+  const raw=p=>{try{if(ws&&ws.readyState===1)ws.send(p)}catch(e){}};
+  const kill=()=>{if(dead)return;dead=true;ready=false;clearInterval(pingT);clearTimeout(to);try{ws&&ws.close()}catch(e){}try{h.close&&h.close()}catch(e){}};
+  const to=setTimeout(()=>{if(!ready)kill()},7000);
+  const api={sub:t=>raw(pkt(0x82,[new Uint8Array([0,(pid++%250)+1]),str(t),new Uint8Array([0])])),pub:(t,s)=>raw(pkt(0x30,[str(t),te.encode(s)])),close:kill,isReady:()=>ready,url};
+  try{ws=new WebSocket(url,'mqtt')}catch(e){setTimeout(kill,0);return api}
+  ws.binaryType='arraybuffer';
+  ws.onopen=()=>raw(pkt(0x10,[str('MQTT'),new Uint8Array([4,2,0,30]),str('dt'+Math.random().toString(36).slice(2,12))]));
+  ws.onmessage=e=>{if(dead||typeof e.data==='string')return;const d=new Uint8Array(e.data);const nb=new Uint8Array(buf.length+d.length);nb.set(buf);nb.set(d,buf.length);buf=nb;
+    for(;;){if(buf.length<2)return;let mul=1,len=0,i=1,b;do{if(i>=buf.length)return;if(i>4){kill();return}b=buf[i++];len+=(b&127)*mul;mul*=128}while(b&128);
+      if(buf.length<i+len)return;const type=buf[0]>>4,flags=buf[0]&15,body=buf.slice(i,i+len);buf=buf.slice(i+len);
+      if(type===2){if(body[1]===0){ready=true;pingT=setInterval(()=>raw(new Uint8Array([0xC0,0])),20000);try{h.open&&h.open()}catch(x){}}else{kill();return}}
+      else if(type===3){const tl=(body[0]<<8)|body[1];const topic=td.decode(body.subarray(2,2+tl));let o=2+tl;if(flags&6)o+=2;try{h.msg&&h.msg(topic,td.decode(body.subarray(o)))}catch(x){}}}};
+  ws.onclose=()=>kill();ws.onerror=()=>kill();
+  return api}
+function relayStopTV(){const R=T.relay;if(!R)return;R.stop=true;clearInterval(R.sweep);R.links.forEach(x=>{try{x.mq&&x.mq.close()}catch(e){}});T.relay=null}
+function relayStartTV(code){relayStopTV();if(!relayOK())return;const R=T.relay={code,links:[],stop:false,ok:false};const base=RTOPIC(code);
+  RELAYS.forEach(url=>{const L={mq:null,vcs:new Map()};R.links.push(L);
+    const open=()=>{if(R.stop)return;const mq=L.mq=Mq(url,{
+      open(){mq.sub(base+'/up/+');R.ok=true;setTimeout(()=>{if(!R.stop&&T.phase==='boot'){T.phase='lobby';T.msg='';tvKey='';sync()}},3500)},
+      msg(topic,txt){const cid=topic.slice(topic.lastIndexOf('/')+1);let m;try{m=JSON.parse(txt)}catch(e){return}if(!m||typeof m!=='object'||!cid)return;let vc=L.vcs.get(cid);
+        if(m.t==='bye'){if(vc){vc.silent=true;vc.close()}return}
+        if(!vc){if(m.t!=='join'){mq.pub(base+'/dn/'+cid,'{"t":"who"}');return}if(L.vcs.size>40)return;
+          vc={open:true,relay:true,silent:false,h:{},last:now(),on(e,f){this.h[e]=f},send(o){if(this.open)mq.pub(base+'/dn/'+cid,JSON.stringify(o))},
+            close(){if(!this.open)return;if(!this.silent)mq.pub(base+'/dn/'+cid,'{"t":"bye"}');this.open=false;L.vcs.delete(cid);try{this.h.close&&this.h.close()}catch(e){}}};
+          L.vcs.set(cid,vc);onConn(vc)}
+        vc.last=now();if(m.t==='ping'){vc.send({t:'pong'});return}if(vc.h.data)vc.h.data(m)},
+      close(){[...L.vcs.values()].forEach(v=>{v.silent=true;v.close()});if(!R.stop)setTimeout(open,5000)}})};
+    open()});
+  R.sweep=setInterval(()=>{R.links.forEach(L=>[...L.vcs.values()].forEach(v=>{if(now()-v.last>16000)v.close()}))},4000)}
+
 /* =========================================================
    TV — weergave
    ========================================================= */
@@ -5989,6 +6028,7 @@ function unlock(){if(T.unlocked)return;T.unlocked=true;keepAwake();
   tvKey='';sync()}
 function startPeer(code){
   T.code=code;T.joinUrl=location.origin+location.pathname+'?r='+code;
+  relayStartTV(code);
   const peer=new Peer(PREFIX+code);T.peer=peer;
   peer.on('open',()=>{ss.set('dt_tv',code);store.set('dt_tvcode',{code,ts:Date.now()});if(T.phase==='boot')T.phase='lobby';T.msg='';tvKey='';sync()});
   peer.on('connection',onConn);
@@ -6077,25 +6117,27 @@ let wl=null;async function wake(){try{if('wakeLock' in navigator&&(!wl||wl.relea
 const send=m=>{if(P.conn&&P.conn.open){try{P.conn.send(m)}catch(e){}}};
 const buzz=(ms=15)=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
 function phoneConnect(fresh){
+  if(P.relay&&relayOK())return relayConnect();
   if(fresh&&P.peer){try{P.peer.destroy()}catch(e){}P.peer=null}
   if(P.peer&&!P.peer.destroyed){if(P.peer.open)openConn();else if(P.peer.disconnected){try{P.peer.reconnect()}catch(e){}}return}
   const peer=new Peer();P.peer=peer;
   peer.on('open',()=>openConn());
   peer.on('disconnected',()=>{setTimeout(()=>{if(!peer.destroyed&&peer.disconnected){try{peer.reconnect()}catch(e){}}},1500)});
   peer.on('error',e=>{
+    const msg=e.type==='peer-unavailable'?t('notFound',{c:P.code}):e.type==='browser-incompatible'?t('errWebrtc'):t('connIssue',{e:e.type});
+    if(relayOK()&&!P.relay){P.p2pErr=msg;return useRelay()}
     if(P.joined){setLost(true);P.fails++;retry(Math.min(8000,1500+P.fails*1000));return}
-    P.connecting=false;
-    P.status=e.type==='peer-unavailable'?t('notFound',{c:P.code}):e.type==='browser-incompatible'?t('errWebrtc'):t('connIssue',{e:e.type});
+    P.connecting=false;P.status=msg;
     renderPhone()});
 }
 function openConn(){
   const old=P.conn;P.conn=null;if(old){try{old.close()}catch(e){}}
   const c=P.peer.connect(PREFIX+P.code,{reliable:true});P.conn=c;
-  c.on('open',()=>{if(P.conn!==c)return;c.send({t:'join',id:P.id,name:P.name,emoji:P.emoji})});
+  c.on('open',()=>{if(P.conn!==c)return;try{document.body.classList.remove('viarelay')}catch(e){}c.send({t:'join',id:P.id,name:P.name,emoji:P.emoji})});
   c.on('data',m=>{if(P.conn===c)onPhoneMsg(m)});
   c.on('close',()=>{if(P.conn===c&&P.joined){setLost(true);retry(1500)}});
   c.on('error',()=>{});
-  setTimeout(()=>{if(P.conn===c&&!c.open){if(P.joined){setLost(true);P.fails++;retry(2000)}else if(P.connecting){P.connecting=false;P.status=t('noAnswerTv');renderPhone()}}},10000);
+  setTimeout(()=>{if(P.conn===c&&!c.open){if(relayOK()){P.p2pErr='';return useRelay()}if(P.joined){setLost(true);P.fails++;retry(2000)}else if(P.connecting){P.connecting=false;P.status=t('noAnswerTv');renderPhone()}}},5000);
 }
 function setLost(on){if(on&&!P.lost)P.lostAt=now();P.lost=on;if(!on)P.fails=0;const l=document.getElementById('lostov');if(l){l.hidden=!on;if(!on)l.dataset.k=''}updLost()}
 function updLost(){const l=document.getElementById('lostov');if(!l||!P.lost)return;const long=now()-P.lostAt>6000;const k=long+LANG;if(l.dataset.k===k)return;l.dataset.k=k;l.innerHTML=`<div class="lostbox"><div class="em">📡</div><b>${t('connLost')}</b><p>${long?t('lostLong'):t('lostShort')}</p><button class="btn big" data-act="reconnect">🔄 ${t('reconnect')}</button></div>`}
@@ -6522,6 +6564,27 @@ function haptic(v){try{if(!navigator.vibrate)return;const r=v.res;
   else if(v.phase==='round'&&v.buzz&&v.buzz.me)navigator.vibrate([80,40,80]);
   else if(v.phase==='round'&&v.vibe&&v.vibe.isDj&&v.vibe.sub==='pick')navigator.vibrate(120);
   else if(v.phase==='end')navigator.vibrate([60,60,60,60,200])}catch(e){}}
+
+/* ---------- reserveweg op de telefoon ---------- */
+function useRelay(){if(P.relay)return;P.relay=true;if(!P.joined&&P.connecting){P.status=t('tryRelay');renderPhone()}relayConnect()}
+function relayConnect(){const old=P.conn;P.conn=null;if(old){try{old.close()}catch(e){}}
+  const cid=Math.random().toString(36).slice(2,12),base=RTOPIC(P.code),up=base+'/up/'+cid;const join=()=>JSON.stringify({t:'join',id:P.id,name:P.name,emoji:P.emoji});
+  const mqs=[],order=[];let got=false,tryT=null,giveT=null,pingT=null;
+  const c={open:false,relay:true,closed:false,mq:null,last:now(),send(m){if(this.mq&&this.open&&!this.closed)this.mq.pub(up,JSON.stringify(m))},close(){if(this.mq&&this.open&&!this.closed){try{this.mq.pub(up,'{"t":"bye"}')}catch(e){}}fin()}};
+  const fin=()=>{if(c.closed)return;c.closed=true;c.open=false;clearInterval(pingT);clearTimeout(tryT);clearTimeout(giveT);setTimeout(()=>mqs.forEach(m=>{try{m.close()}catch(e){}}),50)};
+  const lost=()=>{if(c.closed)return;fin();if(P.conn!==c)return;if(!got)P.relay=false;
+    if(P.joined){setLost(true);P.fails++;retry(1500)}else if(P.connecting){P.connecting=false;P.status=P.p2pErr||t('noAnswerTv');renderPhone()}};
+  const next=()=>{clearTimeout(tryT);if(c.closed||got)return;const m=order.shift();if(!m){c.mq=null;c.open=false;return}
+    c.mq=m;c.open=true;m.sub(base+'/dn/'+cid);m.pub(up,join());tryT=setTimeout(()=>{if(!got&&!c.closed)next()},3500)};
+  P.conn=c;
+  RELAYS.forEach(url=>{const m=Mq(url,{
+    open(){if(c.closed||got)return;order.push(m);if(!c.mq)next()},
+    msg(topic,txt){if(c.closed||m!==c.mq)return;let o;try{o=JSON.parse(txt)}catch(e){return}if(!o)return;c.last=now();
+      if(!got){got=true;clearTimeout(tryT);clearTimeout(giveT);mqs.forEach(x=>{if(x!==m)try{x.close()}catch(e){}});try{document.body.classList.add('viarelay')}catch(e){}}
+      if(o.t==='pong')return;if(o.t==='who'){m.pub(up,join());return}if(o.t==='bye'){lost();return}if(P.conn===c)onPhoneMsg(o)},
+    close(){if(m===c.mq&&!c.closed){if(got)lost();else next()}}});mqs.push(m)});
+  giveT=setTimeout(()=>{if(!got)lost()},11000);
+  pingT=setInterval(()=>{if(c.closed||!got)return;c.send({t:'ping'});if(now()-c.last>15000)lost()},5000)}
 </script>
 </body>
 </html>
