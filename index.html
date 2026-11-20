@@ -664,6 +664,7 @@ details.look summary{cursor:pointer;font-weight:800;font-size:1.05rem;list-style
 .modegrid.compact .modecard:first-child b{font-size:1rem}.modegrid.compact .modecard small{display:block;font-size:.74rem;color:var(--mute);font-weight:500;margin-left:auto;text-align:right}
 .modecard{position:relative}.wishn{position:absolute;right:4px;top:4px;font-style:normal;font-size:.68rem;background:var(--yel);color:#201000;border-radius:99px;padding:1px 6px;font-weight:800}
 .wishg{display:flex;flex-wrap:wrap;gap:6px}.wishg .tg{font-size:.8rem;padding:6px 10px}
+.packgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.pack{min-width:0}.pack div{min-width:0;overflow-wrap:anywhere;hyphens:auto}.pack>span{flex:none}
 </style>
 </head>
 <body>
@@ -1044,7 +1045,7 @@ sqn_bomb:"Bom",sqn_rocket:"Raket",sq_bomb:"Boem! {u} blaast iedereen 2 vakjes te
 dj_hello:"Hallo, ik ben DJ Plaat. Scan de code en doe mee!|Welkom bij Draaitafel! Ik draai, jullie raden.",
 dj_tips:"Tip: de spelleider kiest alles op zijn telefoon, in 3 stapjes.|Wist je dat je met de P-toets kunt pauzeren?|Probeer eens het Bordspel: een race over het bord!|In de lobby kun je lawaai maken met de toeters op je telefoon.|Geen zin om te kiezen? Tik op 'Verras me'.|Verbinding kwijt? Scan de code opnieuw en je doet gewoon verder.|Met 'Artiestenavond' speel je alleen nummers van je favoriete artiest.|Nieuw: Tijdmachine, Platenhoes, Typ het! en Op een rij.|Hoe meer zielen, hoe meer vreugd. Er kunnen 12 spelers mee.|Na elk nummer kun je sterren geven. Op het einde zie je de hit van de avond.",
 dj_join:"Welkom, {n}!|Daar is {n}! Nu wordt het leuk.|{n} doet mee. Oppassen, allemaal!|Hey {n}, zoek een plekje in de zetel.",
-dj_howto:"Even opletten, zo werkt het!|Lees snel mee, dan beginnen we.",
+dj_howto:"Even opletten, zo werkt het!|Lees snel mee, dan beginnen we.",dj_last:"Laatste ronde! Alles geven nu.|De allerlaatste. Nu of nooit!|Laatste kans op punten!",
 dj_round:"Oren open!|Daar gaan we!|Deze ken je zeker.|Volume omhoog!|Wie weet het?|Concentratie…|Luister goed!",
 dj_allok:"Iedereen juist! Wat een kenners.|Te makkelijk voor jullie!|Allemaal goed, ik moet beter mijn best doen.|Wauw, een volle zetel vol experts!",
 dj_none:"Oei… niemand?|Die was gemeen, sorry!|Volgende keer beter.|Stilte in de zaal…|Zelfs ik wist hem niet. Grapje, ik wel.",
@@ -1068,7 +1069,7 @@ sqn_bomb:"Bomb",sqn_rocket:"Rocket",sq_bomb:"Boom! {u} blows everyone back 2 squ
 dj_hello:"Hi, I'm DJ Vinyl. Scan the code and join!|Welcome to Draaitafel! I spin, you guess.",
 dj_tips:"Tip: the game leader sets everything up on their phone, in 3 steps.|Did you know the P key pauses the game?|Try the Board game: a race across the board!|In the lobby you can make noise with the horns on your phone.|Can't decide? Tap 'Surprise me'.|Lost connection? Scan the code again and carry on.|'Artist night' plays only songs by your favourite artist.|New: Time machine, Album cover, Type it! and In a row.|The more the merrier. Up to 12 players can join.|Rate each song with stars. At the end you'll see the hit of the night.",
 dj_join:"Welcome, {n}!|Here's {n}! Now it gets fun.|{n} is in. Watch out, everyone!|Hey {n}, grab a seat.",
-dj_howto:"Pay attention, here's how it works!|Read along, then we start.",
+dj_howto:"Pay attention, here's how it works!|Read along, then we start.",dj_last:"Last round! Give it everything.|The very last one. Now or never!|Last chance for points!",
 dj_round:"Ears open!|Here we go!|You know this one.|Turn it up!|Who knows it?|Focus…|Listen closely!",
 dj_allok:"Everyone got it! What a bunch of experts.|Too easy for you!|All correct, I need to try harder.|Wow, a sofa full of experts!",
 dj_none:"Oops… nobody?|That one was mean, sorry!|Better luck next time.|Silence in the room…|Even I didn't know it. Kidding, I did.",
@@ -2516,6 +2517,7 @@ Als een leeuw in een kooi|Willy Sommers|1990|nbx
 Altijd heb ik je lief|Clouseau|1990|nb
 Better the Devil You Know|Kylie Minogue|1990|p
 Blauw|The Scene|1990|n
+Can I Kick It?|A Tribe Called Quest|1990|h
 Cemetery Gates|Pantera|1990|mw
 Close to You|Maxi Priest|1990|l
 Cowboys from Hell|Pantera|1990|mw
@@ -2635,7 +2637,7 @@ Achy Breaky Heart|Billy Ray Cyrus|1992|pocx
 All That She Wants|Ace of Base|1992|pu
 Alles naar de klote|Euromasters|1992|du
 Arabian Nights|Bruce Adler|1992|gf
-Baby Got Back|Sir Mix-a-Lot|1992|h
+Baby Got Back|Sir Mix-a-Lot|1992|ho
 Bombtrack|Rage Against the Machine|1992|rmw
 Come As You Are|Nirvana|1992|riw
 Could It Be Magic|Take That|1992|py
@@ -2661,7 +2663,7 @@ Informer|Snow|1992|hol
 Irene|De Mens|1992|nb
 It's My Life|Dr. Alban|1992|du
 Jeremy|Pearl Jam|1992|riw
-Jump|Kris Kross|1992|h
+Jump|Kris Kross|1992|ho
 Jump Around|House of Pain|1992|hx
 Keep the Faith|Bon Jovi|1992|rw
 Killing in the Name|Rage Against the Machine|1992|rmw
@@ -2705,6 +2707,7 @@ All Apologies|Nirvana|1993|ri
 Anything|Culture Beat|1993|du
 Are You Gonna Go My Way|Lenny Kravitz|1993|r
 Bed of Roses|Bon Jovi|1993|ra
+C.R.E.A.M.|Wu-Tang Clan|1993|h
 Cryin'|Aerosmith|1993|r
 De pizza-dans|André van Duin|1993|nx
 De wereld is mooi|Samson & Gert|1993|nbg
@@ -2744,6 +2747,7 @@ Relight My Fire|Take That & Lulu|1993|py
 Rooster|Alice in Chains|1993|r
 Schrei nach Liebe|Die Ärzte|1993|jr
 Sensualité|Axelle Red|1993|pb
+Shoop|Salt-N-Pepa|1993|h
 Show Me Love|Robin S.|1993|du
 Sing Hallelujah!|Dr. Alban|1993|du
 Sober|Tool|1993|m
@@ -2858,6 +2862,7 @@ Be My Lover|La Bouche|1995|du
 Beautiful Life|Ace of Base|1995|pu
 Boom Boom Boom|The Outhere Brothers|1995|du
 Boombastic|Shaggy|1995|hzl
+Born Slippy .NUXX|Underworld|1995|d
 Breakfast at Tiffany's|Deep Blue Something|1995|po
 Bullet with Butterfly Wings|The Smashing Pumpkins|1995|ri
 California Love|2Pac|1995|h
@@ -3062,6 +3067,7 @@ Samba de Janeiro|Bellini|1997|lxu
 Save Tonight|Eagle-Eye Cherry|1997|po
 Say What You Want|Texas|1997|p
 Semi-Charmed Life|Third Eye Blind|1997|r
+Smack My Bitch Up|The Prodigy|1997|d
 Song 2|Blur|1997|rxi
 Sonic Empire|Members of Mayday|1997|du
 Spice Up Your Life|Spice Girls|1997|pxy
@@ -3218,6 +3224,7 @@ Much Against Everyone's Advice|Soulwax|1999|ib
 My Love Is Your Love|Whitney Houston|1999|ps
 My Name Is|Eminem|1999|h
 No Scrubs|TLC|1999|hy
+Porcelain|Moby|1999|d
 Praise You|Fatboy Slim|1999|d
 Premier gaou|Magic System|1999|qx
 Red Alert|Basement Jaxx|1999|d
@@ -3227,6 +3234,7 @@ Sandstorm|Darude|1999|dxou
 Scar Tissue|Red Hot Chili Peppers|1999|ri
 She's the One|Robbie Williams|1999|pa
 Show Me the Meaning of Being Lonely|Backstreet Boys|1999|py
+Silence|Delerium & Sarah McLachlan|1999|d
 Smooth|Santana|1999|pl
 Sometimes|Britney Spears|1999|p
 SpongeBob SquarePants Theme|Painty the Pirate|1999|gv
@@ -3254,6 +3262,7 @@ Why Don't You Get a Job?|The Offspring|1999|r
 Wild Wild West|Will Smith|1999|hf
 You'll Be in My Heart|Phil Collins|1999|gf
 Zehn nackte Friseusen|Mickie Krause|1999|jx
+Zombie Nation|Kernkraft 400|1999|d
 Aimer|Roméo & Juliette|2000|q
 Alle kleuren|K3|2000|nbgy
 Around the World (La La La La La)|ATC|2000|duo
@@ -3342,7 +3351,7 @@ Walking Away|Craig David|2000|h
 Who Let the Dogs Out|Baha Men|2000|pxol
 With Arms Wide Open|Creed|2000|r
 Wrong|Novastar|2000|ib
-Yellow|Coldplay|2000|ri
+Yellow|Coldplay|2000|rpi
 Zomer in Nederland|De Sjonnies|2000|njx
 19-2000|Gorillaz|2001|pi
 Aan de grens van de Duitse heuvelen|Frans Bauer|2001|n
@@ -3377,6 +3386,7 @@ Get the Party Started|P!nk|2001|px
 Get Ur Freak On|Missy Elliott|2001|h
 Gotta Get Thru This|Daniel Bedingfield|2001|d
 Harder, Better, Faster, Stronger|Daft Punk|2001|d
+Have a Nice Day|Stereophonics|2001|r
 Hedwig's Theme|John Williams|2001|f
 Hero|Enrique Iglesias|2001|pla
 How You Remind Me|Nickelback|2001|r
@@ -3411,6 +3421,7 @@ Someday|The Strokes|2001|ri
 Something|Lasgo|2001|dbua
 Sonne|Rammstein|2001|m
 Sous le vent|Garou & Céline Dion|2001|q
+Starlight|The Supermen Lovers|2001|d
 Survivor|Destiny's Child|2001|hy
 Tele-Romeo|K3|2001|nbgy
 The Logical Song|Scooter|2001|du
@@ -3441,7 +3452,7 @@ Can't Stop|Red Hot Chili Peppers|2002|ri
 Cheeky Song (Touch My Bum)|The Cheeky Girls|2002|xo
 Chihuahua|DJ BoBo|2002|dxu
 Cleanin' Out My Closet|Eminem|2002|h
-Clocks|Coldplay|2002|ri
+Clocks|Coldplay|2002|rpi
 Cloud Connected|In Flames|2002|m
 Cochise|Audioslave|2002|r
 Complicated|Avril Lavigne|2002|pr
@@ -3491,7 +3502,7 @@ Still Waiting|Sum 41|2002|r
 Stop Crying Your Heart Out|Oasis|2002|ri
 The Anthem|Good Charlotte|2002|r
 The Ketchup Song (Aserejé)|Las Ketchup|2002|pdxzol
-The Scientist|Coldplay|2002|ria
+The Scientist|Coldplay|2002|rpia
 The Tide Is High (Get the Feeling)|Atomic Kitten|2002|py
 The World Is Mine|Hooverphonic|2002|ib
 Toveren|K3|2002|nbgy
@@ -3526,6 +3537,7 @@ Hey Ya!|OutKast|2003|hx
 Hole in the Head|Sugababes|2003|py
 Hysteria|Muse|2003|ri
 I Believe in a Thing Called Love|The Darkness|2003|r
+I Hate Everything About You|Three Days Grace|2003|r
 Ik ben Gerrit|Gebroeders Ko|2003|nx
 In da Club|50 Cent|2003|h
 Like a Stone|Audioslave|2003|r
@@ -3534,7 +3546,7 @@ Maps|Yeah Yeah Yeahs|2003|i
 Maria (I Like It Loud)|Scooter|2003|dxu
 Mijn houten hart|De Poema's|2003|n
 My Immortal|Evanescence|2003|r
-Numb|Linkin Park|2003|r
+Numb|Linkin Park|2003|rm
 Omarm|BLØF|2003|n
 Oya lélé|K3|2003|nbgy
 P.I.M.P.|50 Cent|2003|h
@@ -3542,7 +3554,7 @@ Perfect|Simple Plan|2003|ra
 Piraten potpourri|Piet Piraat|2003|gnb
 Rags 'n' Run|Admiral Freebee|2003|ib
 Rock Your Body|Justin Timberlake|2003|p
-Run|Snow Patrol|2003|ri
+Run|Snow Patrol|2003|rpi
 Seven Nation Army|The White Stripes|2003|rxti
 Show Me How to Live|Audioslave|2003|r
 Sing for the Moment|Eminem|2003|h
@@ -3551,9 +3563,11 @@ Such Great Heights|The Postal Service|2003|i
 The Bitter End|Placebo|2003|ri
 Time Is Running Out|Muse|2003|ri
 Times Like These|Foo Fighters|2003|ri
+Traffic|Tiësto|2003|d
 Turn Me On|Kevin Lyttle|2003|pzo
 Viva Colonia|Höhner|2003|jx
 Where Is the Love?|Black Eyed Peas|2003|h
+Where Is the Love?|The Black Eyed Peas|2003|h
 White Flag|Dido|2003|p
 Wicked Soul|Admiral Freebee|2003|ib
 1001 Arabian Nights|Ch!pz|2004|pyg
@@ -3586,11 +3600,13 @@ I Miss You|blink-182|2004|r
 I Predict a Riot|Kaiser Chiefs|2004|ri
 I'm Not Okay (I Promise)|My Chemical Romance|2004|r
 Ik ben Bumba|Bumba|2004|nbg
+Jesus Walks|Kanye West|2004|h
 Jongens|Spring|2004|gnb
 Just Lose It|Eminem|2004|h
 La Camisa Negra|Juanes|2004|l
 Leipe mocro flavour|Ali B|2004|nh
 Let's Get It Started|Black Eyed Peas|2004|hx
+Let's Get It Started|The Black Eyed Peas|2004|h
 Lola's Theme|The Shapeshifters|2004|d
 Love Machine|Girls Aloud|2004|py
 Ma philosophie|Amel Bent|2004|q
@@ -3614,7 +3630,7 @@ She Will Be Loved|Maroon 5|2004|p
 Si seulement je pouvais lui manquer|Calogero|2004|q
 Since U Been Gone|Kelly Clarkson|2004|p
 Somebody Told Me|The Killers|2004|ri
-Somewhere Only We Know|Keane|2004|ri
+Somewhere Only We Know|Keane|2004|rpi
 Stand My Ground|Within Temptation|2004|m
 Take Me Out|Franz Ferdinand|2004|ri
 This Love|Maroon 5|2004|p
@@ -3631,6 +3647,7 @@ Wish I Had an Angel|Nightwish|2004|m
 Yeah!|Usher|2004|hx
 Zelfs je naam is mooi|Bart Peeters|2004|nb
 Zinloos|Lange Frans & Baas B|2004|nhu
+Adagio for Strings|Tiësto|2005|d
 All About You|McFly|2005|py
 All These Things That I've Done|The Killers|2005|ri
 Angels|Within Temptation|2005|ma
@@ -3648,6 +3665,7 @@ Best of You|Foo Fighters|2005|ri
 Black Horse and the Cherry Tree|KT Tunstall|2005|p
 Candy Shop|50 Cent|2005|h
 Coming Undone|Korn|2005|m
+Dakota|Stereophonics|2005|r
 Dance, Dance|Fall Out Boy|2005|r
 Dare|Gorillaz|2005|pi
 Do You Want To|Franz Ferdinand|2005|ri
@@ -3685,6 +3703,7 @@ One, Two, Three|Ch!pz|2005|pyg
 Photograph|Nickelback|2005|ra
 Pon de Replay|Rihanna|2005|h
 Primo Victoria|Sabaton|2005|m
+Pump It|The Black Eyed Peas|2005|d
 Push the Button|Sugababes|2005|py
 Saudade|Arsenal|2005|ib
 Sjeng aon de geng|Fabrizio|2005|nx
@@ -3715,11 +3734,12 @@ Breaking Free|Troy & Gabriella|2006|gf
 British Mode|Goose|2006|ib
 Buttons|The Pussycat Dolls|2006|py
 Call Me When You're Sober|Evanescence|2006|r
-Chasing Cars|Snow Patrol|2006|ria
+Chasing Cars|Snow Patrol|2006|rpia
 Chelsea Dagger|The Fratellis|2006|rxi
 Crazy|Gnarls Barkley|2006|hs
 Cupido|Jan Smit|2006|nx
 Dani California|Red Hot Chili Peppers|2006|ri
+Destination Calabria|Alex Gaudino|2006|d
 Door de wind|Het Huis Anubis|2006|gnb
 Hard Rock Hallelujah|Lordi|2006|me
 Hello|Goose|2006|iba
@@ -3837,9 +3857,10 @@ Umbrella|Rihanna|2007|h
 Valerie|Mark Ronson & Amy Winehouse|2007|ps
 Vonken en vuur|Clouseau|2007|nb
 What Have You Done|Within Temptation|2007|m
-What I've Done|Linkin Park|2007|rf
+What I've Done|Linkin Park|2007|rfm
 Wiegelied|3JS|2007|n
 You Know I'm No Good|Amy Winehouse|2007|hs
+A Milli|Lil Wayne|2008|h
 Alles neu|Peter Fox|2008|xj
 Breaking Bad Theme|Dave Porter|2008|v
 Burnin' Up|Jonas Brothers|2008|py
@@ -3867,7 +3888,9 @@ Human|The Killers|2008|ri
 I Kissed a Girl|Katy Perry|2008|p
 I'm Yours|Jason Mraz|2008|p
 If I Were a Boy|Beyoncé|2008|pa
+In and Out of Love|Armin van Buuren|2008|d
 Indestructible|Disturbed|2008|m
+Infinity 2008|Guru Josh Project|2008|d
 Just Dance|Lady Gaga|2008|pd
 Leef nu het kan|Gerard Joling|2008|nx
 Lollipop|Lil Wayne|2008|h
@@ -3893,7 +3916,7 @@ Time to Pretend|MGMT|2008|pi
 Twilight of the Thunder God|Amon Amarth|2008|m
 Use Somebody|Kings of Leon|2008|ri
 Viva Hollandia|Wolter Kroes|2008|nx
-Viva la Vida|Coldplay|2008|rti
+Viva la Vida|Coldplay|2008|rtpi
 Walking on a Dream|Empire of the Sun|2008|p
 Warwick Avenue|Duffy|2008|s
 When I Grow Up|The Pussycat Dolls|2008|py
@@ -3908,6 +3931,7 @@ Als er ooit iets fout zou gaan|Clouseau|2009|nb
 Ayo Technology|Milow|2009|pb
 Bad Romance|Lady Gaga|2009|pd
 Boom Boom Pow|Black Eyed Peas|2009|h
+Boom Boom Pow|The Black Eyed Peas|2009|d
 Break Your Heart|Taio Cruz|2009|p
 Broodje bakpao|The Opposites|2009|nhx
 Bulletproof|La Roux|2009|p
@@ -3923,6 +3947,7 @@ Hey, Soul Sister|Train|2009|p
 Home|Edward Sharpe & the Magnetic Zeros|2009|ci
 Hotel Room Service|Pitbull|2009|dl
 I Gotta Feeling|Black Eyed Peas|2009|pdx
+I Gotta Feeling|The Black Eyed Peas|2009|dx
 I Know You Want Me (Calle Ocho)|Pitbull|2009|dxl
 I'm Not Alone|Calvin Harris|2009|d
 Kom|3JS|2009|n
@@ -3940,7 +3965,9 @@ Party in the U.S.A.|Miley Cyrus|2009|p
 Right Round|Flo Rida|2009|h
 Run This Town|Jay-Z|2009|h
 Schatje mag ik je foto|Gebroeders Ko|2009|nx
+Sexy Bitch|David Guetta & Akon|2009|d
 She Wolf|Shakira|2009|l
+Shots|LMFAO & Lil Jon|2009|dx
 Snuff|Slipknot|2009|m
 Stuk|The Partysquad|2009|nh
 Sweet Caroline|DJ Ötzi|2009|jx
@@ -3960,6 +3987,7 @@ Baby|Justin Bieber|2010|p
 Bad Company|Five Finger Death Punch|2010|m
 Barbra Streisand|Duck Sauce|2010|dx
 Billionaire|Travie McCoy|2010|p
+Black and Yellow|Wiz Khalifa|2010|h
 California Gurls|Katy Perry|2010|pz
 Christmas Lights|Coldplay|2010|ki
 Club Can't Handle Me|Flo Rida|2010|d
@@ -4028,11 +4056,13 @@ Bloody Mary|Lady Gaga|2011|p
 Born This Way|Lady Gaga|2011|p
 Born to Die|Lana Del Rey|2011|i
 Call Me Maybe|Carly Rae Jepsen|2011|p
+Can't Hold Us|Macklemore & Ryan Lewis|2011|h
 Cowboys en indianen|Dries Roelvink|2011|njx
 Die mooie blauwe ogen|Django Wagner|2011|njx
 Domino|Jessie J|2011|p
 E.T.|Katy Perry|2011|p
 Elle me dit|Mika|2011|q
+Epic|Sandro Silva & Quintino|2011|d
 Every Teardrop Is a Waterfall|Coldplay|2011|pi
 Feel So Close|Calvin Harris|2011|d
 Game of Thrones Main Title|Ramin Djawadi|2011|v
@@ -4090,6 +4120,7 @@ Without You|David Guetta|2011|da
 Young, Wild & Free|Snoop Dogg|2011|h
 Zo stil|BLØF|2011|n
 Another Love|Tom Odell|2012|p
+Apollo|Hardwell|2012|d
 Beauty & de Brains|Nielson|2012|n
 Breezeblocks|alt-J|2012|i
 Chasing the Sun|The Wanted|2012|py
@@ -4097,6 +4128,7 @@ Clarity|Zedd|2012|d
 Cruise|Florida Georgia Line|2012|c
 Demons|Imagine Dragons|2012|ri
 Diamonds|Rihanna|2012|p
+Die Young|Kesha|2012|p
 Dit pakt niemand ons meer af|Kraantje Pappie|2012|nh
 Don't You Worry Child|Swedish House Mafia|2012|d
 Euphoria|Loreen|2012|pde
@@ -4123,13 +4155,15 @@ On Top of the World|Imagine Dragons|2012|ri
 Parijs|Gers Pardoel|2012|nh
 Part of Me|Katy Perry|2012|p
 Payphone|Maroon 5|2012|p
+Play Hard|David Guetta|2012|d
 Pompen|Kraantje Pappie|2012|nhx
 R U Mine?|Arctic Monkeys|2012|ri
 Radioactive|Imagine Dragons|2012|ri
 Shirt uit en zwaaien|Mental Theo & Gordon|2012|nx
 Skyfall|Adele|2012|pf
 Some Nights|fun.|2012|p
-Starships|Nicki Minaj|2012|pd
+Spaceman|Hardwell|2012|d
+Starships|Nicki Minaj|2012|pdh
 Summertime Sadness|Lana Del Rey|2012|pzi
 Sweater Weather|The Neighbourhood|2012|i
 Sweet Nothing|Calvin Harris|2012|d
@@ -4140,7 +4174,7 @@ Try|P!nk|2012|p
 We Are Never Ever Getting Back Together|Taylor Swift|2012|p
 Wereld van verschil|Miss Montreal|2012|n
 Where Have You Been|Rihanna|2012|d
-Whistle|Flo Rida|2012|p
+Whistle|Flo Rida|2012|ph
 Wide Awake|Katy Perry|2012|p
 Wings|Little Mix|2012|py
 22|Taylor Swift|2013|p
@@ -4151,6 +4185,7 @@ Atemlos durch die Nacht|Helene Fischer|2013|xj
 Best Song Ever|One Direction|2013|py
 Birds|Anouk|2013|pe
 Blurred Lines|Robin Thicke|2013|s
+Boneless|Steve Aoki|2013|d
 Burn|Ellie Goulding|2013|p
 Can You Feel My Heart|Bring Me the Horizon|2013|m
 Chocolate|The 1975|2013|i
@@ -4187,6 +4222,7 @@ Paw Patrol Theme|Scott Simons|2013|gv
 Pompeii|Bastille|2013|p
 Rap God|Eminem|2013|h
 Red Lights|Tiësto|2013|d
+Reload|Sebastian Ingrosso & Tommy Trash|2013|d
 Riptide|Vance Joy|2013|pci
 Roar|Katy Perry|2013|p
 Royals|Lorde|2013|pi
@@ -4195,6 +4231,7 @@ Safe and Sound|Capital Cities|2013|p
 Shadow Moses|Bring Me the Horizon|2013|m
 Slapeloze nachten|The Opposites|2013|nh
 Sleepwalking|Bring Me the Horizon|2013|m
+Started from the Bottom|Drake|2013|h
 Still Into You|Paramore|2013|r
 Stolen Dance|Milky Chance|2013|pi
 Story of My Life|One Direction|2013|py
@@ -4247,8 +4284,11 @@ Earned It|The Weeknd|2014|pf
 Elastic Heart|Sia|2014|p
 En route|Tourist LeMC|2014|nbh
 Everything Is Awesome|Tegan and Sara|2014|fg
+Fancy|Iggy Azalea & Charli XCX|2014|h
 Feest|Feestteam|2014|njx
+Fireball|Pitbull|2014|dxl
 Firestone|Kygo|2014|d
+Gecko (Overdrive)|Oliver Heldens & Becky Hill|2014|d
 Ghost Rockers|Ghost Rockers|2014|gnb
 Gimme Chocolate!!|Babymetal|2014|m
 Hemel valt|Typhoon|2014|nh
@@ -4286,6 +4326,7 @@ The Nights|Avicii|2014|d
 Thinking Out Loud|Ed Sheeran|2014|pa
 To Hell and Back|Sabaton|2014|m
 Tourner dans le vide|Indila|2014|q
+Trap Queen|Fetty Wap|2014|h
 Tremor|Dimitri Vegas & Like Mike|2014|db
 Uptown Funk|Mark Ronson|2014|pdxs
 Waves|Mr Probz|2014|dz
@@ -4327,10 +4368,12 @@ Love Me Like You Do|Ellie Goulding|2015|pf
 Love Yourself|Justin Bieber|2015|p
 Mooi|Marco Borsato|2015|n
 Ocean Drive|Duke Dumont|2015|d
+Panda|Desiigner|2015|h
 Parijs|Kenny B|2015|n
 Reality|Lost Frequencies|2015|db
 Rhythm Inside|Loïc Nottet|2015|pbe
 Ride|Twenty One Pilots|2015|ri
+Roses|The Chainsmokers|2015|d
 See You Again|Wiz Khalifa|2015|hf
 Sorry|Justin Bieber|2015|p
 Space Song|Beach House|2015|i
@@ -4359,7 +4402,10 @@ Writing's on the Wall|Sam Smith|2015|pf
 Zoveel te doen|Tourist LeMC|2015|nbh
 1944|Jamala|2016|pe
 24K Magic|Bruno Mars|2016|ps
+Alone|Alan Walker|2016|d
 Baby Shark|Pinkfong|2016|fg
+Bad and Boujee|Migos|2016|h
+Black Beatles|Rae Sremmurd|2016|h
 Can't Stop the Feeling!|Justin Timberlake|2016|pfxgs
 Chantaje|Shakira & Maluma|2016|l
 Chaos|Bazart|2016|nb
@@ -4368,11 +4414,14 @@ Chöre|Mark Forster|2016|xj
 City of Stars|Ryan Gosling & Emma Stone|2016|f
 Closer|The Chainsmokers|2016|d
 Cold Water|Major Lazer|2016|d
+Congratulations|Post Malone|2016|h
 Dangerous Woman|Ariana Grande|2016|p
 Die for You|The Weeknd|2016|p
+Don't Let Me Down|The Chainsmokers & Daya|2016|d
 Formation|Beyoncé|2016|h
 Get Back Up Again|Anna Kendrick|2016|gf
 Good as Hell|Lizzo|2016|s
+Goosebumps|Travis Scott|2016|h
 Goud|Bazart|2016|nb
 Heathens|Twenty One Pilots|2016|rfi
 How Far I'll Go|Auli'i Cravalho|2016|fg
@@ -4447,6 +4496,7 @@ Krantenwijk|Lil Kleine & Boef|2017|nh
 La loi de Murphy|Angèle|2017|qb
 Look What You Made Me Do|Taylor Swift|2017|p
 Love Tonight|Shouse|2017|d
+Mask Off|Future|2017|h
 Mi Gente|J Balvin|2017|dzl
 Million Eyes|Loïc Nottet|2017|pb
 Mwaka Moon|Kalash & Damso|2017|qh
@@ -4459,9 +4509,10 @@ Shape of You|Ed Sheeran|2017|p
 Sign of the Times|Harry Styles|2017|p
 Slide|Calvin Harris|2017|d
 Snowman|Sia|2017|pk
-Something Just Like This|The Chainsmokers|2017|p
+Something Just Like This|The Chainsmokers|2017|pd
 Sorry Not Sorry|Demi Lovato|2017|p
 Springen nondeju|Snollebollekes|2017|njx
+Stay|Zedd & Alessia Cara|2017|d
 Symphony|Clean Bandit|2017|d
 That's What I Like|Bruno Mars|2017|p
 The Greatest Show|Hugh Jackman|2017|f
@@ -4473,7 +4524,9 @@ Truth Hurts|Lizzo|2017|p
 Un Poco Loco|Anthony Gonzalez|2017|fg
 Verover mij|Niels Destadsbader|2017|nb
 What About Us|P!nk|2017|p
+Whatever It Takes|Imagine Dragons|2017|ri
 Without You|Avicii|2017|da
+XO Tour Llif3|Lil Uzi Vert|2017|h
 Zoutelande|BLØF|2017|nb
 Échame la culpa|Luis Fonsi & Demi Lovato|2017|l
 2002|Anne-Marie|2018|p
@@ -4483,6 +4536,7 @@ Als het avond is|Suzan & Freek|2018|na
 Atje voor de sfeer|René Karst|2018|njx
 Bella ciao|El Profesor|2018|lx
 Better Now|Post Malone|2018|p
+Blah Blah Blah|Armin van Buuren|2018|d
 Bluey Theme Tune|Joff Bush|2018|vg
 Calma|Pedro Capó|2018|l
 Copines|Aya Nakamura|2018|q
@@ -4502,8 +4556,9 @@ God's Plan|Drake|2018|h
 Grip|Bazart|2018|nb
 Happier|Marshmello|2018|d
 High Hopes|Panic! at the Disco|2018|p
+High on Life|Martin Garrix|2018|d
 Horizon|Tourist LeMC|2018|nbh
-I Like It|Cardi B|2018|h
+I Like It|Cardi B|2018|hl
 IJskoud|Nielson|2018|n
 Ik ben een kleine zebra|Juf Roos|2018|gn
 In My Feelings|Drake|2018|h
@@ -4512,6 +4567,7 @@ Later als ik groot ben|Tino Martin|2018|nj
 Lente in mijn hart|Niels Destadsbader|2018|nb
 Lil Craney|Kraantje Pappie|2018|nh
 Losing It|Fisher|2018|d
+Lucid Dreams|Juice WRLD|2018|h
 Mama Laudaaa|Almklausi & Specktakel|2018|jx
 No Tears Left to Cry|Ariana Grande|2018|p
 Old Town Road|Lil Nas X|2018|h
@@ -4531,6 +4587,7 @@ Sweet but Psycho|Ava Max|2018|p
 Ta reine|Angèle|2018|pb
 Taki Taki|DJ Snake|2018|dl
 Thank U, Next|Ariana Grande|2018|p
+The Middle|Zedd, Maren Morris & Grey|2018|d
 These Days|Rudimental|2018|d
 Tout oublier|Angèle|2018|pbq
 Toy|Netta|2018|pe
@@ -4625,6 +4682,7 @@ Mood|24kGoldn|2020|h
 No Time to Die|Billie Eilish|2020|pfi
 Nu wij niet meer praten|Jaap Reesema & Pommelien Thijs|2020|nb
 Parasite Eve|Bring Me the Horizon|2020|m
+Physical|Dua Lipa|2020|p
 Pink Pony Club|Chappell Roan|2020|p
 positions|Ariana Grande|2020|p
 Rain on Me|Lady Gaga|2020|pd
@@ -4637,6 +4695,7 @@ Smoorverliefd|Snelle|2020|n
 Sweet Melody|Little Mix|2020|py
 The Business|Tiësto|2020|d
 Think About Things|Daði Freyr|2020|pe
+WAP|Cardi B & Megan Thee Stallion|2020|h
 1 op een miljoen|Metejoor & Babet|2021|nb
 abcdefu|GAYLE|2021|p
 Aloha!|Cristobal Tapia de Veer|2021|v
@@ -4650,26 +4709,28 @@ Cold Heart|Elton John|2021|pd
 Dat heb jij gedaan|MEAU|2021|n
 Denk maar niet aan morgen|Bazart|2021|nb
 drivers license|Olivia Rodrigo|2021|p
-Easy On Me|Adele|2021|p
+Easy On Me|Adele|2021|pa
 Enemy|Imagine Dragons|2021|rvi
 Fade Up|Hamza & SCH & Zeg P|2021|qbh
+Friday|Riton & Nightcrawlers|2021|d
 Ghost|Justin Bieber|2021|p
 good 4 u|Olivia Rodrigo|2021|pr
 Happier Than Ever|Billie Eilish|2021|pi
 Higher Power|Coldplay|2021|pi
 I Wanna Be Your Slave|Måneskin|2021|r
 Industry Baby|Lil Nas X|2021|h
+Industry Baby|Lil Nas X & Jack Harlow|2021|h
 Kiss Me More|Doja Cat|2021|p
 La kiffance|Naps|2021|qh
 Leave the Door Open|Silk Sonic|2021|hs
 Liefde voor muziek|Jaap Reesema & Pommelien Thijs|2021|nb
 Meisje|Bazart|2021|nb
 Merry Christmas|Ed Sheeran|2021|pk
-Montero (Call Me by Your Name)|Lil Nas X|2021|h
+Montero (Call Me by Your Name)|Lil Nas X|2021|hp
 My Universe|Coldplay|2021|pi
 Noodgeval|Goldband|2021|nx
 Onderweg naar later|Suzan & Freek|2021|n
-Peaches|Justin Bieber|2021|p
+Peaches|Justin Bieber|2021|ph
 Pepas|Farruko|2021|dxl
 Petrouchka|Soso Maness & PLK|2021|qh
 Remember|Becky Hill|2021|d
@@ -4696,6 +4757,7 @@ Als ik jou zie|Camille|2022|nb
 Anti-Hero|Taylor Swift|2022|p
 As It Was|Harry Styles|2022|p
 Bad Habit|Steve Lacy|2022|h
+Bad Memories|MEDUZA & James Carter|2022|d
 Bones|Imagine Dragons|2022|ri
 Break My Soul|Beyoncé|2022|d
 Calm Down|Rema|2022|phl
@@ -4705,6 +4767,7 @@ De diepte|S10|2022|n
 Despechá|Rosalía|2022|pzl
 Diamant|Camille|2022|nb
 Dromen in kleur|Suzan & Freek|2022|n
+End of Beginning|Djo|2022|i
 Engelbewaarder|Marco Schuitmaker|2022|nx
 Escapism.|RAYE|2022|p
 First Class|Jack Harlow|2022|h
@@ -4720,10 +4783,12 @@ Kill Bill|SZA|2022|h
 L'enfer|Stromae|2022|pb
 Late Night Talking|Harry Styles|2022|p
 Layla|DJ Robin & Schürze|2022|xj
+Lift Me Up|Rihanna|2022|pf
 Made You Look|Meghan Trainor|2022|p
 Me Porto Bonito|Bad Bunny & Chencho Corleone|2022|l
 Meisjes blijven meisjes|Pommelien Thijs|2022|nb
 Miss You|Jérémie Makiese|2022|eb
+Nonsense|Sabrina Carpenter|2022|p
 Ongewoon|Pommelien Thijs|2022|nb
 Pink Venom|BLACKPINK|2022|py
 Snap|Rosa Linn|2022|pe
@@ -4732,7 +4797,7 @@ Something in the Orange|Zach Bryan|2022|c
 Space Man|Sam Ryder|2022|pe
 Stapelgek|Bankzitters|2022|nx
 Stefania|Kalush Orchestra|2022|pe
-Stick Season|Noah Kahan|2022|c
+Stick Season|Noah Kahan|2022|cp
 Stiekem|Maan & Goldband|2022|n
 Sunroof|Nicky Youre|2022|pz
 Tití Me Preguntó|Bad Bunny|2022|hzl
@@ -4742,6 +4807,7 @@ Zeit|Rammstein|2022|m
 Zo is 't leven|Laura Tesoro|2022|nb
 Zotteke|Metejoor|2022|nb
 Zukunft Pink|Peter Fox & Inéz|2022|xj
+Austin|Dasha|2023|c
 Baby Don't Hurt Me|David Guetta|2023|d
 Because of You|Gustaph|2023|eb
 Boy's a Liar Pt. 2|PinkPantheress|2023|p
@@ -4760,6 +4826,7 @@ Hot To Go!|Chappell Roan|2023|px
 Houdini|Dua Lipa|2023|pd
 I Remember Everything|Zach Bryan & Kacey Musgraves|2023|c
 I'm Just Ken|Ryan Gosling|2023|f
+Is It Over Now?|Taylor Swift|2023|p
 Ja!|Bankzitters|2023|nx
 Je blik richting mij|Bankzitters|2023|nx
 Komet|Udo Lindenberg & Apache 207|2023|xj
@@ -4772,8 +4839,11 @@ Paint The Town Red|Doja Cat|2023|h
 Peaches|Jack Black|2023|gf
 Prada|Cassö|2023|d
 Seven|Jung Kook|2023|p
+Si No Estás|Iñigo Quintero|2023|l
 Sprinter|Dave|2023|h
+Standing Next to You|Jung Kook|2023|p
 Strangers|Kenya Grace|2023|d
+Stumblin' In|Cyril|2023|d
 Super Shy|NewJeans|2023|py
 Tattoo|Loreen|2023|pe
 The Last of Us|Gustavo Santaolalla|2023|v
@@ -4781,20 +4851,29 @@ Vampire|Olivia Rodrigo|2023|pr
 Wat wil je van mij|Metejoor & Hannah Mae|2023|nb
 Water|Tyla|2023|hl
 What Was I Made For?|Billie Eilish|2023|pfi
+360|Charli xcx|2024|pd
 A Bar Song (Tipsy)|Shaboozey|2024|pxc
+Apple|Charli xcx|2024|pd
 APT.|ROSÉ|2024|px
 Atlas|Pommelien Thijs|2024|nb
 Beautiful Things|Benson Boone|2024|p
 Before the Party's Over|Mustii|2024|eb
+Belong Together|Mark Ambor|2024|p
 Birds of a Feather|Billie Eilish|2024|pi
+Denial Is a River|Doechii|2024|h
 Die With A Smile|Lady Gaga|2024|pa
+Disease|Lady Gaga|2024|p
 Espresso|Sabrina Carpenter|2024|p
 Europapa|Joost|2024|ndxe
+Feelslikeimfallinginlove|Coldplay|2024|pi
 Fortnight|Taylor Swift|2024|p
 Good Luck, Babe!|Chappell Roan|2024|p
+Guess|Charli xcx & Billie Eilish|2024|pd
 Het midden|Pommelien Thijs|2024|nb
 I Had Some Help|Post Malone|2024|pc
 I Like the Way You Kiss Me|Artemas|2024|p
+Love Me Not|Ravyn Lenae|2024|h
+Lunch|Billie Eilish|2024|pi
 Luther|Kendrick Lamar|2024|h
 Mea culpa (Ah! Ça ira!)|Gojira|2024|m
 Messy|Lola Young|2024|p
@@ -4804,20 +4883,31 @@ Please Please Please|Sabrina Carpenter|2024|p
 Rim Tim Tagi Dim|Baby Lasagna|2024|ex
 Sailor Song|Gigi Perez|2024|pi
 Stargazing|Myles Smith|2024|p
+Sympathy Is a Knife|Charli xcx|2024|p
 Taste|Sabrina Carpenter|2024|p
 Texas Hold 'Em|Beyoncé|2024|pc
 That's So True|Gracie Abrams|2024|p
 The Code|Nemo|2024|pe
-Too Sweet|Hozier|2024|ri
+The Emptiness Machine|Linkin Park|2024|m
+Too Sweet|Hozier|2024|rip
 Training Season|Dua Lipa|2024|p
+We Can't Be Friends (Wait for Your Love)|Ariana Grande|2024|p
 yes, and?|Ariana Grande|2024|p
 Abracadabra|Lady Gaga|2025|pd
+Anxiety|Doechii|2025|h
+Azizam|Ed Sheeran|2025|p
 Bara bada bastu|KAJ|2025|ex
+Blessings|Calvin Harris & Clementine Douglas|2025|d
 Espresso Macchiato|Tommy Cash|2025|ex
 Golden|HUNTR/X|2025|pfg
 Manchild|Sabrina Carpenter|2025|p
+Mystical Magical|Benson Boone|2025|p
 Ordinary|Alex Warren|2025|p
+Sapphire|Ed Sheeran|2025|p
+Show Me Love|WizTheMc & bees & honey|2025|p
 Soda Pop|Saja Boys|2025|gf
+Sorry I'm Here for Someone Else|Benson Boone|2025|p
+Sports Car|Tate McRae|2025|p
 Strobe Lights|Red Sebastian|2025|eb
 The Subway|Chappell Roan|2025|p
 Wasted Love|JJ|2025|pe
@@ -5132,7 +5222,7 @@ async function nextRound(){
   if(cm==='chip'){T.chip={start:Math.random()<.5?2:.55};setRate(T.chip.start)}
   sync();announceRound();
 }
-function announceRound(){DJ('dj_round',null,.3);const m=mult()>1;if(m){sfx('double');crowd('clap')}speak(t('sayRound',{n:T.segRound})+(m?' '+t('sayDouble'):''))}
+function announceRound(){const lastR=!cardMode()&&!isBoard()&&T.segRound===segRounds()&&(!isEvening()||T.ev.idx===T.ev.list.length-1)&&segRounds()>1;if(lastR){DJ('dj_last');crowd('drum')}else DJ('dj_round',null,.3);const m=mult()>1;if(m){sfx('double');crowd('clap')}speak(t('sayRound',{n:T.segRound})+(m?' '+t('sayDouble'):''))}
 function unitDone(u){const cm=curMode(),a=u.ans;
   if(cm==='fake'){if(!T.fake)return false;return T.fake.sub==='write'?!!(a&&a.fake):T.fake.votes.has(u.id)}
   if(cm==='herd')return !!(T.herd&&T.herd.votes.has(u.id));
@@ -5419,7 +5509,7 @@ async function liveSearch(q){q=String(q||'').trim().slice(0,100);if(!q)return;
 async function liveLoad(id){id=String(id||'');if(!/^(chart|[ag]?\d+)$/.test(id))return;T.liveStatus=t('liveLoading');sync();
   try{let name,data;
     if(id==='chart'){const d=await dz('/chart/0/tracks',{limit:100});name=t('liveChart');data=(d&&d.data)||[]}
-    else if(id[0]==='g'){const g=DZ_GENRES.find(x=>String(x[0])===id.slice(1));const d=await dz('/chart/'+id.slice(1)+'/tracks',{limit:100});name='Top '+(g?g[1]:'');data=(d&&d.data)||[]}
+    else if(id[0]==='g'){const g=(T.dzGenres||DZ_GENRES).find(x=>String(x[0])===id.slice(1));const d=await dz('/chart/'+id.slice(1)+'/tracks',{limit:100});name='Top '+(g?g[1]:'');data=(d&&d.data)||[]}
     else if(id[0]==='a'){const info=await dz('/artist/'+id.slice(1));const d=await dz('/artist/'+id.slice(1)+'/top',{limit:60});name='👤 '+((info&&info.name)||'Artiest');data=(d&&d.data)||[]}
     else{const info=await dz('/playlist/'+id);const d=await dz('/playlist/'+id+'/tracks',{limit:400});name=(info&&info.title)||'Playlist';data=(d&&d.data)||[]}
     const seen=new Set(),songs=[];
@@ -5530,7 +5620,7 @@ function view(p){const s=T.settings,u=unitOf(p),cm=curMode();
     players:[...T.players.values()].map(pub),units:[...T.units.values()].map(x=>pubUnit(x,false))};
   if(T.ev)v.ev={i:T.ev.idx,n:T.ev.list.length,list:T.ev.list};
   v.paused=!!T.paused;v.vol=T.settings.vol||5;if(T.phase==='howto')v.remaining=Math.max(0,T.deadline-(T.paused?T.paused.at:now()));if(isBoard()){v.boardLen=T.settings.boardLen;if(T.board)v.turn=T.board.turn}
-  if(p.host){v.settings=s;v.pool=pool().length;v.heard=inGame()?0:heardCount();v.live=T.live?{name:T.live.name,n:T.live.songs.length}:null;v.liveStatus=T.liveStatus;v.liveResults=T.liveResults;if(!inGame())v.liveRecent=store.get('dt_lists',[])||[]}
+  if(p.host){v.settings=s;v.pool=pool().length;v.heard=inGame()?0:heardCount();v.live=T.live?{name:T.live.name,n:T.live.songs.length}:null;v.liveStatus=T.liveStatus;v.liveResults=T.liveResults;if(!inGame()){v.liveRecent=store.get('dt_lists',[])||[];v.dzGenres=T.dzGenres||DZ_GENRES}}
   if(!inGame()){const w={};T.wishes.forEach((m,pid)=>{if(T.players.has(pid))w[m]=(w[m]||0)+1});v.wishes=w;v.myWish=T.wishes.get(p.id)||null}
   const rem=Math.max(0,T.deadline-(T.paused?T.paused.at:now()));
   if(T.phase==='deal'){if(T.anchor)v.anchor=pubSong(T.anchor)}
@@ -5890,7 +5980,8 @@ function renderTV(){if(MODE!=='tv')return;LANG=T.settings.lang;const app=$('#app
   if(key!==tvKey){tvKey=key;let h;try{h=tvScreen()}catch(e){console.warn('tvScreen',e);tvKey='';h=`<div class="tv col"><div class="big-center">${vinylHTML('♪',true,'5s')}</div></div>`}app.innerHTML=h;afterTV()}
   tvUpdate()}
 function floatReact(p,e){const fx=document.getElementById('fx');if(!fx||!fx.appendChild)return;const d=document.createElement('div');d.className='react';d.style.left=(6+Math.random()*86)+'%';d.style.setProperty('--c',p.color);d.innerHTML=`<span>${e}</span><small>${esc(p.name)}</small>`;fx.appendChild(d);setTimeout(()=>d.remove(),3300)}
-function unlock(){if(T.unlocked)return;T.unlocked=true;keepAwake();setTimeout(()=>DJ('dj_hello'),900);
+function unlock(){if(T.unlocked)return;T.unlocked=true;keepAwake();
+  try{dz('/genre').then(d=>{const g=((d&&d.data)||[]).filter(x=>x&&x.id>0&&x.name).slice(0,18).map(x=>[x.id,String(x.name).slice(0,24)]);if(g.length>=5){T.dzGenres=g;sync()}}).catch(()=>{})}catch(e){}setTimeout(()=>DJ('dj_hello'),900);
   try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume()}catch(e){}
   try{const el=document.documentElement;const fn=el.requestFullscreen||el.webkitRequestFullscreen;if(fn){const r=fn.call(el);if(r&&r.catch)r.catch(()=>{})}}catch(e){}
   try{if(window.speechSynthesis){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}}catch(e){}
@@ -6261,7 +6352,7 @@ function lobbyUpdate(v){{const wg=document.getElementById('wishg');if(wg){const 
   set('linfo',v.live?`<div class="row" style="margin-bottom:8px"><span style="flex:1">🎧 <b>${esc(v.live.name)}</b> (${v.live.n})</span><button class="btn ghost" data-act="lclear">✕</button></div>`:'');
   set('lsug',t('liveSugg').split('|').map(q=>`<button class="tg" data-act="lsug" data-v="${esc(q)}">${esc(q)}</button>`).join(''));
   set('lres',(v.liveStatus?`<p>${esc(v.liveStatus)}</p>`:'')+(v.liveResults||[]).map(r=>`<button class="lr" data-act="lload" data-v="${esc(r.id)}">${r.pic?`<img src="${esc(r.pic)}" alt="">`:''}<div>${esc(r.title)}<small>${r.artist?'👤 '+t('artistNight'):r.n+' '+t('songsWord')}</small></div></button>`).join(''));
-  set('lgen',DZ_GENRES.map(([id,nm])=>`<button class="tg" data-act="lload" data-v="g${id}">${nm}</button>`).join(''));
+  set('lgen',(v.dzGenres||DZ_GENRES).map(([id,nm])=>`<button class="tg" data-act="lload" data-v="g${id}">${esc(nm)}</button>`).join(''));
   set('lrec',(v.liveRecent&&v.liveRecent.length)?`<h4>🕘 ${t('recentLists')}</h4><div class="chipset">${v.liveRecent.map(r=>`<button class="tg" data-act="lload" data-v="${esc(r.id)}">${esc(r.name)}</button>`).join('')}</div>`:'');
   const chips=(k,vals,lbl)=>vals.map(x=>`<button class="tg ${s[k]===x?'on':''}" data-act="set" data-k="${k}" data-v="${x}">${lbl(x)}</button>`).join('');
   const m=s.mode;let rules='';
