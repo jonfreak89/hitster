@@ -5199,7 +5199,7 @@ async function nextRound(){
   if(cm==='hl'&&T.cur&&T.cur.year)T.anchor=T.cur;
   if(cardMode()&&s.quick&&T.sinceQuick>=s.quick){T.sinceQuick=0;return startQuick()}
   T.sinceQuick++;T.round++;T.segRound++;T.phase='loading';audio.pause();resetRate();
-  T.buzz=null;T.buzzWin=null;T.locked=new Set();T.fake=null;T.herd=null;T.vibe=null;T.chip=null;T.ord=null;T.tm=null;T.units.forEach(u=>{u.ans=null;u.res=null;u.fakeErr=false;u._s0=u.score});
+  T.buzz=null;T.buzzWin=null;T.locked=new Set();T.fake=null;T.herd=null;T.vibe=null;T.chip=null;T.ord=null;T.tm=null;T.units.forEach(u=>{u.ans=null;u.res=null;u.draft=null;u.fakeErr=false;u._s0=u.score});
   const pre=takePre(cm);if(!(pre&&pre.done))sync();
   try{
     if(cm==='herd')return await startHerdRound(pre);
@@ -5232,6 +5232,9 @@ function unitDone(u){const cm=curMode(),a=u.ans;
   if(!a)return false;
   if(cm==='hitster')return a.slot!=null&&a.bonus!=null;if(cm==='year')return a.year!=null;if(cm==='hl')return !!a.dir;if(cm==='chip'||cm==='cover')return a.choice!=null;if(cm==='type')return !!(a.gotT&&a.gotA);if(cm==='order')return !!a.order;if(cm==='tm')return a.year!=null;return false}
 function reveal(){
+  if(T.applying)return;
+  /* gekozen maar niet bevestigd? Dan telt de keuze toch. */
+  T.applying=true;try{T.units.forEach(u=>{const d=u.draft;u.draft=null;if(!d||u.out||unitDone(u))return;const p=T.players.get(d.by);if(p&&unitOf(p)===u){try{onMsg(null,d.m,p)}catch(e){}}})}finally{T.applying=false}
   const s=T.settings,cm=curMode(),coop=s.play==='coop';
   if(cm==='fake')return revealFake();if(cm==='herd')return revealHerd();if(cm==='vibe')return revealVibe();if(cm==='order')return revealOrder();if(cm==='tm')return revealTm();
   const song=T.cur;if(!song)return;
@@ -5533,7 +5536,7 @@ function onConn(conn){
   conn.on('error',()=>{});
 }
 const inGame=()=>!['lobby','end','boot'].includes(T.phase);
-function onMsg(conn,m){
+function onMsg(conn,m,fp){
   if(!m||typeof m!=='object')return;
   if(m.t==='ping'){for(const q of T.players.values())if(q.conn===conn){q.seen=now();q.pings=true}try{conn.send({t:'pong'})}catch(e){}return}
   if(m.t==='join'){
@@ -5555,7 +5558,8 @@ function onMsg(conn,m){
     if(p.conn&&p.conn!==conn){const old=p.conn;p.conn=null;try{old.close()}catch(e){}}
     p.conn=conn;p.online=true;p.seen=now();fixHost();if(back){sfx('join');T.welcome={name:p.name,emoji:p.emoji,at:now()}}sync();return;
   }
-  const p=[...T.players.values()].find(x=>x.conn===conn);if(!p)return;
+  const p=fp||[...T.players.values()].find(x=>x.conn===conn);if(!p)return;
+  if(m.t==='draft'){const u0=unitOf(p);if(u0){const d=m.m;u0.draft=(T.phase==='round'&&!u0.out&&d&&typeof d==='object'&&['place','year','order','vguess','fake','guess'].includes(d.t))?{m:d,by:p.id}:null}return}
   if(T.paused&&!['react','rate','pause','lobby','vol'].includes(m.t))return;
   const u=unitOf(p),cm=curMode(),tnow=now(),R=T.phase==='round'&&u&&!u.out;
   const A=()=>u.ans||(u.ans={});
@@ -6450,8 +6454,8 @@ function renderPhone(){if(MODE!=='phone')return;const app=$('#app');if(!app)retu
   try{document.body.classList.toggle('wizmode',v.phase==='lobby'&&!!v.me.host)}catch(e){}
   phUpdate(v)}
 function pushSettings(s){const v=P.v;v.settings=s;v.mode=s.mode;v.baseMode=s.mode;v.play=s.play;v.teams=s.teams;v.pool=localPool(s);if(s.lang!==v.lang||s.theme!==v.theme){v.lang=s.lang;v.theme=s.theme;applyTheme(s.theme);P.key=''}renderPhone();send({t:'settings',settings:s})}
-function setYear(y){P.ypick=Math.max(YEAR_MIN+10,Math.min(CURY,Math.round(y)));const b=document.getElementById('ybig');if(b)b.textContent=P.ypick;const r=document.getElementById('yrange');if(r)r.value=P.ypick}
-function setVpos(x){P.vpos=Math.max(0,Math.min(100,Math.round(x)));const g=document.getElementById('pguess');if(g)g.style.left=P.vpos+'%'}
+function setYear(y){P.ypick=Math.max(YEAR_MIN+10,Math.min(CURY,Math.round(y)));const b=document.getElementById('ybig');if(b)b.textContent=P.ypick;const r=document.getElementById('yrange');if(r)r.value=P.ypick;draft({t:'year',year:P.ypick})}
+function setVpos(x){P.vpos=Math.max(0,Math.min(100,Math.round(x)));const g=document.getElementById('pguess');if(g)g.style.left=P.vpos+'%';draft({t:'vguess',pos:P.vpos})}
 function lockOpts(b){(b.closest&&b.closest('.ph')||document).querySelectorAll('.opt').forEach(o=>{o.disabled=true;o.classList.add(o===b?'picked':'dim')})}
 function phoneClick(e){keepAwake();const b=e.target.closest&&e.target.closest('[data-act]');if(!b||b.disabled)return;const a=b.dataset.act,v=P.v;buzz();
   const S=()=>Object.assign({},v.settings);
@@ -6463,7 +6467,7 @@ function phoneClick(e){keepAwake();const b=e.target.closest&&e.target.closest('[
   case 'reconnect':P.fails=0;P.lostAt=now();updLost();phoneConnect(true);return;
   case 'react':send({t:'react',e:b.dataset.v});b.animate&&b.animate([{transform:'scale(1.5)'},{transform:'scale(1)'}],{duration:300});return;
   case 'rate':send({t:'rate',stars:+b.dataset.v});(b.parentElement?b.parentElement.querySelectorAll('button'):[]).forEach((x,i)=>x.classList.toggle('on',i<+b.dataset.v));return;
-  case 'slot':P.sel=+b.dataset.i;document.querySelectorAll('.slot').forEach(sl=>{sl.classList.toggle('sel',sl===b);sl.textContent=sl===b?t('placeHere'):sl.dataset.l});{const pb=document.getElementById('placeBtn');if(pb)pb.disabled=false}return;
+  case 'slot':P.sel=+b.dataset.i;draft({t:'place',slot:P.sel});document.querySelectorAll('.slot').forEach(sl=>{sl.classList.toggle('sel',sl===b);sl.textContent=sl===b?t('placeHere'):sl.dataset.l});{const pb=document.getElementById('placeBtn');if(pb)pb.disabled=false}return;
   case 'place':if(P.sel!=null){send({t:'place',slot:P.sel});b.disabled=true}return;
   case 'bonus':case 'quick':case 'bans':case 'chip':send({t:a,choice:b.dataset.v});lockOpts(b);return;
   case 'fvote':case 'herd':case 'vpick':case 'bpick':send({t:a,i:+b.dataset.v});lockOpts(b);return;
@@ -6479,8 +6483,8 @@ function phoneClick(e){keepAwake();const b=e.target.closest&&e.target.closest('[
     else{const ms=MODES.map(m=>m[0]).filter(m=>!['evening','vibe'].includes(m)&&m!==s.mode);s.mode=ms[Math.floor(Math.random()*ms.length)]}
     if(s.play==='coop'&&!COOP_OK.includes(s.mode))s.play='solo';pushSettings(s);return}
   case 'gsend':{const i=document.getElementById('tyin');const tx=i?i.value.trim():'';if(!tx){if(i)i.focus();return}send({t:'guess',text:tx});return}
-  case 'ordtap':{const i=+b.dataset.v;P.ord=P.ord||[];const k=P.ord.indexOf(i);if(k>=0)P.ord.splice(k,1);else P.ord.push(i);updOrd(v);return}
-  case 'ordreset':P.ord=[];updOrd(v);return;
+  case 'ordtap':{const i=+b.dataset.v;P.ord=P.ord||[];const k=P.ord.indexOf(i);if(k>=0)P.ord.splice(k,1);else P.ord.push(i);updOrd(v);draft(v.ord&&P.ord.length===v.ord.songs.length?{t:'order',o:P.ord.slice()}:null);return}
+  case 'ordreset':P.ord=[];updOrd(v);draft(null);return;
   case 'ordsend':if(v.ord&&P.ord&&P.ord.length===v.ord.songs.length){send({t:'order',o:P.ord});b.disabled=true}return;
   case 'fsend':{const i=document.getElementById('fakein');const tx=i?i.value.trim():'';if(!tx){if(i)i.focus();return}send({t:'fake',text:tx});b.disabled=true;return}
   case 'fidea':{const i=document.getElementById('fakein');if(i){i.value=b.dataset.v;i.focus()}return}
@@ -6522,7 +6526,7 @@ function phoneClick(e){keepAwake();const b=e.target.closest&&e.target.closest('[
 function phoneInit(){
   applyTheme('neon');
   document.addEventListener('click',phoneClick);
-  document.addEventListener('input',e=>{const id=e.target.id;if(id==='jname')P.name=e.target.value;if(id==='jcode'){e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');P.code=e.target.value}if(id==='yrange')setYear(+e.target.value);if(id==='vrange')setVpos(+e.target.value)});
+  document.addEventListener('input',e=>{const id=e.target.id;if(id==='jname')P.name=e.target.value;if(id==='jcode'){e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');P.code=e.target.value}if(id==='tyin'){const x=e.target.value.trim();draft(x?{t:'guess',text:x}:null)}if(id==='fakein'){const x=e.target.value.trim();draft(x?{t:'fake',text:x}:null)}if(id==='yrange')setYear(+e.target.value);if(id==='vrange')setVpos(+e.target.value)});
   document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const id=e.target.id;if(!P.joined&&(id==='jname'||id==='jcode'))doJoin();if(id==='lq'){send({t:'lsearch',q:e.target.value});e.target.blur()}if(id==='tyin'){const tx=e.target.value.trim();if(tx)send({t:'guess',text:tx});return}if(id==='fakein'){const b=document.querySelector('[data-act="fsend"]');if(b)phoneClick({target:b})}});
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&P.joined){wake();if(!P.conn||!P.conn.open){setLost(true);retry(200)}}});
   window.addEventListener('online',()=>{if(P.joined&&(!P.conn||!P.conn.open))phoneConnect(true)});
@@ -6596,6 +6600,9 @@ function relayConnect(){const old=P.conn;P.conn=null;if(old){try{old.close()}cat
 setInterval(()=>{try{const c=P.conn;if(!c||!c.open||c.relay||!P.joined||P.kicked)return;if(document.visibilityState==='hidden')return;c.send({t:'ping'});
   if(P.lastRx&&now()-P.lastRx>14000&&P.pongSeen){P.lastRx=now();try{c.close()}catch(e){}if(P.conn===c){setLost(true);retry(500)}}}catch(e){}},4000);
 function toast(s){try{let e=document.getElementById('toast');if(!e){e=document.createElement('div');e.id='toast';document.body.appendChild(e)}e.textContent=s;e.classList.add('on');buzz(60);clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),4500)}catch(x){}}
+
+/* keuze doorgeven nog vóór het bevestigen, zodat ze meetelt als de tijd om is */
+let draftT=null,draftM;function draft(m){draftM=m;if(draftT)return;draftT=setTimeout(()=>{draftT=null;send({t:'draft',m:draftM})},250)}
 </script>
 </body>
 </html>
