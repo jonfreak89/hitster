@@ -666,6 +666,7 @@ details.look summary{cursor:pointer;font-weight:800;font-size:1.05rem;list-style
 .wishg{display:flex;flex-wrap:wrap;gap:6px}.wishg .tg{font-size:.8rem;padding:6px 10px}
 .packgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.pack{min-width:0}.pack div{min-width:0;overflow-wrap:anywhere;hyphens:auto}.pack>span{flex:none}
 body.viarelay .ptop .me::after{content:' 📡';font-size:.7em;opacity:.7}
+#toast{position:fixed;left:50%;top:14px;transform:translate(-50%,-140%);z-index:90;background:#ffd23f;color:#201000;font-weight:800;padding:12px 18px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.45);transition:transform .35s;max-width:90vw;text-align:center}#toast.on{transform:translate(-50%,0)}
 </style>
 </head>
 <body>
@@ -1038,7 +1039,7 @@ Object.assign(I18N.nl,I18N_ADD7.nl);Object.assign(I18N.vl,I18N_ADD7.nl,I18N_ADD7
 
 /* ---------- v7b: presentator, presets, thema's ---------- */
 const I18N_ADD8={
-nl:{th_strand:"Strand",th_rock:"Rock",th_kerst:"Kerst",tryRelay:"Rechtstreeks lukt niet op dit netwerk. Ik probeer een omweg…",eveningShort:"Een mix van spelvormen",wishT:"Wat wil jij spelen?",wishTip:"Tik je favoriet aan. De spelleider ziet wat iedereen wil.",
+nl:{th_strand:"Strand",th_rock:"Rock",th_kerst:"Kerst",nowHost:"Jij bent nu de spelleider",tryRelay:"Rechtstreeks lukt niet op dit netwerk. Ik probeer een omweg…",eveningShort:"Een mix van spelvormen",wishT:"Wat wil jij spelen?",wishTip:"Tik je favoriet aan. De spelleider ziet wat iedereen wil.",
 rules_board:"🎲 Elke beurt een andere muziekuitdaging. Goed antwoorden = vakjes vooruit. Speciale vakjes: ⭐ +2 · 🚀 +4 · ⚡ volgende worp dubbel · ⬅️ 3 terug · 🎲 dobbelsteen · 🔄 wissel met de leider · 🧲 trek de leider terug · 💣 iedereen 2 terug. Wie eerst op 🏁 staat, wint!",mascotLbl:"DJ Plaat (presentator)",volLbl:"Volume van de muziek",
 presetsLbl:"Snel kiezen:",pre_party:"Feestje",pre_family:"Familie",pre_expert:"Kenners",pre_short:"Kort",pre_random:"Verras me",
 sndLbl:"Lawaai maken op tv",howtoT:"Zo werkt het",howtoHint:"We beginnen zo · de spelleider kan meteen starten",howtoGo:"Begrepen, start!",howtoWait:"De spelleider start zo het spel…",
@@ -1060,9 +1061,9 @@ dj_allok:"Iedereen juist! Wat een kenners.|Te gemakkelijk voor ulle!|Allemaal go
 dj_none:"Oei… niemand?|Die was gemeen, sorry!|Volgende keer beter.|Stilte in de zaal…|Zelfs ik wist hem niet. Grapje, ik wel.",
 dj_some:"Schoon gedaan!|Niet slecht!|Het wordt spannend.|Zo, punten erbij!|Goed geluisterd!",
 dj_blunder:"Amai, dat was er ver naast!|Twintig jaar ernaast? Dat doet zeer.|Hebt ge onder een steen gelegen?",
-dj_pause:"Pauze! Tijd voor een pintje.|Efkes bekomen…",wishT:"Wat wilt gij spelen?",wishTip:"Tik uw favoriet aan. De spelleider ziet wat iedereen wil.",
+dj_pause:"Pauze! Tijd voor een pintje.|Efkes bekomen…",wishT:"Wat wilt gij spelen?",nowHost:"Gij zijt nu de spelleider",wishTip:"Tik uw favoriet aan. De spelleider ziet wat iedereen wil.",
 dj_tips:"Tip: de spelleider kiest alles op zijn gsm, in 3 stapjes.|Wist ge dat ge met de P-toets kunt pauzeren?|Probeer eens het Bordspel: een race over het bord!|In de lobby kunt ge lawaai maken met de toeters op uw gsm.|Geen goesting om te kiezen? Tik op 'Verras me'.|Verbinding kwijt? Scan de code opnieuw en ge doet gewoon verder.|Met 'Artiestenavond' speelt ge alleen nummers van uw favoriete artiest.|Nieuw: Tijdmachine, Platenhoes, Typ het! en Op een rij.|Hoe meer zielen, hoe meer vreugd. Er kunnen 12 spelers mee.|Na elk nummer kunt ge sterren geven. Op het einde ziet ge de hit van de avond."},
-en:{th_strand:"Beach",th_rock:"Rock",th_kerst:"Christmas",tryRelay:"A direct link fails on this network. Trying a detour…",eveningShort:"A mix of game modes",wishT:"What do you want to play?",wishTip:"Tap your favourite. The game leader sees what everyone wants.",
+en:{th_strand:"Beach",th_rock:"Rock",th_kerst:"Christmas",nowHost:"You are now the game leader",tryRelay:"A direct link fails on this network. Trying a detour…",eveningShort:"A mix of game modes",wishT:"What do you want to play?",wishTip:"Tap your favourite. The game leader sees what everyone wants.",
 rules_board:"🎲 Every turn is a different music challenge. Good answers = squares forward. Special squares: ⭐ +2 · 🚀 +4 · ⚡ next move double · ⬅️ 3 back · 🎲 dice · 🔄 swap with the leader · 🧲 pull the leader back · 💣 everyone 2 back. First to 🏁 wins!",mascotLbl:"DJ Vinyl (host)",volLbl:"Music volume",
 presetsLbl:"Quick pick:",pre_party:"Party",pre_family:"Family",pre_expert:"Experts",pre_short:"Short",pre_random:"Surprise me",
 sndLbl:"Make noise on the TV",howtoT:"How it works",howtoHint:"Starting in a moment · the game leader can start right away",howtoGo:"Got it, start!",howtoWait:"The game leader will start in a moment…",
@@ -5522,7 +5523,10 @@ async function liveLoad(id){id=String(id||'');if(!/^(chart|[ag]?\d+)$/.test(id))
   catch(e){T.liveStatus=t('liveErr');sync()}}
 
 /* ---------- netwerk ---------- */
-function fixHost(){const h=[...T.players.values()].filter(p=>p.host&&p.online);if(h.length)return;T.players.forEach(p=>p.host=false);const f=[...T.players.values()].find(p=>p.online);if(f)f.host=true}
+function fixHost(){const h=[...T.players.values()].filter(p=>p.host&&p.online);if(h.length){if(h.length>1)h.slice(1).forEach(p=>p.host=false);return}const f=[...T.players.values()].find(p=>p.online);if(!f)return;T.players.forEach(p=>p.host=false);f.host=true}
+/* hartslag: een speler die niets meer laat horen, telt als weg (ook als de verbinding nog 'open' lijkt) */
+function heartSweep(){const tn=now();let ch=false;T.players.forEach(p=>{if(p.online&&p.pings&&tn-(p.seen||tn)>13000){p.online=false;ch=true;const c=p.conn;p.conn=null;try{c&&c.close()}catch(e){}}});if(ch){fixHost();sync()}}
+if(MODE==='tv')setInterval(()=>{try{heartSweep()}catch(e){}},3000);
 function onConn(conn){
   conn.on('data',m=>onMsg(conn,m));
   conn.on('close',()=>{for(const p of T.players.values())if(p.conn===conn){p.online=false;fixHost();sync()}});
@@ -5531,6 +5535,7 @@ function onConn(conn){
 const inGame=()=>!['lobby','end','boot'].includes(T.phase);
 function onMsg(conn,m){
   if(!m||typeof m!=='object')return;
+  if(m.t==='ping'){for(const q of T.players.values())if(q.conn===conn){q.seen=now();q.pings=true}try{conn.send({t:'pong'})}catch(e){}return}
   if(m.t==='join'){
     const name=String(m.name||'Speler').trim().slice(0,14)||'Speler';const emoji=EMOJIS.includes(m.emoji)?m.emoji:'🎵';
     let p=T.players.get(String(m.id));
@@ -5548,7 +5553,7 @@ function onMsg(conn,m){
       sfx('join');DJ('dj_join',{n:name},.7);
     }else{p.name=name;p.emoji=emoji;const u=unitOf(p);if(u&&!u.tkey&&T.settings.play==='solo'){u.name=name;u.emoji=emoji}}
     if(p.conn&&p.conn!==conn){const old=p.conn;p.conn=null;try{old.close()}catch(e){}}
-    p.conn=conn;p.online=true;fixHost();if(back){sfx('join');T.welcome={name:p.name,emoji:p.emoji,at:now()}}sync();return;
+    p.conn=conn;p.online=true;p.seen=now();fixHost();if(back){sfx('join');T.welcome={name:p.name,emoji:p.emoji,at:now()}}sync();return;
   }
   const p=[...T.players.values()].find(x=>x.conn===conn);if(!p)return;
   if(T.paused&&!['react','rate','pause','lobby','vol'].includes(m.t))return;
@@ -6143,7 +6148,7 @@ function setLost(on){if(on&&!P.lost)P.lostAt=now();P.lost=on;if(!on)P.fails=0;co
 function updLost(){const l=document.getElementById('lostov');if(!l||!P.lost)return;const long=now()-P.lostAt>6000;const k=long+LANG;if(l.dataset.k===k)return;l.dataset.k=k;l.innerHTML=`<div class="lostbox"><div class="em">📡</div><b>${t('connLost')}</b><p>${long?t('lostLong'):t('lostShort')}</p><button class="btn big" data-act="reconnect">🔄 ${t('reconnect')}</button></div>`}
 let rT=null;function retry(ms){if(rT||P.kicked)return;rT=setTimeout(()=>{rT=null;if(P.conn&&P.conn.open)return;phoneConnect(P.fails>2&&P.fails%3===0)},ms)}
 function onPhoneMsg(m){
-  if(!m)return;
+  if(!m)return;P.lastRx=now();if(m.t==='pong'){P.pongSeen=true;return}
   if(m.t==='full'){P.connecting=false;P.status=t('gameFull');renderPhone();return}
   if(m.t==='kicked'){P.kicked=true;P.joined=false;P.connecting=false;store.set('dt_sess',null);ss.set('dt_joined','');try{P.conn&&P.conn.close()}catch(e){}P.status='';const app=$('#app');if(app)app.innerHTML=`<div class="ph"><div class="hero"><div class="em">👋</div><h2>${t('kickedT')}</h2><p>${t('kickedSub')}</p></div><button class="btn big" data-act="unkick">${t('rejoinAgain')}</button></div>`;['reactbar','lostov','pauseovp'].forEach(id=>{const e=document.getElementById(id);if(e)e.hidden=true});return}
   if(m.t!=='state')return;
@@ -6153,6 +6158,7 @@ function onPhoneMsg(m){
   if(m.buzz&&m.buzz.me)P.bdeadline=now()+m.buzz.rem;
   if(m.bingo)P.lockUntil=now()+m.bingo.lock;
   const prev=P.v;P.v=m;applyTheme(m.theme);
+  if(prev&&prev.me&&m.me&&!prev.me.host&&m.me.host)toast('👑 '+t('nowHost'));
   if(first)mountChrome();
   renderPhone();
   const pp=prev&&prev.phase;
@@ -6585,6 +6591,11 @@ function relayConnect(){const old=P.conn;P.conn=null;if(old){try{old.close()}cat
     close(){if(m===c.mq&&!c.closed){if(got)lost();else next()}}});mqs.push(m)});
   giveT=setTimeout(()=>{if(!got)lost()},11000);
   pingT=setInterval(()=>{if(c.closed||!got)return;c.send({t:'ping'});if(now()-c.last>15000)lost()},5000)}
+
+/* hartslag voor de rechtstreekse verbinding + melding */
+setInterval(()=>{try{const c=P.conn;if(!c||!c.open||c.relay||!P.joined||P.kicked)return;if(document.visibilityState==='hidden')return;c.send({t:'ping'});
+  if(P.lastRx&&now()-P.lastRx>14000&&P.pongSeen){P.lastRx=now();try{c.close()}catch(e){}if(P.conn===c){setLost(true);retry(500)}}}catch(e){}},4000);
+function toast(s){try{let e=document.getElementById('toast');if(!e){e=document.createElement('div');e.id='toast';document.body.appendChild(e)}e.textContent=s;e.classList.add('on');buzz(60);clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),4500)}catch(x){}}
 </script>
 </body>
 </html>
