@@ -667,6 +667,18 @@ details.look summary{cursor:pointer;font-weight:800;font-size:1.05rem;list-style
 .packgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.pack{min-width:0}.pack div{min-width:0;overflow-wrap:anywhere;hyphens:auto}.pack>span{flex:none}
 body.viarelay .ptop .me::after{content:' 📡';font-size:.7em;opacity:.7}
 #toast{position:fixed;left:50%;top:14px;transform:translate(-50%,-140%);z-index:90;background:#ffd23f;color:#201000;font-weight:800;padding:12px 18px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.45);transition:transform .35s;max-width:90vw;text-align:center}#toast.on{transform:translate(-50%,0)}
+/* ---------- v8: film & soundtrack ---------- */
+.filmreel{flex:none}.scov{display:flex;align-items:center;justify-content:center;font-size:8vh;background:rgba(255,255,255,.06)}
+.stile.hid{opacity:.4}
+.sndwrap{display:flex;flex-direction:column;align-items:center;gap:4vh;width:100%}
+.sndq{font-size:3.4vh;font-weight:800;text-align:center;padding:1.6vh 3vh;border-radius:2vh;background:rgba(255,255,255,.08);border:.3vh solid var(--yel,#ffd23f);max-width:90%}
+.sndq.big{font-size:5.6vh;padding:3vh 5vh;line-height:1.2;box-shadow:0 2vh 5vh rgba(0,0,0,.4);transform:rotate(-1.2deg)}
+.sndcards{display:flex;gap:2vh;flex-wrap:wrap;justify-content:center}
+.sndcard{width:11vh;height:15vh;border-radius:1.4vh;border:.4vh dashed rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:5vh;transition:transform .3s}
+.sndcard.in{border:.4vh solid #fff;background:linear-gradient(135deg,var(--g1),var(--g2));transform:rotate(-4deg) translateY(-1vh);animation:cardin .35s ease}
+@keyframes cardin{from{transform:scale(.4);opacity:0}}
+.orow.win{background:rgba(62,224,143,.16)}
+.sndprompt{font-weight:800;font-size:1.15rem;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.07);border:2px solid var(--yel);text-align:center}
 </style>
 </head>
 <body>
@@ -1082,26 +1094,80 @@ dj_end:"Congratulations, {n}!|{n} wins! Applause!|What a night. One more?"
 }};
 Object.assign(I18N.nl,I18N_ADD8.nl);Object.assign(I18N.vl,I18N_ADD8.nl,I18N_ADD8.vl);Object.assign(I18N.en,I18N_ADD8.en);
 
+/* ---------- v8: film, series, Disney + Soundtrack van… ---------- */
+const I18N_ADD9={
+nl:{
+pk_W:"Disney & Pixar",pkd_W:"Van Sneeuwwitje tot Encanto",pk_f:"Films",pkd_f:"Van Bond tot Barbie",pk_v:"Series & tv",pkd_v:"Van Friends tot Stranger Things",pk_g:"Kinderhits",pkd_g:"K3, Samson, tekenfilms en meer",
+m_film:"Raad de film",md_film:"Je hoort een nummer. Uit welke film, serie of Disneyfilm komt het?",
+rules_film:"🎞️ Luister naar het fragment en kies op je telefoon uit welke film, serie of Disneyfilm het komt. Snel antwoorden levert meer punten op. Kies bij Muziek het pakket Disney, Films of Series om het thema te bepalen.",
+m_scene:"Zoek de soundtrack",md_scene:"Je ziet een film of serie. Welk van de drie nummers hoort erbij?",
+rules_scene:"🍿 De tv toont een film of serie en speelt drie nummers na elkaar. Tik het nummer aan dat erbij hoort. Juist = 3 punten, en 4 als je antwoordt voor je ze alle drie gehoord hebt.",
+m_snd:"Soundtrack van…",md_snd:"Een grappige stelling, iedereen legt een nummer uit zijn hand en de jury kiest het beste. Vanaf 3 spelers.",
+rules_snd:"🎭 Elke ronde is iemand anders de jury. Op tv verschijnt een stelling, zoals 'Muziek voor in de lift'. De anderen kiezen uit hun 4 kaarten het nummer dat het best (of grappigst) past. Daarna speelt de tv alles af en kiest de jury een winnaar: 3 punten.",
+askFilm:"Uit welke film of serie komt dit?",askFilmSub:"Kies op je telefoon. Snel = meer punten.",filmTip:"Luister goed naar de tv.",filmWas:"Het kwam uit {f}",
+askScene:"Welk nummer hoort bij {f}?",askSceneSub:"Tik op je telefoon het juiste nummer aan. Vroeg = extra punt.",sceneTip:"De tv speelt de drie nummers na elkaar.",sceneSong:"Nummer {l}",heardIt:"al gehoord",
+sndPickTv:"Kies op je telefoon een nummer dat past!",sndJury:"Jury: {n}",sndJudging:"{n} kiest de winnaar…",sndWinner:"🏆 Gewonnen door {n}!",sndNoWin:"Geen winnaar deze keer.",sndJudgeWord:"jury",
+sndYouJudge:"Jij bent de jury!",sndJudgeWait:"{a} van {b} kaarten ingeleverd. Daarna kies jij de winnaar.",sndSent:"Kaart ingeleverd!",sndPickTip:"Kies het nummer dat het best past. Jury: {n}",
+sndJudgeTip:"Luister naar de tv en tik je favoriet aan.",sndWasJudge:"Jij was de jury",sndYouWin:"Jouw kaart wint!",sndNotChosen:"Niet gekozen, volgende keer beter!",
+sndNeed3:"Soundtrack van… heeft minstens 3 spelers nodig.",sndSoloOnly:"Bij Soundtrack van… speelt iedereen voor zich.",
+snd_prompts:"Muziek voor in de lift|Het nummer dat de buren om 3 uur 's nachts horen|De opkomstmuziek van de juf of meester|Wat de hond zou kiezen|Het lied voor op je eigen begrafenis|Muziek bij een eerste date die mislukt|Het nummer dat oma stiekem luistert|De soundtrack van een file op de ring|Wat er speelt als je de vaatwasser uitruimt|Het themalied van deze familie|Het lied voor een sollicitatiegesprek|Het nummer bij een verrassingsfeestje|Muziek voor in de wachtrij van de bank|Het perfecte nummer om mee te stofzuigen|Het lied dat je in de douche zingt|De muziek als de pizza eindelijk komt|Het nummer bij een slow-motion-wandeling|Het nummer dat papa zingt in de auto|De soundtrack van een maandagochtend|Het lied om de kinderen wakker te maken|Muziek voor een romantisch diner|Wat er speelt als je de trein net mist|Het nummer om een ruzie bij te leggen|De opkomstmuziek van een bokser|Het lied bij een verloren voetbalmatch|Muziek voor in de sauna|Het nummer bij het afscheid van een collega|Het lied om op te dansen op een trouwfeest|De soundtrack van een huiswerkavond|Het nummer dat de kat zou kiezen|Het lied als iemand zijn sleutels kwijt is|Muziek voor een roadtrip naar Spanje|Het nummer van een superheld die te laat is|Wat de dinosaurussen luisterden|Het lied bij het uitpakken van cadeaus|Het nummer voor een spannende penalty|Muziek bij het koken van spaghetti|De soundtrack van een verhuizing|Het lied bij een eerste kus|Het nummer dat je nooit meer uit je hoofd krijgt|De muziek in de wachtkamer van de tandarts|Het lied om de juf te bedanken|Het nummer bij een sneeuwbalgevecht|Muziek voor een spooktocht|Het lied voor de laatste dag van de vakantie|Het nummer bij het verliezen van een spelletje|De soundtrack van een cowboy|Het lied als de wifi uitvalt|Muziek voor een modeshow in de woonkamer|Het nummer bij het winnen van de lotto"
+},
+vl:{rules_snd:"🎭 Elke ronde is iemand anders de jury. Op tv verschijnt een stelling, zoals 'Muziek voor in de lift'. De anderen kiezen uit hun 4 kaarten het nummer dat het best (of grappigst) past. Daarna speelt de tv alles af en kiest de jury een winnaar: 3 punten.",
+sndYouJudge:"Gij zijt de jury!",sndJudgeWait:"{a} van {b} kaarten ingeleverd. Daarna kiest gij de winnaar.",sndWasJudge:"Gij waart de jury",sndYouWin:"Uw kaart wint!",sndJudgeTip:"Luister naar de tv en tik uw favoriet aan.",
+snd_prompts:"Muziek voor in de lift|Het nummer dat de buren om 3 uur 's nachts horen|De opkomstmuziek van de juf of meester|Wat de hond zou kiezen|Het lied voor op uw eigen begrafenis|Muziek bij een eerste date die mislukt|Het nummer dat oma stiekem luistert|De soundtrack van een file op de Antwerpse ring|Wat er speelt als ge de vaatwasser uitruimt|Het themalied van deze familie|Het lied voor een sollicitatiegesprek|Het nummer bij een verrassingsfeestje|Muziek voor in de wachtrij van de bank|Het perfecte nummer om mee te stofzuigen|Het lied dat ge in de douche zingt|De muziek als de frieten eindelijk komen|Het nummer bij een slow-motion-wandeling|Het nummer dat papa zingt in de auto|De soundtrack van een maandagochtend|Het lied om de kinderen wakker te maken|Muziek voor een romantisch diner|Wat er speelt als ge de trein net mist|Het nummer om een ruzie bij te leggen|De opkomstmuziek van een bokser|Het lied bij een verloren voetbalmatch|Muziek voor in de sauna|Het nummer bij het afscheid van een collega|Het lied om op te dansen op een trouwfeest|De soundtrack van een huiswerkavond|Het nummer dat de kat zou kiezen|Het lied als iemand zijn sleutels kwijt is|Muziek voor een roadtrip naar Spanje|Het nummer van een superheld die te laat is|Wat de dinosaurussen luisterden|Het lied bij het uitpakken van cadeaus|Het nummer voor een spannende penalty|Muziek bij het koken van spaghetti|De soundtrack van een verhuis|Het lied bij een eerste kus|Het nummer dat ge nooit meer uit uw hoofd krijgt|De muziek in de wachtzaal van de tandarts|Het lied om de juf te bedanken|Het nummer bij een sneeuwbalgevecht|Muziek voor een spooktocht|Het lied voor de laatste dag van de vakantie|Het nummer bij het verliezen van een spelletje|De soundtrack van een cowboy|Het lied als de wifi uitvalt|Muziek voor een modeshow in de living|Het nummer bij het winnen van de Lotto"},
+en:{
+pk_W:"Disney & Pixar",pkd_W:"From Snow White to Encanto",pk_f:"Movies",pkd_f:"From Bond to Barbie",pk_v:"Series & TV",pkd_v:"From Friends to Stranger Things",pk_g:"Kids hits",pkd_g:"Cartoons and children's songs",
+m_film:"Name the movie",md_film:"You hear a song. Which movie, series or Disney film is it from?",
+rules_film:"🎞️ Listen to the clip and pick on your phone which movie, series or Disney film it's from. Fast answers earn more points. Pick the Disney, Movies or Series pack under Music to set the theme.",
+m_scene:"Find the soundtrack",md_scene:"You see a movie or series. Which of three songs belongs to it?",
+rules_scene:"🍿 The TV shows a movie or series and plays three songs in turn. Tap the song that belongs to it. Correct = 3 points, or 4 if you answer before hearing all three.",
+m_snd:"Soundtrack of…",md_snd:"A funny prompt, everyone plays a song from their hand and the judge picks the best. 3 players or more.",
+rules_snd:"🎭 Each round someone else is the judge. The TV shows a prompt, like 'Music for the elevator'. The others pick the song from their 4 cards that fits best (or funniest). The TV plays them all and the judge picks a winner: 3 points.",
+askFilm:"Which movie or series is this from?",askFilmSub:"Pick on your phone. Fast = more points.",filmTip:"Listen closely to the TV.",filmWas:"It was from {f}",
+askScene:"Which song belongs to {f}?",askSceneSub:"Tap the right song on your phone. Early = bonus point.",sceneTip:"The TV plays the three songs in turn.",sceneSong:"Song {l}",heardIt:"heard",
+sndPickTv:"Pick a song on your phone that fits!",sndJury:"Judge: {n}",sndJudging:"{n} is picking the winner…",sndWinner:"🏆 Won by {n}!",sndNoWin:"No winner this time.",sndJudgeWord:"judge",
+sndYouJudge:"You're the judge!",sndJudgeWait:"{a} of {b} cards in. Then you pick the winner.",sndSent:"Card played!",sndPickTip:"Pick the song that fits best. Judge: {n}",
+sndJudgeTip:"Listen to the TV and tap your favourite.",sndWasJudge:"You were the judge",sndYouWin:"Your card wins!",sndNotChosen:"Not picked, better luck next time!",
+sndNeed3:"Soundtrack of… needs at least 3 players.",sndSoloOnly:"In Soundtrack of… everyone plays for themselves.",
+snd_prompts:"Music for the elevator|The song the neighbours hear at 3 a.m.|The teacher's walk-on music|What the dog would choose|The song for your own funeral|Music for a first date gone wrong|The song grandma secretly listens to|The soundtrack of a traffic jam|What plays while you empty the dishwasher|This family's theme song|The song for a job interview|The song for a surprise party|Music for the bank queue|The perfect song for vacuuming|The song you sing in the shower|The music when the pizza finally arrives|The song for a slow-motion walk|The song dad sings in the car|The soundtrack of a Monday morning|The song to wake the kids up|Music for a romantic dinner|What plays when you just miss the train|The song to end an argument|A boxer's walk-on music|The song after a lost football match|Music for the sauna|The song for a colleague's farewell|The song to dance to at a wedding|The soundtrack of a homework night|The song the cat would choose|The song when someone lost their keys|Music for a road trip to Spain|The song of a superhero who's running late|What the dinosaurs listened to|The song for unwrapping presents|The song for a tense penalty|Music for cooking spaghetti|The soundtrack of moving house|The song for a first kiss|The song you'll never get out of your head|The music in the dentist's waiting room|The song to thank the teacher|The song for a snowball fight|Music for a haunted walk|The song for the last day of the holiday|The song for losing a board game|A cowboy's soundtrack|The song when the wifi goes down|Music for a fashion show in the living room|The song for winning the lottery"
+}};
+Object.assign(I18N.nl,I18N_ADD9.nl);Object.assign(I18N.vl,I18N_ADD9.nl,I18N_ADD9.vl);Object.assign(I18N.en,I18N_ADD9.en);
+
 const RAW=`
-Heigh-Ho|The Dwarf Chorus|1937|gf
-Whistle While You Work|Adriana Caselotti|1937|gf
-When You Wish Upon a Star|Cliff Edwards|1940|gf
+Heigh-Ho|The Dwarf Chorus|1937|gfW|Sneeuwwitje~Snow White
+Some Day My Prince Will Come|Adriana Caselotti|1937|Wfg|Sneeuwwitje~Snow White
+Whistle While You Work|Adriana Caselotti|1937|gfW|Sneeuwwitje~Snow White
+Over the Rainbow|Judy Garland|1939|f|De Tovenaar van Oz~The Wizard of Oz
+Hi-Diddle-Dee-Dee (An Actor's Life for Me)|Walter Catlett|1940|Wfg|Pinokkio~Pinocchio
+I've Got No Strings|Dickie Jones|1940|Wfg|Pinokkio~Pinocchio
+When You Wish Upon a Star|Cliff Edwards|1940|gfW|Pinokkio~Pinocchio
+Baby Mine|Betty Noyes|1941|Wfg|Dumbo
+As Time Goes By|Dooley Wilson|1942|f|Casablanca
 White Christmas|Bing Crosby|1942|pk
 La vie en rose|Édith Piaf|1947|q
 Rudolph the Red-Nosed Reindeer|Gene Autry|1949|pk
-Bibbidi-Bobbidi-Boo|Verna Felton|1950|gf
+The Third Man Theme|Anton Karas|1949|f|The Third Man
+A Dream Is a Wish Your Heart Makes|Ilene Woods|1950|Wfg|Assepoester~Cinderella
+Bibbidi-Bobbidi-Boo|Verna Felton|1950|gfW|Assepoester~Cinderella
 Hey, Good Lookin'|Hank Williams|1951|c
 De lichtjes van de Schelde|Bobbejaan Schoepen|1952|nb
 Jambalaya (On the Bayou)|Hank Williams|1952|c
+Singin' in the Rain|Gene Kelly|1952|f|Singin' in the Rain
 Santa Baby|Eartha Kitt|1953|pk
+The Second Star to the Right|The Jud Conlon Chorus|1953|Wfg|Peter Pan
+You Can Fly! You Can Fly! You Can Fly!|The Jud Conlon Chorus|1953|Wfg|Peter Pan
 I Got a Woman|Ray Charles|1954|s
 Sway|Dean Martin|1954|l
+Bella Notte|George Givot|1955|Wfg|Lady en de Vagebond~Lady and the Tramp
 Bij ons in de Jordaan|Johnny Jordaan|1955|n
 Folsom Prison Blues|Johnny Cash|1955|c
 Geef mij maar Amsterdam|Johnny Jordaan|1955|n
-He's a Tramp|Peggy Lee|1955|gf
+He's a Tramp|Peggy Lee|1955|gfW|Lady en de Vagebond~Lady and the Tramp
+Love and Marriage|Frank Sinatra|1955|v|Married... with Children
 Sixteen Tons|Tennessee Ernie Ford|1955|c
+The Siamese Cat Song|Peggy Lee|1955|Wfg|Lady en de Vagebond~Lady and the Tramp
 Bésame mucho|Trio Los Panchos|1956|l
+Day-O (The Banana Boat Song)|Harry Belafonte|1956|f|Beetlejuice
 I Walk the Line|Johnny Cash|1956|c
 Quand on n'a que l'amour|Jacques Brel|1956|qb
 Blue Christmas|Elvis Presley|1957|pk
@@ -1122,7 +1188,7 @@ La valse à mille temps|Jacques Brel|1959|qb
 Let It Snow! Let It Snow! Let It Snow!|Dean Martin|1959|pk
 Milord|Édith Piaf|1959|q
 Ne me quitte pas|Jacques Brel|1959|bqa
-Once Upon a Dream|Mary Costa|1959|gf
+Once Upon a Dream|Mary Costa|1959|gfW|Doornroosje~Sleeping Beauty
 Shout|The Isley Brothers|1959|s
 Tulpen aus Amsterdam|Mieke Telkamp|1959|xj
 What'd I Say|Ray Charles|1959|s
@@ -1137,15 +1203,16 @@ The Twist|Chubby Checker|1960|px
 Where Have All the Flowers Gone?|Pete Seeger|1960|c
 Wonderful World|Sam Cooke|1960|hs
 Zie ginds komt de stoomboot|Kinderkoor|1960|gn
-Can't Help Falling in Love|Elvis Presley|1961|pfa
+Can't Help Falling in Love|Elvis Presley|1961|pfa|Blue Hawaii
 Crazy|Patsy Cline|1961|c
-Cruella de Vil|Bill Lee|1961|gf
+Cruella de Vil|Bill Lee|1961|gfW|101 Dalmatiërs~101 Dalmatians
 Cupid|Sam Cooke|1961|s
 Hit the Road Jack|Ray Charles|1961|hs
 Jump in the Line (Shake, Senora)|Harry Belafonte|1961|x
 Kom van dat dak af|Peter Koelewijn|1961|n
 Let's Twist Again|Chubby Checker|1961|px
 Marieke|Jacques Brel|1961|b
+Moon River|Audrey Hepburn|1961|f|Breakfast at Tiffany's
 Runaround Sue|Dion|1961|p
 Stand by Me|Ben E. King|1961|htsa
 The Christmas Song|Nat King Cole|1961|pk
@@ -1156,10 +1223,11 @@ Big Girls Don't Cry|The Four Seasons|1962|p
 Brandend zand|Anneke Grönloh|1962|n
 Do You Love Me|The Contours|1962|px
 Green Onions|Booker T. & the M.G.'s|1962|hs
-James Bond Theme|Monty Norman|1962|f
+James Bond Theme|Monty Norman|1962|f|James Bond: Dr. No
 Le Plat Pays|Jacques Brel|1962|b
 Les bourgeois|Jacques Brel|1962|qb
 Love Me Do|The Beatles|1962|p
+Misirlou|Dick Dale & His Del-Tones|1962|f|Pulp Fiction
 Paradiso|Anneke Grönloh|1962|n
 Sherry|The Four Seasons|1962|p
 The Loco-Motion|Little Eva|1962|p
@@ -1170,8 +1238,9 @@ Blowin' in the Wind|Bob Dylan|1963|c
 Blue Velvet|Bobby Vinton|1963|p
 Christmas (Baby Please Come Home)|Darlene Love|1963|pk
 Da Doo Ron Ron|The Crystals|1963|p
-Doctor Who Theme|Ron Grainer|1963|v
+Doctor Who Theme|Ron Grainer|1963|v|Doctor Who
 Eenzaam zonder jou|Will Tura|1963|nb
+From Russia with Love|Matt Monro|1963|f|James Bond: From Russia with Love
 I Want to Hold Your Hand|The Beatles|1963|p
 If I Had a Hammer|Trini Lopez|1963|c
 Ik ben zo eenzaam zonder jou|Will Tura|1963|nb
@@ -1186,36 +1255,38 @@ She Loves You|The Beatles|1963|p
 Sleigh Ride|The Ronettes|1963|pk
 Spiegelbeeld|Willeke Alberti|1963|n
 Surfin' U.S.A.|The Beach Boys|1963|pz
-The Pink Panther Theme|Henry Mancini|1963|f
+The Pink Panther Theme|Henry Mancini|1963|f|The Pink Panther
 Then He Kissed Me|The Crystals|1963|p
 Tombe la neige|Adamo|1963|pb
 Twist and Shout|The Beatles|1963|prx
 A Change Is Gonna Come|Sam Cooke|1964|hs
 A Hard Day's Night|The Beatles|1964|p
-A Spoonful of Sugar|Julie Andrews|1964|fg
+A Spoonful of Sugar|Julie Andrews|1964|fgW|Mary Poppins
 All Day and All of the Night|The Kinks|1964|rw
 Amsterdam|Jacques Brel|1964|b
 Baby Love|The Supremes|1964|hs
 Can't Buy Me Love|The Beatles|1964|p
 Chapel of Love|The Dixie Cups|1964|p
-Chim Chim Cher-ee|Dick Van Dyke|1964|gf
+Chim Chim Cher-ee|Dick Van Dyke|1964|gfW|Mary Poppins
 Dancing in the Street|Martha and the Vandellas|1964|hs
 Downtown|Petula Clark|1964|p
+Feed the Birds (Tuppence a Bag)|Julie Andrews|1964|Wfg|Mary Poppins
 Fly Me to the Moon|Frank Sinatra|1964|p
 Gloria|Them|1964|rw
-Goldfinger|Shirley Bassey|1964|f
+Goldfinger|Shirley Bassey|1964|f|James Bond: Goldfinger
 Holly Jolly Christmas|Burl Ives|1964|pk
 I Get Around|The Beach Boys|1964|p
 Leader of the Pack|The Shangri-Las|1964|p
 Les filles du bord de mer|Adamo|1964|qb
+Let's Go Fly a Kite|Dick Van Dyke|1964|Wfg|Mary Poppins
 Mon amie la rose|Françoise Hardy|1964|q
 My Girl|The Temptations|1964|hsa
 My Guy|Mary Wells|1964|h
 Non ho l'età|Gigliola Cinquetti|1964|pe
-Oh, Pretty Woman|Roy Orbison|1964|prw
+Oh, Pretty Woman|Roy Orbison|1964|prwf|Pretty Woman
 Shout|Lulu|1964|px
-Supercalifragilisticexpialidocious|Julie Andrews|1964|fg
-The Addams Family Theme|Vic Mizzy|1964|v
+Supercalifragilisticexpialidocious|Julie Andrews|1964|fgW|Mary Poppins
+The Addams Family Theme|Vic Mizzy|1964|v|The Addams Family
 The Girl from Ipanema|Stan Getz & Astrud Gilberto|1964|l
 The House of the Rising Sun|The Animals|1964|rtw
 The Times They Are a-Changin'|Bob Dylan|1964|c
@@ -1223,6 +1294,7 @@ The Wild Rover|The Dubliners|1964|c
 Under the Boardwalk|The Drifters|1964|pz
 Vous permettez, Monsieur ?|Adamo|1964|qb
 Where Did Our Love Go|The Supremes|1964|hs
+You Never Can Tell|Chuck Berry|1964|f|Pulp Fiction
 You Really Got Me|The Kinks|1964|rw
 (I Can't Get No) Satisfaction|The Rolling Stones|1965|rtw
 Aline|Christophe|1965|pq
@@ -1231,6 +1303,7 @@ California Dreamin'|The Mamas & the Papas|1965|p
 California Girls|The Beach Boys|1965|pz
 Capri c'est fini|Hervé Vilard|1965|q
 Day Tripper|The Beatles|1965|p
+Do-Re-Mi|Julie Andrews|1965|fg|The Sound of Music
 Don't Let Me Be Misunderstood|The Animals|1965|rw
 Get Off of My Cloud|The Rolling Stones|1965|rw
 Help!|The Beatles|1965|p
@@ -1242,29 +1315,33 @@ In the Midnight Hour|Wilson Pickett|1965|hs
 It's Not Unusual|Tom Jones|1965|p
 King of the Road|Roger Miller|1965|c
 La Bohème|Charles Aznavour|1965|pq
+Lara's Theme|Maurice Jarre|1965|f|Doctor Zhivago
 Like a Rolling Stone|Bob Dylan|1965|rtcw
 Marmor, Stein und Eisen bricht|Drafi Deutscher|1965|xj
 Meisje van 16|Boudewijn de Groot|1965|n
 Mijn vlakke land|Jacques Brel|1965|nb
 Mr. Tambourine Man|The Byrds|1965|rw
 Mr. Tambourine Man|Bob Dylan|1965|c
+My Favorite Things|Julie Andrews|1965|f|The Sound of Music
 My Generation|The Who|1965|rw
 Nowhere to Run|Martha and the Vandellas|1965|s
 Papa's Got a Brand New Bag|James Brown|1965|hs
 Poupée de cire, poupée de son|France Gall|1965|peq
 Rescue Me|Fontella Bass|1965|s
 Stop! In the Name of Love|The Supremes|1965|hs
-The Sound of Silence|Simon & Garfunkel|1965|ptc
+The Sound of Silence|Simon & Garfunkel|1965|ptcf|The Graduate
 The Tracks of My Tears|Smokey Robinson & The Miracles|1965|h
 The Tracks of My Tears|The Miracles|1965|s
+Thunderball|Tom Jones|1965|f|James Bond: Thunderball
 Ticket to Ride|The Beatles|1965|p
 Turn! Turn! Turn!|The Byrds|1965|rw
-Unchained Melody|The Righteous Brothers|1965|pfa
+Unchained Melody|The Righteous Brothers|1965|pfa|Ghost
 Uptight (Everything's Alright)|Stevie Wonder|1965|hs
 We Gotta Get Out of This Place|The Animals|1965|rw
 Yesterday|The Beatles|1965|pta
 Ain't Too Proud to Beg|The Temptations|1966|hs
-Batman Theme|Neal Hefti|1966|v
+Bang Bang (My Baby Shot Me Down)|Nancy Sinatra|1966|f|Kill Bill
+Batman Theme|Neal Hefti|1966|v|Batman (tv-serie)~Batman (TV series)
 Eleanor Rigby|The Beatles|1966|p
 Et moi, et moi, et moi|Jacques Dutronc|1966|q
 For What It's Worth|Buffalo Springfield|1966|rw
@@ -1291,10 +1368,11 @@ River Deep – Mountain High|Ike & Tina Turner|1966|s
 Sammy|Ramses Shaffy|1966|n
 Scarborough Fair/Canticle|Simon & Garfunkel|1966|c
 Sloop John B|The Beach Boys|1966|p
+Star Trek Theme|Alexander Courage|1966|v|Star Trek
 Strangers in the Night|Frank Sinatra|1966|p
 Sunny Afternoon|The Kinks|1966|rzw
 Sunshine Superman|Donovan|1966|p
-The Good, the Bad and the Ugly|Ennio Morricone|1966|f
+The Good, the Bad and the Ugly|Ennio Morricone|1966|f|The Good, the Bad and the Ugly
 Theme from Mission: Impossible|Lalo Schifrin|1966|v
 These Boots Are Made for Walkin'|Nancy Sinatra|1966|p
 Try a Little Tenderness|Otis Redding|1966|hs
@@ -1308,7 +1386,7 @@ You Keep Me Hangin' On|The Supremes|1966|hs
 (You Make Me Feel Like) A Natural Woman|Aretha Franklin|1967|hs
 (Your Love Keeps Lifting Me) Higher and Higher|Jackie Wilson|1967|h
 A Whiter Shade of Pale|Procol Harum|1967|rtw
-Ain't No Mountain High Enough|Marvin Gaye & Tammi Terrell|1967|hs
+Ain't No Mountain High Enough|Marvin Gaye & Tammi Terrell|1967|hsf|Guardians of the Galaxy
 All You Need Is Love|The Beatles|1967|p
 Break On Through (To the Other Side)|The Doors|1967|rw
 Brown Eyed Girl|Van Morrison|1967|p
@@ -1319,11 +1397,12 @@ Emmenez-moi|Charles Aznavour|1967|q
 Foxy Lady|Jimi Hendrix|1967|rw
 Happy Together|The Turtles|1967|p
 Hello, Goodbye|The Beatles|1967|p
-I Wan'na Be Like You|Louis Prima|1967|fg
+I Wan'na Be Like You|Louis Prima|1967|fgW|Het Jungleboek~The Jungle Book
 Inch'Allah|Adamo|1967|b
 Jackson|Johnny Cash & June Carter|1967|c
 Land van Maas en Waal|Boudewijn de Groot|1967|n
 Light My Fire|The Doors|1967|rw
+Mission: Impossible Theme|Lalo Schifrin|1967|f|Mission: Impossible
 Nights in White Satin|The Moody Blues|1967|rtw
 Ode to Billie Joe|Bobbie Gentry|1967|c
 Penny Lane|The Beatles|1967|p
@@ -1343,7 +1422,8 @@ Sunshine of Your Love|Cream|1967|rw
 Suzanne|Leonard Cohen|1967|c
 Sweet Soul Music|Arthur Conley|1967|s
 Testament|Boudewijn de Groot|1967|n
-The Bare Necessities|Phil Harris|1967|fg
+The Bare Necessities|Phil Harris|1967|fgW|Het Jungleboek~The Jungle Book
+Trust in Me|Sterling Holloway|1967|Wfg|Het Jungleboek~The Jungle Book
 Waterloo Sunset|The Kinks|1967|rw
 What a Wonderful World|Louis Armstrong|1967|pt
 Whiskey in the Jar|The Dubliners|1967|c
@@ -1355,13 +1435,13 @@ Born to Be Wild|Steppenwolf|1968|rw
 Build Me Up Buttercup|The Foundations|1968|p
 Congratulations|Cliff Richard|1968|pe
 Dance to the Music|Sly and the Family Stone|1968|hs
-De Fabeltjeskrant|Leen Jongewaard|1968|gnv
+De Fabeltjeskrant|Leen Jongewaard|1968|gnv|De Fabeltjeskrant
 De glimlach van een kind|Willy Alberti|1968|nj
 Delilah|Tom Jones|1968|px
 Everyday People|Sly and the Family Stone|1968|hs
 Hallo meneer de uil|De Fabeltjeskrant|1968|gnv
 Harper Valley P.T.A.|Jeannie C. Riley|1968|c
-Hawaii Five-O|The Ventures|1968|v
+Hawaii Five-O|The Ventures|1968|v|Hawaii Five-O
 Hello, I Love You|The Doors|1968|rw
 Hey Jude|The Beatles|1968|prtw
 I Heard It Through the Grapevine|Marvin Gaye|1968|hs
@@ -1369,10 +1449,10 @@ I Say a Little Prayer|Aretha Franklin|1968|hs
 Il est cinq heures, Paris s'éveille|Jacques Dutronc|1968|q
 Jumpin' Jack Flash|The Rolling Stones|1968|rw
 Lady Madonna|The Beatles|1968|p
-Mrs. Robinson|Simon & Garfunkel|1968|pfc
+Mrs. Robinson|Simon & Garfunkel|1968|pfc|The Graduate
 Ob-La-Di, Ob-La-Da|The Beatles|1968|p
 Schwarzbraun ist die Haselnuss|Heino|1968|xj
-Son of a Preacher Man|Dusty Springfield|1968|p
+Son of a Preacher Man|Dusty Springfield|1968|pf|Pulp Fiction
 Stand by Your Man|Tammy Wynette|1968|c
 Sympathy for the Devil|The Rolling Stones|1968|rw
 The Israelites|Desmond Dekker|1968|l
@@ -1388,7 +1468,7 @@ Both Sides, Now|Joni Mitchell|1969|c
 Come Together|The Beatles|1969|rw
 De troubadour|Lenny Kuhr|1969|ne
 Down on the Corner|Creedence Clearwater Revival|1969|rcw
-Everybody's Talkin'|Harry Nilsson|1969|pf
+Everybody's Talkin'|Harry Nilsson|1969|pf|Midnight Cowboy
 Fortunate Son|Creedence Clearwater Revival|1969|rcw
 Get Back|The Beatles|1969|rw
 Gimme Shelter|The Rolling Stones|1969|rtw
@@ -1400,7 +1480,7 @@ It's Your Thing|The Isley Brothers|1969|s
 Je t'aime... moi non plus|Serge Gainsbourg & Jane Birkin|1969|pq
 Leaving on a Jet Plane|John Denver|1969|c
 Les Champs-Élysées|Joe Dassin|1969|pq
-Little Green Bag|George Baker Selection|1969|rfw
+Little Green Bag|George Baker Selection|1969|rfw|Reservoir Dogs
 Ma Belle Amie|Tee Set|1969|p
 Many Rivers to Cross|Jimmy Cliff|1969|l
 My Cherie Amour|Stevie Wonder|1969|hs
@@ -1411,7 +1491,8 @@ Pinball Wizard|The Who|1969|rw
 Pressure Drop|Toots and the Maytals|1969|l
 Proud Mary|Creedence Clearwater Revival|1969|rcw
 Que je t'aime|Johnny Hallyday|1969|q
-Scooby-Doo, Where Are You!|Larry Marks|1969|gv
+Raindrops Keep Fallin' on My Head|B.J. Thomas|1969|f|Butch Cassidy and the Sundance Kid
+Scooby-Doo, Where Are You!|Larry Marks|1969|gv|Scooby-Doo
 Something|The Beatles|1969|pa
 Space Oddity|David Bowie|1969|prtw
 Spirit in the Sky|Norman Greenbaum|1969|row
@@ -1432,7 +1513,7 @@ Black Night|Deep Purple|1970|rw
 Bridge over Troubled Water|Simon & Garfunkel|1970|pc
 Cecilia|Simon & Garfunkel|1970|pc
 Child in Time|Deep Purple|1970|rtw
-Everybody Wants to Be a Cat|Scatman Crothers|1970|gf
+Everybody Wants to Be a Cat|Scatman Crothers|1970|gfW|De Aristokatten~The Aristocats
 Father and Son|Cat Stevens|1970|pc
 Feliz Navidad|José Feliciano|1970|pk
 Get Up (I Feel Like Being a) Sex Machine|James Brown|1970|hs
@@ -1455,6 +1536,7 @@ Roadhouse Blues|The Doors|1970|rw
 Rozen voor Sandra|Jimmy Frey|1970|nb
 Santa Claus Is Comin' to Town|The Jackson 5|1970|ks
 Signed, Sealed, Delivered I'm Yours|Stevie Wonder|1970|hs
+The Aristocats|Maurice Chevalier|1970|Wfg|De Aristokatten~The Aristocats
 The Tears of a Clown|Smokey Robinson & the Miracles|1970|s
 War Pigs|Black Sabbath|1970|mw
 Wild World|Cat Stevens|1970|pc
@@ -1465,6 +1547,7 @@ American Pie|Don McLean|1971|ptc
 Black Dog|Led Zeppelin|1971|rw
 Brown Sugar|The Rolling Stones|1971|rw
 Changes|David Bowie|1971|rw
+Diamonds Are Forever|Shirley Bassey|1971|f|James Bond: Diamonds Are Forever
 Eviva España|Samantha|1971|nbx
 Family Affair|Sly and the Family Stone|1971|s
 Get It On|T. Rex|1971|rw
@@ -1485,7 +1568,7 @@ Rock and Roll|Led Zeppelin|1971|rw
 Schöne Maid|Tony Marshall|1971|xj
 Stairway to Heaven|Led Zeppelin|1971|rtw
 Take Me Home, Country Roads|John Denver|1971|pxtc
-Theme from Shaft|Isaac Hayes|1971|fhs
+Theme from Shaft|Isaac Hayes|1971|fhs|Shaft
 Tiny Dancer|Elton John|1971|p
 Tired of Being Alone|Al Green|1971|s
 Vincent|Don McLean|1971|pc
@@ -1512,17 +1595,19 @@ I Can See Clearly Now|Johnny Nash|1972|l
 If You Don't Know Me by Now|Harold Melvin & the Blue Notes|1972|s
 Le lundi au soleil|Claude François|1972|q
 Lean on Me|Bill Withers|1972|hs
+Love Theme from The Godfather|Nino Rota|1972|f|The Godfather
 Love Train|The O'Jays|1972|hs
 Me and Mrs. Jones|Billy Paul|1972|s
 Papa Was a Rollin' Stone|The Temptations|1972|hs
-Perfect Day|Lou Reed|1972|rw
-Pippi Langkous|Paula Majoor|1972|gnv
+Perfect Day|Lou Reed|1972|rwf|Trainspotting
+Pippi Langkous|Paula Majoor|1972|gnv|Pippi Langkous~Pippi Longstocking
 Popcorn|Hot Butter|1972|po
 Rocket Man|Elton John|1972|p
 Rocky Mountain High|John Denver|1972|c
 School's Out|Alice Cooper|1972|rw
 Smoke on the Water|Deep Purple|1972|rmw
 Starman|David Bowie|1972|rw
+Stuck in the Middle with You|Stealers Wheel|1972|f|Reservoir Dogs
 Superfly|Curtis Mayfield|1972|s
 Superstition|Stevie Wonder|1972|hs
 Take It Easy|Eagles|1972|rcw
@@ -1558,12 +1643,14 @@ Killing Me Softly with His Song|Roberta Flack|1973|hsa
 Knockin' on Heaven's Door|Bob Dylan|1973|c
 La maladie d'amour|Michel Sardou|1973|q
 Let's Get It On|Marvin Gaye|1973|hs
-Live and Let Die|Wings|1973|rfw
+Live and Let Die|Wings|1973|rfw|James Bond: Live and Let Die
 Living for the City|Stevie Wonder|1973|hs
+Love|Nancy Adams|1973|Wfg|Robin Hood
 Love's Theme|The Love Unlimited Orchestra|1973|s
 Merry Xmas Everybody|Slade|1973|pk
 Midnight Train to Georgia|Gladys Knight & the Pips|1973|s
 Money|Pink Floyd|1973|rw
+Oo-De-Lally|Roger Miller|1973|Wfg|Robin Hood
 Paroles, paroles|Dalida & Alain Delon|1973|q
 Piano Man|Billy Joel|1973|p
 Radar Love|Golden Earring|1973|rw
@@ -1576,17 +1663,20 @@ The Joker|Steve Miller Band|1973|rw
 Tie a Yellow Ribbon Round the Ole Oak Tree|Tony Orlando & Dawn|1973|p
 Time|Pink Floyd|1973|rw
 Tu te reconnaîtras|Anne-Marie David|1973|pe
+Tubular Bells|Mike Oldfield|1973|f|The Exorcist
+Whistle-Stop|Roger Miller|1973|Wfg|Robin Hood
 Yesterday Once More|Carpenters|1973|p
 You Are the Sunshine of My Life|Stevie Wonder|1973|hs
 Annie's Song|John Denver|1974|ca
 Band on the Run|Wings|1974|rw
 Bennie and the Jets|Elton John|1974|p
 Can't Get Enough of Your Love, Babe|Barry White|1974|hs
+Come and Get Your Love|Redbone|1974|f|Guardians of the Galaxy
 Devil Gate Drive|Suzi Quatro|1974|rw
 Gigi l'amoroso|Dalida|1974|q
 Griechischer Wein|Udo Jürgens|1974|pj
 Het dorp|Wim Sonneveld|1974|n
-Hooked on a Feeling|Blue Swede|1974|po
+Hooked on a Feeling|Blue Swede|1974|pof|Guardians of the Galaxy
 I Shot the Sheriff|Eric Clapton|1974|rw
 I Will Always Love You|Dolly Parton|1974|ca
 Killer Queen|Queen|1974|rw
@@ -1633,6 +1723,7 @@ Le Sud|Nino Ferrer|1975|q
 Let the Music Play|Barry White|1975|s
 Love to Love You Baby|Donna Summer|1975|s
 Lyin' Eyes|Eagles|1975|c
+Main Title (Theme from Jaws)|John Williams|1975|f|Jaws
 Malle Babbe|Rob de Nijs|1975|n
 Mamma Mia|ABBA|1975|p
 Mississippi|Pussycat|1975|p
@@ -1650,7 +1741,7 @@ That's the Way (I Like It)|KC and the Sunshine Band|1975|dxs
 The Hustle|Van McCoy|1975|ds
 Una Paloma Blanca|George Baker Selection|1975|pz
 Walk This Way|Aerosmith|1975|rw
-Wickie de Viking|Wickie|1975|gnv
+Wickie de Viking|Wickie|1975|gnv|Wickie de Viking~Vicky the Viking
 Wish You Were Here|Pink Floyd|1975|rtw
 You Sexy Thing|Hot Chocolate|1975|ps
 Young Americans|David Bowie|1975|rw
@@ -1670,7 +1761,8 @@ Don't Leave Me This Way|Thelma Houston|1976|ds
 Eenzame kerst|André Hazes|1976|nk
 Ein Bett im Kornfeld|Jürgen Drews|1976|xj
 Fernando|ABBA|1976|p
-Gonna Fly Now|Bill Conti|1976|f
+Gonna Fly Now|Bill Conti|1976|f|Rocky
+Happy Days|Pratt & McClain|1976|v|Happy Days
 Hotel California|Eagles|1976|rtcw
 I Wish|Stevie Wonder|1976|hs
 Isn't She Lovely|Stevie Wonder|1976|hs
@@ -1692,11 +1784,12 @@ You to Me Are Everything|The Real Thing|1976|s
 You're My Best Friend|Queen|1976|rw
 Young Hearts Run Free|Candi Staton|1976|s
 Zeven dagen lang|Bots|1976|n
-'t Smurfenlied|Vader Abraham|1977|gn
+'t Smurfenlied|Vader Abraham|1977|gnv|De Smurfen~The Smurfs
 Alexandrie Alexandra|Claude François|1977|q
 Best of My Love|The Emotions|1977|s
 Black Betty|Ram Jam|1977|row
 Brick House|Commodores|1977|hs
+Cantina Band|John Williams|1977|f|Star Wars
 Cold as Ice|Foreigner|1977|rw
 De Smurfen|Vader Abraham|1977|gn
 De vlieger|André Hazes|1977|n
@@ -1711,12 +1804,12 @@ Give a Little Bit|Supertramp|1977|rw
 Go Your Own Way|Fleetwood Mac|1977|rw
 God Save the Queen|Sex Pistols|1977|rw
 Got to Give It Up|Marvin Gaye|1977|s
-Heidi|Gitti & Erika|1977|gv
+Heidi|Gitti & Erika|1977|gv|Heidi
 Here You Come Again|Dolly Parton|1977|c
 Heroes|David Bowie|1977|rtw
 Het Smurfenlied|Vader Abraham|1977|n
 Het werd zomer|Rob de Nijs|1977|n
-How Deep Is Your Love|Bee Gees|1977|psa
+How Deep Is Your Love|Bee Gees|1977|psaf|Saturday Night Fever
 I Feel Love|Donna Summer|1977|ds
 It's a Heartache|Bonnie Tyler|1977|p
 Jamming|Bob Marley & The Wailers|1977|pl
@@ -1727,14 +1820,15 @@ L'oiseau et l'enfant|Marie Myriam|1977|pe
 Lay Back in the Arms of Someone|Smokie|1977|p
 Lovely Day|Bill Withers|1977|hs
 Lucille|Kenny Rogers|1977|c
-Lust for Life|Iggy Pop|1977|riw
+Lust for Life|Iggy Pop|1977|riwf|Trainspotting
 Ma Baker|Boney M.|1977|ds
-Maya de Bij|Karel Svoboda|1977|gnv
+Maya de Bij|Karel Svoboda|1977|gnv|Maya de Bij~Maya the Bee
 Meisjes|Raymond van het Groenewoud|1977|nb
 Mit 66 Jahren|Udo Jürgens|1977|xj
-More Than a Woman|Bee Gees|1977|ps
-Mr. Blue Sky|Electric Light Orchestra|1977|p
+More Than a Woman|Bee Gees|1977|psf|Saturday Night Fever
+Mr. Blue Sky|Electric Light Orchestra|1977|pf|Guardians of the Galaxy
 Mull of Kintyre|Wings|1977|p
+Nobody Does It Better|Carly Simon|1977|f|James Bond: The Spy Who Loved Me
 Oerend hard|Normaal|1977|nrw
 One Love/People Get Ready|Bob Marley & The Wailers|1977|pl
 Only the Good Die Young|Billy Joel|1977|p
@@ -1746,8 +1840,8 @@ Shame|Evelyn "Champagne" King|1977|s
 Si maman si|France Gall|1977|q
 Sir Duke|Stevie Wonder|1977|hs
 Solsbury Hill|Peter Gabriel|1977|rw
-Star Wars (Main Title)|John Williams|1977|f
-Stayin' Alive|Bee Gees|1977|pdfs
+Star Wars (Main Title)|John Williams|1977|f|Star Wars
+Stayin' Alive|Bee Gees|1977|pdfs|Saturday Night Fever
 Thank You for the Music|ABBA|1977|p
 The Passenger|Iggy Pop|1977|riw
 Three Little Birds|Bob Marley & The Wailers|1977|pzl
@@ -1771,16 +1865,18 @@ Blame It on the Boogie|The Jacksons|1978|ds
 Boogie Oogie Oogie|A Taste of Honey|1978|s
 Born to Be Alive|Patrick Hernandez|1978|dos
 Da Ya Think I'm Sexy?|Rod Stewart|1978|pd
+Dallas Theme|Jerrold Immel|1978|v|Dallas
 Dreadlock Holiday|10cc|1978|pl
 En chantant|Michel Sardou|1978|q
 Ever Fallen in Love (With Someone You Shouldn't've)|Buzzcocks|1978|i
 Fat Bottomed Girls|Queen|1978|rw
 Got to Be Real|Cheryl Lynn|1978|s
-Grease|Frankie Valli|1978|f
-Greased Lightnin'|John Travolta|1978|f
+Grease|Frankie Valli|1978|f|Grease
+Greased Lightnin'|John Travolta|1978|f|Grease
+Halloween Theme|John Carpenter|1978|f|Halloween
 Hit Me with Your Rhythm Stick|Ian Dury and the Blockheads|1978|p
 Hold the Line|Toto|1978|rw
-Hopelessly Devoted to You|Olivia Newton-John|1978|f
+Hopelessly Devoted to You|Olivia Newton-John|1978|f|Grease
 I Wanna Be Sedated|Ramones|1978|rw
 I Will Survive|Gloria Gaynor|1978|dxs
 I'm Every Woman|Chaka Khan|1978|s
@@ -1791,7 +1887,7 @@ Last Dance|Donna Summer|1978|ds
 Le Freak|Chic|1978|ds
 Mary's Boy Child – Oh My Lord|Boney M.|1978|ks
 My Life|Billy Joel|1978|p
-Night Fever|Bee Gees|1978|ds
+Night Fever|Bee Gees|1978|dsf|Saturday Night Fever
 Now That We Found Love|Third World|1978|sl
 One Way or Another|Blondie|1978|riw
 Rasputin|Boney M.|1978|pxs
@@ -1801,18 +1897,20 @@ September|Earth, Wind & Fire|1978|dhxs
 Shake Your Body (Down to the Ground)|The Jacksons|1978|ds
 Sultans of Swing|Dire Straits|1978|rtw
 Summer Night City|ABBA|1978|pd
-Summer Nights|John Travolta & Olivia Newton-John|1978|fz
+Summer Nights|John Travolta & Olivia Newton-John|1978|fz|Grease
 Take a Chance on Me|ABBA|1978|p
 Teenage Kicks|The Undertones|1978|i
+Thank You for Being a Friend|Andrew Gold|1978|v|The Golden Girls
 The Gambler|Kenny Rogers|1978|pc
 The Model|Kraftwerk|1978|d
+Theme from Superman|John Williams|1978|f|Superman
 Three Times a Lady|Commodores|1978|hsa
 Vlaanderen boven|Raymond van het Groenewoud|1978|nb
 Wuthering Heights|Kate Bush|1978|pi
 Y.M.C.A.|Village People|1978|dxs
 You Make Me Feel (Mighty Real)|Sylvester|1978|s
 You're the Greatest Lover|Luv'|1978|p
-You're the One That I Want|John Travolta & Olivia Newton-John|1978|pf
+You're the One That I Want|John Travolta & Olivia Newton-John|1978|pf|Grease
 Zondag|Rob de Nijs|1978|n
 A Message to You Rudy|The Specials|1979|i
 After the Love Has Gone|Earth, Wind & Fire|1979|s
@@ -1876,7 +1974,7 @@ Whatever You Want|Status Quo|1979|rw
 When You're in Love with a Beautiful Woman|Dr. Hook|1979|p
 Wonderful Christmastime|Paul McCartney|1979|pk
 'n Vriend|André Hazes|1980|n
-9 to 5|Dolly Parton|1980|pfc
+9 to 5|Dolly Parton|1980|pfc|9 to 5
 A Forest|The Cure|1980|i
 Ace of Spades|Motörhead|1980|mw
 Amoureux solitaires|Lio|1980|qb
@@ -1889,7 +1987,7 @@ Babooshka|Kate Bush|1980|pi
 Back in Black|AC/DC|1980|rmw
 Baggy Trousers|Madness|1980|pi
 Breaking the Law|Judas Priest|1980|mw
-Call Me|Blondie|1980|pfi
+Call Me|Blondie|1980|pfi|American Gigolo
 Can You Feel It|The Jacksons|1980|ds
 Celebration|Kool & The Gang|1980|pxs
 Could You Be Loved|Bob Marley & The Wailers|1980|pzl
@@ -1899,12 +1997,12 @@ Don't Stand So Close to Me|The Police|1980|rw
 Enola Gay|Orchestral Manoeuvres in the Dark|1980|p
 Euro-Vision|Telex|1980|be
 Fade to Grey|Visage|1980|p
-Fame|Irene Cara|1980|f
-Flash|Queen|1980|rfw
+Fame|Irene Cara|1980|f|Fame
+Flash|Queen|1980|rfw|Flash Gordon
 Funkytown|Lipps Inc.|1980|dos
 Give Me the Night|George Benson|1980|s
 Going Underground|The Jam|1980|i
-Hallo vrienden|Bassie & Adriaan|1980|gnv
+Hallo vrienden|Bassie & Adriaan|1980|gnv|Bassie & Adriaan
 Hells Bells|AC/DC|1980|mw
 Het is koud zonder jou|André Hazes|1980|n
 Hit Me with Your Best Shot|Pat Benatar|1980|rw
@@ -1933,6 +2031,7 @@ Sexy Eyes|Dr. Hook|1980|p
 Shoot to Thrill|AC/DC|1980|rmw
 Stop the Cavalry|Jona Lewie|1980|pk
 Super Trouper|ABBA|1980|p
+The Imperial March (Darth Vader's Theme)|John Williams|1980|f|Star Wars
 The Tide Is High|Blondie|1980|pi
 The Winner Takes It All|ABBA|1980|p
 Uit mijn bol|André Hazes|1980|nx
@@ -1943,7 +2042,7 @@ You Shook Me All Night Long|AC/DC|1980|rmxw
 Über sieben Brücken musst du gehn|Peter Maffay|1980|xj
 Bij ons staat op de keukendeur|Tineke Schouten|1981|nx
 Cambodia|Kim Wilde|1981|p
-Chariots of Fire|Vangelis|1981|f
+Chariots of Fire|Vangelis|1981|f|Chariots of Fire
 Christmas Wrapping|The Waitresses|1981|pk
 Don't Stop Believin'|Journey|1981|rxw
 Don't You Want Me|The Human League|1981|p
@@ -1951,11 +2050,13 @@ Down Under|Men at Work|1981|p
 Endless Love|Diana Ross & Lionel Richie|1981|sa
 Er staat een paard in de gang|André van Duin|1981|nx
 Every Little Thing She Does Is Magic|The Police|1981|p
+For Your Eyes Only|Sheena Easton|1981|f|James Bond: For Your Eyes Only
 Get Down on It|Kool & The Gang|1981|pxs
 Ghost Town|The Specials|1981|riw
 Girls on Film|Duran Duran|1981|p
 Give It to Me Baby|Rick James|1981|s
 Golden Brown|The Stranglers|1981|i
+Goo Goo Muck|The Cramps|1981|v|Wednesday
 I Love Rock 'n' Roll|Joan Jett & the Blackhearts|1981|rw
 Il est libre Max|Hervé Cristiani|1981|q
 Il suffira d'un signe|Jean-Jacques Goldman|1981|q
@@ -1976,8 +2077,8 @@ Op een onbewoond eiland|Kinderen voor Kinderen|1981|ng
 Physical|Olivia Newton-John|1981|p
 Polonaise Hollandaise|Arie Ribbens|1981|njx
 Polonäse Blankenese|Gottlieb Wendehals|1981|jx
-Postman Pat|Ken Barrie|1981|gv
-Raiders March|John Williams|1981|f
+Postman Pat|Ken Barrie|1981|gv|Pieter Post~Postman Pat
+Raiders March|John Williams|1981|f|Indiana Jones
 Résiste|France Gall|1981|q
 Saragossa|Jimmy Frey|1981|nb
 Sarà perché ti amo|Ricchi e Poveri|1981|px
@@ -2016,9 +2117,10 @@ Een beetje verliefd|André Hazes|1982|n
 Ein bisschen Frieden|Nicole|1982|xje
 Ein bißchen Frieden|Nicole|1982|pe
 Electric Avenue|Eddy Grant|1982|l
-Eye of the Tiger|Survivor|1982|rfw
+Eye of the Tiger|Survivor|1982|rfw|Rocky
 Felicità|Al Bano & Romina Power|1982|px
 Fields of Athenry|Paddy Reilly|1982|c
+Flying Theme (from E.T.)|John Williams|1982|f|E.T.
 Forget Me Nots|Patrice Rushen|1982|s
 Gloria|Laura Branigan|1982|p
 Hot Hot Hot|Arrow|1982|lx
@@ -2027,7 +2129,7 @@ Hé lekker beest|Drukwerk|1982|n
 Ich war noch niemals in New York|Udo Jürgens|1982|xj
 Is dit alles|Doe Maar|1982|n
 Je loog tegen mij|Drukwerk|1982|n
-Knight Rider Theme|Stu Phillips|1982|v
+Knight Rider Theme|Stu Phillips|1982|v|Knight Rider
 L'aventurier|Indochine|1982|q
 Mad World|Tears for Fears|1982|p
 Mamma Maria|Ricchi e Poveri|1982|px
@@ -2046,9 +2148,10 @@ Sexual Healing|Marvin Gaye|1982|hs
 Should I Stay or Should I Go|The Clash|1982|riw
 The Message|Grandmaster Flash and the Furious Five|1982|h
 The Number of the Beast|Iron Maiden|1982|mw
+Theme from Cheers (Where Everybody Knows Your Name)|Gary Portnoy|1982|v|Cheers
 Town Called Malice|The Jam|1982|rw
 Twilight Zone|Golden Earring|1982|rw
-Up Where We Belong|Joe Cocker|1982|pfa
+Up Where We Belong|Joe Cocker|1982|pfa|An Officer and a Gentleman
 Verliefd op Chris Lomme|De Kreuners|1982|nb
 Vriendschap|Het Goede Doel|1982|n
 Where Everybody Knows Your Name|Gary Portnoy|1982|v
@@ -2075,7 +2178,7 @@ Cruel Summer|Bananarama|1983|pzy
 Dolce Vita|Ryan Paris|1983|p
 Dès que le vent soufflera|Renaud|1983|q
 Every Breath You Take|The Police|1983|prtwa
-Flashdance... What a Feeling|Irene Cara|1983|f
+Flashdance... What a Feeling|Irene Cara|1983|f|Flashdance
 Girls Just Want to Have Fun|Cyndi Lauper|1983|px
 Give It Up|KC and the Sunshine Band|1983|dxs
 Gold|Spandau Ballet|1983|p
@@ -2095,7 +2198,7 @@ Love Is a Battlefield|Pat Benatar|1983|rw
 Lucky Star|Madonna|1983|p
 Major Tom (Völlig losgelöst)|Peter Schilling|1983|pj
 Mama|Genesis|1983|rw
-Maniac|Michael Sembello|1983|f
+Maniac|Michael Sembello|1983|f|Flashdance
 Modern Love|David Bowie|1983|p
 Moonlight Shadow|Mike Oldfield|1983|p
 Mourir sur scène|Dalida|1983|q
@@ -2115,6 +2218,7 @@ Sunshine Reggae|Laid Back|1983|pz
 Suzanne|VOF De Kunst|1983|n
 Sweet Dreams (Are Made of This)|Eurythmics|1983|p
 The A-Team|Mike Post & Pete Carpenter|1983|v
+The A-Team Theme|Mike Post & Pete Carpenter|1983|v|The A-Team
 The Trooper|Iron Maiden|1983|mw
 This Charming Man|The Smiths|1983|riw
 Thriller|Michael Jackson|1983|px
@@ -2130,7 +2234,7 @@ Zeg maar niets meer|André Hazes|1983|n
 1000 und 1 Nacht (Zoom!)|Klaus Lage|1984|xj
 2 Minutes to Midnight|Iron Maiden|1984|mw
 Aces High|Iron Maiden|1984|mw
-Against All Odds (Take a Look at Me Now)|Phil Collins|1984|pfa
+Against All Odds (Take a Look at Me Now)|Phil Collins|1984|pfa|Against All Odds
 Amsterdam huilt|Danny de Munk|1984|nj
 Big in Japan|Alphaville|1984|p
 Borderline|Madonna|1984|p
@@ -2146,18 +2250,18 @@ Encore un matin|Jean-Jacques Goldman|1984|q
 Everything She Wants|Wham!|1984|py
 Eyes Without a Face|Billy Idol|1984|rw
 Femme libérée|Cookie Dingler|1984|q
-Footloose|Kenny Loggins|1984|pfx
+Footloose|Kenny Loggins|1984|pfx|Footloose
 For Whom the Bell Tolls|Metallica|1984|mw
 Forever Young|Alphaville|1984|p
 Freedom|Wham!|1984|py
 Fresh|Kool & The Gang|1984|ps
-Ghostbusters|Ray Parker Jr.|1984|pf
+Ghostbusters|Ray Parker Jr.|1984|pf|Ghostbusters
 Hallelujah|Leonard Cohen|1984|c
 Heaven|Bryan Adams|1984|pa
 Hello|Lionel Richie|1984|psa
 Here Comes the Rain Again|Eurythmics|1984|p
 Hilversum III|Herman van Veen|1984|n
-Holding Out for a Hero|Bonnie Tyler|1984|f
+Holding Out for a Hero|Bonnie Tyler|1984|f|Footloose
 How Soon Is Now?|The Smiths|1984|i
 I Feel for You|Chaka Khan|1984|s
 I Just Called to Say I Love You|Stevie Wonder|1984|ps
@@ -2170,21 +2274,21 @@ Irgendwie, irgendwo, irgendwann|Nena|1984|xj
 Jump|Van Halen|1984|rmw
 Last Christmas|Wham!|1984|pky
 Let's Go Crazy|Prince|1984|rsw
-Let's Hear It for the Boy|Deniece Williams|1984|s
+Let's Hear It for the Boy|Deniece Williams|1984|sf|Footloose
 Like a Virgin|Madonna|1984|p
 Live Is Life|Opus|1984|pxoj
 Marcia Baila|Les Rita Mitsouko|1984|q
-Miami Vice Theme|Jan Hammer|1984|v
+Miami Vice Theme|Jan Hammer|1984|v|Miami Vice
 Männer|Herbert Grönemeyer|1984|xj
 Panama|Van Halen|1984|rw
 Pride (In the Name of Love)|U2|1984|rw
 Private Dancer|Tina Turner|1984|s
-Purple Rain|Prince|1984|rtsw
+Purple Rain|Prince|1984|rtswf|Purple Rain
 Radio Ga Ga|Queen|1984|rw
 Rock You Like a Hurricane|Scorpions|1984|mw
 Run to You|Bryan Adams|1984|rw
 Self Control|Laura Branigan|1984|p
-Sesamstraat|Henny Vrienten|1984|gnv
+Sesamstraat|Henny Vrienten|1984|gnv|Sesamstraat~Sesame Street
 Shout|Tears for Fears|1984|p
 Smalltown Boy|Bronski Beat|1984|pd
 Smooth Operator|Sade|1984|h
@@ -2192,6 +2296,8 @@ Still Loving You|Scorpions|1984|mrwa
 Stuck on You|Lionel Richie|1984|sa
 Summer of '69|Bryan Adams|1984|rzw
 Thank God It's Christmas|Queen|1984|pk
+The Heat Is On|Glenn Frey|1984|f|Beverly Hills Cop
+The NeverEnding Story|Limahl|1984|f|Het Oneindige Verhaal~The NeverEnding Story
 The Power of Love|Frankie Goes to Hollywood|1984|pa
 The Reflex|Duran Duran|1984|p
 The Riddle|Nik Kershaw|1984|p
@@ -2208,24 +2314,25 @@ Wild Boys|Duran Duran|1984|p
 Wouldn't It Be Good|Nik Kershaw|1984|p
 You Spin Me Round (Like a Record)|Dead or Alive|1984|pd
 You're My Heart, You're My Soul|Modern Talking|1984|p
+You're the Best|Joe Esposito|1984|f|The Karate Kid
 Zijn het je ogen|Koos Alberts|1984|n
 Zo lang de lepel in de brijpot staat|Katastroof|1984|nbx
 Zwart wit|Frank Boeijen Groep|1984|n
 (I'll Never Be) Maria Magdalena|Sandra|1985|p
 3e sexe|Indochine|1985|q
-A View to a Kill|Duran Duran|1985|pf
+A View to a Kill|Duran Duran|1985|pf|James Bond: A View to a Kill
 Alive and Kicking|Simple Minds|1985|rw
-Axel F|Harold Faltermeyer|1985|f
-Back to the Future|Alan Silvestri|1985|f
+Axel F|Harold Faltermeyer|1985|f|Beverly Hills Cop
+Back to the Future|Alan Silvestri|1985|f|Back to the Future
 Brothers in Arms|Dire Straits|1985|rtw
-Burning Heart|Survivor|1985|rfw
+Burning Heart|Survivor|1985|rfw|Rocky
 Chain Reaction|Diana Ross|1985|ps
 Cheri, Cheri Lady|Modern Talking|1985|p
 Cherish|Kool & The Gang|1985|ps
 Close to Me|The Cure|1985|riw
 Conga|Miami Sound Machine|1985|pxl
 Dirty Old Town|The Pogues|1985|c
-Don't You (Forget About Me)|Simple Minds|1985|rfw
+Don't You (Forget About Me)|Simple Minds|1985|rfw|The Breakfast Club
 Every Time You Go Away|Paul Young|1985|p
 Everybody Wants to Rule the World|Tears for Fears|1985|p
 Head over Heels|Tears for Fears|1985|p
@@ -2258,14 +2365,14 @@ Quelque chose de Tennessee|Johnny Hallyday|1985|q
 Raspberry Beret|Prince|1985|ps
 Road to Nowhere|Talking Heads|1985|riw
 Rock Me Amadeus|Falco|1985|pj
-Running Up That Hill|Kate Bush|1985|pti
+Running Up That Hill|Kate Bush|1985|ptiv|Stranger Things
 Saving All My Love for You|Whitney Houston|1985|ps
 Say You, Say Me|Lionel Richie|1985|psa
-St. Elmo's Fire (Man in Motion)|John Parr|1985|f
+St. Elmo's Fire (Man in Motion)|John Parr|1985|f|St. Elmo's Fire
 Sussudio|Phil Collins|1985|p
 Take On Me|a-ha|1985|pt
 Tarzan Boy|Baltimora|1985|po
-The Power of Love|Huey Lewis and the News|1985|fa
+The Power of Love|Huey Lewis and the News|1985|fa|Back to the Future
 The Sun Always Shines on T.V.|a-ha|1985|p
 There Must Be an Angel (Playing with My Heart)|Eurythmics|1985|p
 Ticket to the Tropics|Gerard Joling|1985|p
@@ -2273,22 +2380,24 @@ Tombé pour la France|Étienne Daho|1985|q
 Walk of Life|Dire Straits|1985|rw
 We Are the World|USA for Africa|1985|p
 We Built This City|Starship|1985|rw
-We Don't Need Another Hero (Thunderdome)|Tina Turner|1985|pfs
+We Don't Need Another Hero (Thunderdome)|Tina Turner|1985|pfs|Mad Max Beyond Thunderdome
 West End Girls|Pet Shop Boys|1985|p
 When the Going Gets Tough, the Tough Get Going|Billy Ocean|1985|ps
 (You Gotta) Fight for Your Right (To Party!)|Beastie Boys|1986|hx
 A Kind of Magic|Queen|1986|rw
-Absolute Beginners|David Bowie|1986|pf
+Absolute Beginners|David Bowie|1986|pf|Absolute Beginners
 Angel of Death|Slayer|1986|mw
 Anne|Herman van Veen|1986|n
 Bizarre Love Triangle|New Order|1986|i
 Brother Louie|Modern Talking|1986|p
 C'est comme ça|Les Rita Mitsouko|1986|q
 Dancing on the Ceiling|Lionel Richie|1986|ps
-Danger Zone|Kenny Loggins|1986|f
+Danger Zone|Kenny Loggins|1986|f|Top Gun
 Don't Dream It's Over|Crowded House|1986|p
 Driving Home for Christmas|Chris Rea|1986|pk
+Glory of Love|Peter Cetera|1986|fa|The Karate Kid
 Greatest Love of All|Whitney Houston|1986|ps
+If You Leave|Orchestral Manoeuvres in the Dark|1986|f|Pretty in Pink
 In the Army Now|Status Quo|1986|rw
 Invisible Touch|Genesis|1986|rw
 It's Tricky|Run-DMC|1986|h
@@ -2302,6 +2411,7 @@ Les démons de minuit|Images|1986|q
 Lessons in Love|Level 42|1986|p
 Libertine|Mylène Farmer|1986|q
 Livin' on a Prayer|Bon Jovi|1986|rxw
+MacGyver Theme|Randy Edelman|1986|v|MacGyver
 Manic Monday|The Bangles|1986|py
 Master of Puppets|Metallica|1986|mw
 Nasty|Janet Jackson|1986|p
@@ -2311,11 +2421,11 @@ Peace Sells|Megadeth|1986|mw
 Raining Blood|Slayer|1986|mw
 Sledgehammer|Peter Gabriel|1986|p
 Sometimes|Erasure|1986|p
-Take My Breath Away|Berlin|1986|fa
+Take My Breath Away|Berlin|1986|fa|Top Gun
 The Final Countdown|Europe|1986|rxw
 The Lady in Red|Chris de Burgh|1986|pa
 There Is a Light That Never Goes Out|The Smiths|1986|rtiw
-Top Gun Anthem|Harold Faltermeyer|1986|f
+Top Gun Anthem|Harold Faltermeyer|1986|f|Top Gun
 True Colors|Cyndi Lauper|1986|p
 Venus|Bananarama|1986|pdy
 Voyage Voyage|Desireless|1986|pdqo
@@ -2323,12 +2433,12 @@ Walk Like an Egyptian|The Bangles|1986|py
 Walk This Way|Run-DMC|1986|h
 Wasted Years|Iron Maiden|1986|mw
 We Don't Have to Take Our Clothes Off|Jermaine Stewart|1986|p
-Who Wants to Live Forever|Queen|1986|rfw
+Who Wants to Live Forever|Queen|1986|rfw|Highlander
 Word Up!|Cameo|1986|s
 You Can Call Me Al|Paul Simon|1986|pc
-You Can Leave Your Hat On|Joe Cocker|1986|rfw
+You Can Leave Your Hat On|Joe Cocker|1986|rfw|9½ Weeks
 You Give Love a Bad Name|Bon Jovi|1986|rw
-(I've Had) The Time of My Life|Bill Medley & Jennifer Warnes|1987|f
+(I've Had) The Time of My Life|Bill Medley & Jennifer Warnes|1987|f|Dirty Dancing
 Alone|Heart|1987|rw
 Always on My Mind|Pet Shop Boys|1987|p
 Bad|Michael Jackson|1987|p
@@ -2336,16 +2446,18 @@ Bad Boys|Inner Circle|1987|l
 Bamboléo|Gipsy Kings|1987|pzl
 Beds Are Burning|Midnight Oil|1987|rw
 Boys (Summertime Love)|Sabrina|1987|pz
-Brandweerman Sam|Brandweerman Sam|1987|gnv
+Brandweerman Sam|Brandweerman Sam|1987|gnv|Brandweerman Sam~Fireman Sam
 Call Me|Spagna|1987|p
 Carrie|Europe|1987|rw
 Carrousel|Bart Kaëll|1987|nb
+Crockett's Theme|Jan Hammer|1987|v|Miami Vice
 Dansen op de vulkaan|De Dijk|1987|n
 Djobi, Djoba|Gipsy Kings|1987|l
-DuckTales Theme|Jeff Pescetto|1987|vg
+DuckTales Theme|Jeff Pescetto|1987|vgW|DuckTales
 Dude (Looks Like a Lady)|Aerosmith|1987|rw
 Ella, elle l'a|France Gall|1987|q
 Everywhere|Fleetwood Mac|1987|p
+Everywhere You Look|Jesse Frederick|1987|v|Full House
 Fairytale of New York|The Pogues|1987|pk
 Faith|George Michael|1987|p
 Forever and Ever, Amen|Randy Travis|1987|c
@@ -2353,7 +2465,7 @@ Girls, Girls, Girls|Mötley Crüe|1987|mw
 Heaven Is a Place on Earth|Belinda Carlisle|1987|p
 Here I Go Again|Whitesnake|1987|rmw
 Hold Me Now|Johnny Logan|1987|pe
-Hungry Eyes|Eric Carmen|1987|pf
+Hungry Eyes|Eric Carmen|1987|pf|Dirty Dancing
 I Should Be So Lucky|Kylie Minogue|1987|p
 I Still Haven't Found What I'm Looking For|U2|1987|rw
 I Wanna Dance with Somebody|Whitney Houston|1987|pxs
@@ -2382,12 +2494,13 @@ Rechtop in de wind|Marcha|1987|ne
 Respectable|Mel & Kim|1987|p
 Rhythm Is Gonna Get You|Gloria Estefan|1987|pl
 Sans contrefaçon|Mylène Farmer|1987|q
-She's Like the Wind|Patrick Swayze|1987|pf
+She's Like the Wind|Patrick Swayze|1987|pf|Dirty Dancing
 Sierra Madre|Zillertaler Schürzenjäger|1987|xj
 Sign Your Name|Terence Trent D'Arby|1987|h
 Sweet Child o' Mine|Guns N' Roses|1987|rmtw
-Teenage Mutant Ninja Turtles|Chuck Lorre|1987|gv
+Teenage Mutant Ninja Turtles|Chuck Lorre|1987|gv|Teenage Mutant Ninja Turtles
 Tell It to My Heart|Taylor Dayne|1987|pd
+The Living Daylights|a-ha|1987|f|James Bond: The Living Daylights
 The Loco-Motion|Kylie Minogue|1987|p
 The One I Love|R.E.M.|1987|riw
 The Way You Make Me Feel|Michael Jackson|1987|p
@@ -2397,7 +2510,7 @@ Unchain My Heart|Joe Cocker|1987|rw
 Wanted Dead or Alive|Bon Jovi|1987|rw
 Welcome to the Jungle|Guns N' Roses|1987|rmw
 Where the Streets Have No Name|U2|1987|rw
-Who's That Girl|Madonna|1987|pf
+Who's That Girl|Madonna|1987|pf|Who's That Girl
 Wishing Well|Terence Trent D'Arby|1987|h
 With or Without You|U2|1987|rtwa
 Yé ké yé ké|Mory Kanté|1987|dz
@@ -2408,7 +2521,7 @@ Bad Medicine|Bon Jovi|1988|rw
 Bamboleo|Julio Iglesias|1988|l
 Big Fun|Inner City|1988|d
 Buffalo Stance|Neneh Cherry|1988|h
-Calimero|Danny de Munk|1988|gnv
+Calimero|Danny de Munk|1988|gnv|Calimero
 Desire|U2|1988|rw
 Dirty Diana|Michael Jackson|1988|p
 Don't Worry Be Happy|Bobby McFerrin|1988|pzlo
@@ -2458,13 +2571,14 @@ Wild World|Maxi Priest|1988|l
 You Got It (The Right Stuff)|New Kids on the Block|1988|py
 Zet een kaars voor je raam|Rob de Nijs|1988|n
 18 and Life|Skid Row|1989|rw
-Alfred Jodocus Kwak|Herman van Veen|1989|gnv
+Alfred Jodocus Kwak|Herman van Veen|1989|gnv|Alfred J. Kwak
 Alles kan een mens gelukkig maken|René Froger & Het Goede Doel|1989|nj
 Anne|Clouseau|1989|nb
 Another Day in Paradise|Phil Collins|1989|p
+Batdance|Prince|1989|fs|Batman
 Bust a Move|Young MC|1989|h
 Cherish|Madonna|1989|p
-Chip 'n Dale Rescue Rangers Theme|The Jets|1989|gv
+Chip 'n Dale Rescue Rangers Theme|The Jets|1989|gvW|Knabbel en Babbel~Chip 'n Dale: Rescue Rangers
 De Marie-Louise|Bart Kaëll|1989|nbx
 Door de wind|Ingeborg|1989|nbe
 Een eigen huis|René Froger|1989|nj
@@ -2485,7 +2599,7 @@ Infinity|Guru Josh|1989|d
 Janie's Got a Gun|Aerosmith|1989|rw
 Kickstart My Heart|Mötley Crüe|1989|mw
 Kingston Town|UB40|1989|pl
-Kiss the Girl|Samuel E. Wright|1989|gf
+Kiss the Girl|Samuel E. Wright|1989|gfW|De Kleine Zeemeermin~The Little Mermaid
 Lambada|Kaoma|1989|pxzol
 Lena|Bart Kaëll|1989|nb
 Like a Prayer|Madonna|1989|p
@@ -2498,9 +2612,9 @@ Mooi, 't leven is mooi|Will Tura|1989|nb
 Niemand in de stad|De Dijk|1989|n
 No More Bolero's|Gerard Joling|1989|p
 Opposites Attract|Paula Abdul|1989|p
-Part of Your World|Jodi Benson|1989|fg
+Part of Your World|Jodi Benson|1989|fgW|De Kleine Zeemeermin~The Little Mermaid
 Personal Jesus|Depeche Mode|1989|rtiw
-Poor Unfortunate Souls|Pat Carroll|1989|gf
+Poor Unfortunate Souls|Pat Carroll|1989|gfW|De Kleine Zeemeermin~The Little Mermaid
 Pump Up the Jam|Technotronic|1989|dbu
 Rhythm Nation|Janet Jackson|1989|p
 Ride on Time|Black Box|1989|du
@@ -2511,8 +2625,8 @@ Sowing the Seeds of Love|Tears for Fears|1989|p
 Spetter pieter pater|Herman van Veen|1989|gnv
 The Best|Tina Turner|1989|ps
 The Look|Roxette|1989|p
-The Simpsons Theme|Danny Elfman|1989|v
-Under the Sea|Samuel E. Wright|1989|fg
+The Simpsons Theme|Danny Elfman|1989|v|The Simpsons
+Under the Sea|Samuel E. Wright|1989|fgW|De Kleine Zeemeermin~The Little Mermaid
 Volare|Gipsy Kings|1989|l
 We Didn't Start the Fire|Billy Joel|1989|p
 Als een leeuw in een kooi|Willy Sommers|1990|nbx
@@ -2540,7 +2654,7 @@ Ice Ice Baby|Vanilla Ice|1990|ho
 Ik wil je|De Kreuners|1990|nb
 Ik wil niet naar school|Pim Pam Pet|1990|gn
 Insieme: 1992|Toto Cutugno|1990|pe
-It Must Have Been Love|Roxette|1990|pf
+It Must Have Been Love|Roxette|1990|pfa|Pretty Woman
 Kleine jongen|André Hazes|1990|n
 Le paradis blanc|Michel Berger|1990|q
 Louise|Clouseau|1990|nb
@@ -2554,18 +2668,18 @@ Nu of nooit|De Kreuners|1990|nb
 Painkiller|Judas Priest|1990|mw
 Papa|Stef Bos|1990|n
 Policy of Truth|Depeche Mode|1990|pi
-Show Me Heaven|Maria McKee|1990|f
+Show Me Heaven|Maria McKee|1990|f|Days of Thunder
 Step by Step|New Kids on the Block|1990|py
 Step On|Happy Mondays|1990|i
 Strike It Up|Black Box|1990|du
 The Dance|Garth Brooks|1990|c
-The Fresh Prince of Bel-Air|DJ Jazzy Jeff & The Fresh Prince|1990|vh
+The Fresh Prince of Bel-Air|DJ Jazzy Jeff & The Fresh Prince|1990|vh|The Fresh Prince of Bel-Air
 The Power|Snap!|1990|du
 Things That Make You Go Hmmm...|C+C Music Factory|1990|du
 This Beat Is Technotronic|Technotronic|1990|dbu
 Thunderstruck|AC/DC|1990|rmw
 Total Confusion|A Homeboy, a Hippie & a Funki Dredd|1990|du
-Twin Peaks Theme|Angelo Badalamenti|1990|v
+Twin Peaks Theme|Angelo Badalamenti|1990|v|Twin Peaks
 U Can't Touch This|MC Hammer|1990|hx
 Verdammt, ich lieb' dich|Matthias Reim|1990|xj
 Vision of Love|Mariah Carey|1990|p
@@ -2575,15 +2689,15 @@ Wil niet dat je weggaat|Clouseau|1990|nb
 Wind of Change|Scorpions|1990|rmw
 Zeg me dat het niet zo is|Frank Boeijen|1990|n
 Zo jong|De Kreuners|1990|nb
-(Everything I Do) I Do It for You|Bryan Adams|1991|pfa
+(Everything I Do) I Do It for You|Bryan Adams|1991|pfa|Robin Hood: Prince of Thieves
 Alive|Pearl Jam|1991|riw
 Anasthasia|T99|1991|ub
 Anja|Gorki|1991|nb
 Baywatch Theme (I'm Always Here)|Jimi Jamison|1991|v
-Be Our Guest|Jerry Orbach|1991|fg
-Beauty and the Beast|Celine Dion & Peabo Bryson|1991|f
-Beauty and the Beast|Angela Lansbury|1991|gf
-Belle|Paige O'Hara|1991|gf
+Be Our Guest|Jerry Orbach|1991|fgW|Belle en het Beest~Beauty and the Beast
+Beauty and the Beast|Celine Dion & Peabo Bryson|1991|fWga|Belle en het Beest~Beauty and the Beast
+Beauty and the Beast|Angela Lansbury|1991|gfW|Belle en het Beest~Beauty and the Beast
+Belle|Paige O'Hara|1991|gfW|Belle en het Beest~Beauty and the Beast
 Bestel mar|Rowwen Hèze|1991|njx
 Black|Pearl Jam|1991|rtiw
 Black or White|Michael Jackson|1991|p
@@ -2596,13 +2710,14 @@ Enter Sandman|Metallica|1991|mw
 Fading Like a Flower (Every Time You Leave)|Roxette|1991|p
 Finally|CeCe Peniston|1991|du
 Fångad av en stormvind|Carola|1991|pe
-Gaston|Jesse Corti & Richard White|1991|gf
+Gaston|Jesse Corti & Richard White|1991|gfW|Belle en het Beest~Beauty and the Beast
 Geef het op|Clouseau|1991|nb
 Get Ready for This|2 Unlimited|1991|dbxu
 Give It Away|Red Hot Chili Peppers|1991|riw
 Gypsy Woman (She's Homeless)|Crystal Waters|1991|d
 Hij speelde accordeon|Luc Steeno|1991|nbx
 I Can't Dance|Genesis|1991|rw
+I'm Always Here|Jim Jamison|1991|v|Baywatch
 Iedereen is van de wereld|The Scene|1991|n
 Is dit nu later|Stef Bos|1991|n
 It Ain't Over 'til It's Over|Lenny Kravitz|1991|rw
@@ -2622,7 +2737,7 @@ November Rain|Guns N' Roses|1991|rmwa
 O.P.P.|Naughty by Nature|1991|h
 One|U2|1991|rtwa
 Roodkapje|Pater Moeskroen|1991|nx
-Samsonrock|Samson & Gert|1991|nbg
+Samsonrock|Samson & Gert|1991|nbgv|Samson & Gert
 Shiny Happy People|R.E.M.|1991|riw
 Smells Like Teen Spirit|Nirvana|1991|rtiw
 Soms vraagt een mens zich af|Gorki|1991|nb
@@ -2634,11 +2749,12 @@ To Be with You|Mr. Big|1991|rw
 Un homme heureux|William Sheller|1991|q
 Unfinished Sympathy|Massive Attack|1991|p
 Zo mooi, zo blond en zo alleen|Luc Steeno|1991|nbx
-A Whole New World|Brad Kane & Lea Salonga|1992|fga
+A Whole New World|Brad Kane & Lea Salonga|1992|fgaW|Aladdin
+A Whole New World|Peabo Bryson & Regina Belle|1992|Wfga|Aladdin
 Achy Breaky Heart|Billy Ray Cyrus|1992|pocx
 All That She Wants|Ace of Base|1992|pu
 Alles naar de klote|Euromasters|1992|du
-Arabian Nights|Bruce Adler|1992|gf
+Arabian Nights|Bruce Adler|1992|gfW|Aladdin
 Baby Got Back|Sir Mix-a-Lot|1992|ho
 Bombtrack|Rage Against the Machine|1992|rmw
 Come As You Are|Nirvana|1992|riw
@@ -2654,11 +2770,12 @@ Everything About You|Ugly Kid Joe|1992|rw
 Fear of the Dark|Iron Maiden|1992|mw
 Free Your Mind|En Vogue|1992|py
 Friday I'm in Love|The Cure|1992|riw
-Friend Like Me|Robin Williams|1992|fg
+Friend Like Me|Robin Williams|1992|fgW|Aladdin
+Girl, You'll Be a Woman Soon|Urge Overkill|1992|f|Pulp Fiction
 Harvest Moon|Neil Young|1992|c
 Hela hola (tut tut tut)|Pater Moeskroen|1992|nx
 House of Love|East 17|1992|py
-I Will Always Love You|Whitney Houston|1992|pfsa
+I Will Always Love You|Whitney Houston|1992|pfsa|The Bodyguard
 Ik zou het zo weer overdoen|Marianne Weber|1992|n
 In Bloom|Nirvana|1992|riw
 Informer|Snow|1992|hol
@@ -2675,7 +2792,7 @@ Mia|Gorki|1992|nbrtw
 More and More|Captain Hollywood Project|1992|du
 Mr. Loverman|Shabba Ranks|1992|l
 Mr. Wendal|Arrested Development|1992|h
-Nijntje|Nijntje|1992|gnv
+Nijntje|Nijntje|1992|gnv|Nijntje~Miffy
 No Ordinary Love|Sade|1992|h
 Nuthin' but a 'G' Thang|Dr. Dre|1992|h
 Open|The Scene|1992|n
@@ -2683,7 +2800,7 @@ Ordinary World|Duran Duran|1992|p
 Out of Space|The Prodigy|1992|d
 Plush|Stone Temple Pilots|1992|rw
 Poing|Rotterdam Termination Source|1992|du
-Prince Ali|Robin Williams|1992|gf
+Prince Ali|Robin Williams|1992|gfW|Aladdin
 Remember the Time|Michael Jackson|1992|p
 Rhythm Is a Dancer|Snap!|1992|du
 Rosie|Claw Boys Claw|1992|rw
@@ -2699,6 +2816,7 @@ Twilight Zone|2 Unlimited|1992|dbu
 Under the Bridge|Red Hot Chili Peppers|1992|riw
 Verlieben, verloren, vergessen, verzeih'n|Wolfgang Petry|1992|xj
 Vlieg met me mee|Paul de Leeuw|1992|n
+Wake Up|Rage Against the Machine|1992|f|The Matrix
 Walk|Pantera|1992|mw
 Why Me?|Linda Martin|1992|pe
 Wij zijn bij de brandweer|Samson & Gert|1992|nbg
@@ -2716,7 +2834,7 @@ De wereld is mooi|Samson & Gert|1993|nbg
 Faces|2 Unlimited|1993|ub
 Foule sentimentale|Alain Souchon|1993|q
 Get-A-Way|Maxx|1993|du
-Go Go Power Rangers|Ron Wasserman|1993|v
+Go Go Power Rangers|Ron Wasserman|1993|vg|Power Rangers
 Go West|Pet Shop Boys|1993|pd
 Got to Get It|Culture Beat|1993|du
 Happy Nation|Ace of Base|1993|pu
@@ -2724,13 +2842,13 @@ Heart-Shaped Box|Nirvana|1993|ri
 Hero|Mariah Carey|1993|pa
 Hip Hop Hooray|Naughty by Nature|1993|h
 I Can See Clearly Now|Jimmy Cliff|1993|l
-I Have Nothing|Whitney Houston|1993|pfs
+I Have Nothing|Whitney Houston|1993|pfs|The Bodyguard
 I Like to Move It|Reel 2 Real|1993|dxu
-I'm Every Woman|Whitney Houston|1993|ps
+I'm Every Woman|Whitney Houston|1993|psf|The Bodyguard
 Insane in the Brain|Cypress Hill|1993|h
 It's Alright|East 17|1993|py
 Je danse le Mia|IAM|1993|qh
-Jurassic Park Theme|John Williams|1993|f
+Jurassic Park Theme|John Williams|1993|f|Jurassic Park
 Life|Haddaway|1993|du
 Linger|The Cranberries|1993|ri
 Loser|Beck|1993|i
@@ -2761,6 +2879,7 @@ The Rhythm of the Night|Corona|1993|dzu
 The River of Dreams|Billy Joel|1993|p
 The Sign|Ace of Base|1993|pu
 The X-Files|Mark Snow|1993|v
+The X-Files Theme|Mark Snow|1993|v|The X-Files
 Tribal Dance|2 Unlimited|1993|dbu
 Two Princes|Spin Doctors|1993|r
 U Got 2 Let the Music|Cappella|1993|du
@@ -2779,14 +2898,15 @@ Another Night|Real McCoy|1994|du
 Baby Baby|Corona|1994|du
 Baby, I Love Your Way|Big Mountain|1994|l
 Basket Case|Green Day|1994|ri
-Be Prepared|Jeremy Irons|1994|gf
+Be Prepared|Jeremy Irons|1994|gfW|De Leeuwenkoning~The Lion King
 Big Poppa|The Notorious B.I.G.|1994|h
 Black Hole Sun|Soundgarden|1994|r
 Blijf bij mij|Ruth Jacott & Paul de Leeuw|1994|n
 Blind|Korn|1994|m
 Buddy Holly|Weezer|1994|ri
-Can You Feel the Love Tonight|Elton John|1994|pfga
-Circle of Life|Carmen Twillie|1994|fg
+Can You Feel the Love Tonight|Elton John|1994|pfgaW|De Leeuwenkoning~The Lion King
+Circle of Life|Carmen Twillie|1994|fgW|De Leeuwenkoning~The Lion King
+Circle of Life|Elton John|1994|Wfg|De Leeuwenkoning~The Lion King
 Come Out and Play|The Offspring|1994|r
 Cotton Eye Joe|Rednex|1994|xocu
 Crazy|Aerosmith|1994|r
@@ -2804,26 +2924,26 @@ Everybody|DJ BoBo|1994|du
 Flying High|Captain Hollywood Project|1994|du
 Gin and Juice|Snoop Dogg|1994|h
 Girls & Boys|Blur|1994|ri
-Hakuna Matata|Nathan Lane|1994|fg
+Hakuna Matata|Nathan Lane|1994|fgW|De Leeuwenkoning~The Lion King
 Hallelujah|Jeff Buckley|1994|rt
 Here Comes the Hotstepper|Ini Kamoze|1994|hol
 Hotellounge (Be the Death of Me)|dEUS|1994|ib
 Hyper Hyper|Scooter|1994|du
-I Just Can't Wait to Be King|Jason Weaver|1994|fg
+I Just Can't Wait to Be King|Jason Weaver|1994|fgW|De Leeuwenkoning~The Lion King
 I Swear|All-4-One|1994|pya
 I'll Make Love to You|Boyz II Men|1994|hya
 Ik hou van u|Noordkaap|1994|nbra
 Ik wil niet dat je liegt|Paul de Leeuw|1994|n
 Interstate Love Song|Stone Temple Pilots|1994|r
 Juicy|The Notorious B.I.G.|1994|h
-Kiss from a Rose|Seal|1994|pa
+Kiss from a Rose|Seal|1994|paf|Batman Forever
 La corrida|Francis Cabrel|1994|q
 Lente me|Stef Bos|1994|n
 Let the Beat Control Your Body|2 Unlimited|1994|ub
 Let's Get Ready to Rhumble|PJ & Duncan|1994|py
 Live Forever|Oasis|1994|ri
 Longview|Green Day|1994|ri
-Love Is All Around|Wet Wet Wet|1994|pf
+Love Is All Around|Wet Wet Wet|1994|pfa|Four Weddings and a Funeral
 Love Me for a Reason|Boyzone|1994|py
 Max Don't Have Sex with Your Ex|E-Rotic|1994|du
 Move on Baby|Cappella|1994|du
@@ -2831,6 +2951,7 @@ No More (I Can't Stand It)|Maxx|1994|du
 No One|2 Unlimited|1994|ub
 Ode to My Family|The Cranberries|1994|ri
 Parklife|Blur|1994|ri
+Red Right Hand|Nick Cave & The Bad Seeds|1994|v|Peaky Blinders
 Regulate|Warren G|1994|h
 Rock 'n' Roll Kids|Paul Harrington & Charlie McGettigan|1994|pe
 Run Away|Real McCoy|1994|du
@@ -2843,7 +2964,7 @@ Space Cowboy|Jamiroquai|1994|s
 Spoonman|Soundgarden|1994|r
 Stay Another Day|East 17|1994|pyk
 Stil in mij|Van Dik Hout|1994|n
-Streets of Philadelphia|Bruce Springsteen|1994|rf
+Streets of Philadelphia|Bruce Springsteen|1994|rf|Philadelphia
 Such a Night|dEUS|1994|ib
 Suds & Soda|dEUS|1994|rbti
 Supersonic|Oasis|1994|ri
@@ -2864,14 +2985,14 @@ Be My Lover|La Bouche|1995|du
 Beautiful Life|Ace of Base|1995|pu
 Boom Boom Boom|The Outhere Brothers|1995|du
 Boombastic|Shaggy|1995|hzl
-Born Slippy .NUXX|Underworld|1995|d
+Born Slippy .NUXX|Underworld|1995|df|Trainspotting
 Breakfast at Tiffany's|Deep Blue Something|1995|po
 Bullet with Butterfly Wings|The Smashing Pumpkins|1995|ri
 California Love|2Pac|1995|h
 Captain Jack|Captain Jack|1995|du
 Children|Robert Miles|1995|du
-Colors of the Wind|Vanessa Williams|1995|f
-Colors of the Wind|Judy Kuhn|1995|gf
+Colors of the Wind|Vanessa Williams|1995|fWg|Pocahontas
+Colors of the Wind|Judy Kuhn|1995|gfW|Pocahontas
 Come Take My Hand|2 Brothers on the 4th Floor|1995|du
 Common People|Pulp|1995|ri
 Country House|Blur|1995|ri
@@ -2885,10 +3006,11 @@ Fantasy|Mariah Carey|1995|p
 Freedom|DJ BoBo|1995|du
 Gangsta's Paradise|Coolio|1995|h
 Glory Box|Portishead|1995|p
+GoldenEye|Tina Turner|1995|fs|James Bond: GoldenEye
 Hakuna Matata|Jimmy Cliff & Lebo M.|1995|gl
 Hand in My Pocket|Alanis Morissette|1995|pi
 Hardcore Vibes|Dune|1995|du
-Have You Ever Really Loved a Woman?|Bryan Adams|1995|pf
+Have You Ever Really Loved a Woman?|Bryan Adams|1995|pf|Don Juan DeMarco
 Hemelsblauw|Lenny Kuhr|1995|n
 Here I Go|2 Unlimited|1995|ub
 Het busje komt zo|Höllenboer|1995|nx
@@ -2896,13 +3018,13 @@ Het is altijd lente in de ogen van de tandartsassistente|Peter de Koning|1995|nj
 Het is een nacht|Guus Meeuwis & Vagant|1995|nxa
 High and Dry|Radiohead|1995|ri
 I Wanna Be a Hippy|Technohead|1995|duo
-I'll Be There for You|The Rembrandts|1995|va
+I'll Be There for You|The Rembrandts|1995|va|Friends
 Insomnia|Faithless|1995|du
 Ironic|Alanis Morissette|1995|pi
 J'irai où tu iras|Céline Dion & Jean-Jacques Goldman|1995|q
 Je hoeft niet naar huis vannacht|Marco Borsato|1995|n
 Just a Girl|No Doubt|1995|i
-Just Around the Riverbend|Judy Kuhn|1995|gf
+Just Around the Riverbend|Judy Kuhn|1995|gfW|Pocahontas
 Lemon Tree|Fools Garden|1995|pzo
 Les yeux de ma mère|Arno|1995|b
 Lifted|Lighthouse Family|1995|p
@@ -2937,7 +3059,7 @@ When I Come Around|Green Day|1995|ri
 Wish You Were Here|Rednex|1995|du
 Wonderwall|Oasis|1995|rti
 You Oughta Know|Alanis Morissette|1995|ri
-You've Got a Friend in Me|Randy Newman|1995|fg
+You've Got a Friend in Me|Randy Newman|1995|fgW|Toy Story
 Zonder jou|Paul de Leeuw & Simone Kleinsma|1995|n
 Zonder jou|Simone Kleinsma & Paul de Leeuw|1995|n
 's Nachts na tweeën|Van Dik Hout|1996|n
@@ -2949,7 +3071,7 @@ Als je bang bent|Samson & Gert|1996|gnb
 Bailando|Paradisio|1996|dbzlxu
 Banger hart|Rob de Nijs|1996|n
 Beautiful Ones|Suede|1996|r
-Because You Loved Me|Céline Dion|1996|pfa
+Because You Loved Me|Céline Dion|1996|pfa|Up Close & Personal
 Born Slippy|Underworld|1996|df
 Breathe|The Prodigy|1996|d
 Bulls on Parade|Rage Against the Machine|1996|rm
@@ -2965,12 +3087,15 @@ Drill Instructor|Captain Jack|1996|du
 Firestarter|The Prodigy|1996|dr
 Forty Six & 2|Tool|1996|m
 Freed from Desire|Gala|1996|dxu
+God Help the Outcasts|Heidi Mollenhauer|1996|Wfg|De Klokkenluider van de Notre Dame~The Hunchback of Notre Dame
 Hakke & Zage|Gabber Piet|1996|uno
 Hava Naquila|Party Animals|1996|du
 Have You Ever Been Mellow|Party Animals|1996|du
 Het ABC|Bart Peeters|1996|nb
 Het is een nacht (Levensecht)|Party Animals|1996|dua
 Het is zover|Get Ready!|1996|nby
+How Soon Is Now?|Love Spit Love|1996|v|Charmed
+I Don't Want to Wait|Paula Cole|1996|v|Dawson's Creek
 If It Makes You Happy|Sheryl Crow|1996|p
 Ik leef niet meer voor jou|Marco Borsato|1996|n
 Ik mis je zo|Exit|1996|nby
@@ -2982,10 +3107,11 @@ Kwestie van geduld|Rowwen Hèze|1996|nj
 Liefde is overal|Samson & Gert|1996|nbg
 Limburg|Rowwen Hèze|1996|nj
 Little Arithmetics|dEUS|1996|rbi
-Lovefool|The Cardigans|1996|pfi
+Lovefool|The Cardigans|1996|pfi|Romeo + Juliet
 Margherita|Marco Borsato|1996|n
 No Diggity|Blackstreet|1996|h
 Nobelprijs|Clouseau|1996|nb
+Out There|Tom Hulce|1996|Wfg|De Klokkenluider van de Notre Dame~The Hunchback of Notre Dame
 Per spoor (Kedeng kedeng)|Guus Meeuwis & Vagant|1996|nx
 Quit Playing Games (With My Heart)|Backstreet Boys|1996|py
 Ravers in the UK|DJ Paul Elstak|1996|du
@@ -2995,6 +3121,7 @@ Roots Bloody Roots|Sepultura|1996|m
 Roses|dEUS|1996|ib
 Say You'll Be There|Spice Girls|1996|py
 Sex verandert alles|De Mens|1996|nb
+Space Jam|Quad City DJ's|1996|f|Space Jam
 Street Spirit (Fade Out)|Radiohead|1996|ri
 Stupid Girl|Garbage|1996|r
 Swentibold|Clouseau|1996|nb
@@ -3038,12 +3165,13 @@ Everybody (Backstreet's Back)|Backstreet Boys|1997|pxy
 Fire|Scooter|1997|du
 Free|Ultra Naté|1997|d
 From This Moment On|Shania Twain|1997|ca
-Go the Distance|Roger Bart|1997|gf
+Go the Distance|Roger Bart|1997|gfW|Hercules
+Go the Distance|Michael Bolton|1997|Wfg|Hercules
 Good Riddance (Time of Your Life)|Green Day|1997|ri
 High|Lighthouse Family|1997|p
 How Do I Live|LeAnn Rimes|1997|ca
 Hypnotize|The Notorious B.I.G.|1997|h
-I Won't Say (I'm in Love)|Susan Egan|1997|gf
+I Won't Say (I'm in Love)|Susan Egan|1997|gfW|Hercules
 I'll Be Missing You|Puff Daddy|1997|h
 Ik zing dit lied voor jou alleen|Jantje Smit|1997|n
 Karma Police|Radiohead|1997|rti
@@ -3054,11 +3182,11 @@ Lollipop (Candyman)|Aqua|1997|duy
 Love Shine a Light|Katrina and the Waves|1997|pe
 Lucky Man|The Verve|1997|ri
 Meet Her at the Love Parade|Da Hool|1997|du
-Men in Black|Will Smith|1997|hf
+Men in Black|Will Smith|1997|hf|Men in Black
 Mexico|Samson & Gert|1997|gnb
 MMMBop|Hanson|1997|poy
 Mo Money Mo Problems|The Notorious B.I.G.|1997|h
-My Heart Will Go On|Céline Dion|1997|pfa
+My Heart Will Go On|Céline Dion|1997|pfa|Titanic
 My Own Summer (Shove It)|Deftones|1997|m
 N'oubliez jamais|Joe Cocker|1997|p
 Never Ever|All Saints|1997|py
@@ -3075,6 +3203,8 @@ Sonic Empire|Members of Mayday|1997|du
 Spice Up Your Life|Spice Girls|1997|pxy
 Stay|Sash! & La Trec|1997|du
 Sunchyme|Dario G|1997|dz
+Superman|Lazlo Bane|1997|v|Scrubs
+Teletubbies Say Eh-Oh!|Teletubbies|1997|vg|Teletubbies
 The Drugs Don't Work|The Verve|1997|ri
 Together Again|Janet Jackson|1997|p
 Torn|Natalie Imbruglia|1997|pi
@@ -3085,7 +3215,8 @@ Vamos a la discoteca|Paradisio|1997|ub
 Wacht niet te lang|Mama's Jasje|1997|nb
 Wat zou je doen|BLØF|1997|n
 Who Do You Think You Are|Spice Girls|1997|py
-Zero to Hero|Tawatha Agee|1997|gf
+Woke Up This Morning|Alabama 3|1997|v|The Sopranos
+Zero to Hero|Tawatha Agee|1997|gfW|Hercules
 ...Baby One More Time|Britney Spears|1998|p
 9 PM (Till I Come)|ATB|1998|du
 9PM (Till I Come)|ATB|1998|du
@@ -3124,12 +3255,12 @@ Het regent zonnestralen|Acda en De Munnik|1998|n
 Hijo de la luna|Loona|1998|du
 Hou me vast|Volumia!|1998|n
 How Much Is the Fish?|Scooter|1998|dxu
-I Don't Want to Miss a Thing|Aerosmith|1998|rfa
-I'll Make a Man Out of You|Donny Osmond|1998|fg
+I Don't Want to Miss a Thing|Aerosmith|1998|rfa|Armageddon
+I'll Make a Man Out of You|Donny Osmond|1998|fgW|Mulan
 Ik wil alleen maar bij je zijn|X-Session|1998|nby
 Intergalactic|Beastie Boys|1998|h
-Iris|Goo Goo Dolls|1998|rfa
-Kabouter Plop|Kabouter Plop|1998|nbg
+Iris|Goo Goo Dolls|1998|rfa|City of Angels
+Kabouter Plop|Kabouter Plop|1998|nbgv|Kabouter Plop
 Kiss Me|Sixpence None the Richer|1998|pi
 Laat het los|Van Dik Hout|1998|n
 Let Me Entertain You|Robbie Williams|1998|r
@@ -3144,16 +3275,18 @@ No Matter What|Boyzone|1998|pya
 No Surprises|Radiohead|1998|ri
 November|Rowwen Hèze|1998|nj
 One for Sorrow|Steps|1998|py
-Pokémon Theme|Jason Paige|1998|vg
+Pokémon Theme|Jason Paige|1998|vg|Pokémon
 Pretty Fly (For a White Guy)|The Offspring|1998|r
 Pure Morning|Placebo|1998|ri
-Reflection|Lea Salonga|1998|fg
+Reflection|Lea Salonga|1998|fgW|Mulan
+Reflection|Christina Aguilera|1998|Wfg|Mulan
 S'il suffisait d'aimer|Céline Dion|1998|q
+Searchin' My Soul|Vonda Shepard|1998|v|Ally McBeal
 Sonnet|The Verve|1998|ri
 Stop|Spice Girls|1998|py
 Storm op zee|Samson & Gert|1998|gnb
 Suavemente|Elvis Crespo|1998|l
-Teardrop|Massive Attack|1998|p
+Teardrop|Massive Attack|1998|pv|House
 Tearin' Up My Heart|NSYNC|1998|py
 That Don't Impress Me Much|Shania Twain|1998|pc
 The Boy Is Mine|Brandy & Monica|1998|hy
@@ -3170,7 +3303,7 @@ When the Lights Go Out|Five|1998|py
 Whiskey in the Jar|Metallica|1998|m
 You're Still the One|Shania Twain|1998|pca
 (You Drive Me) Crazy|Britney Spears|1999|p
-All Star|Smash Mouth|1999|rfg
+All Star|Smash Mouth|1999|rfg|Shrek
 All the Small Things|blink-182|1999|r
 Annemarie|De Sjonnies|1999|njx
 Another Way|Gigi D'Agostino|1999|du
@@ -3234,14 +3367,15 @@ Right Here, Right Now|Fatboy Slim|1999|d
 S Club Party|S Club 7|1999|py
 Sandstorm|Darude|1999|dxou
 Scar Tissue|Red Hot Chili Peppers|1999|ri
+She|Elvis Costello|1999|fa|Notting Hill
 She's the One|Robbie Williams|1999|pa
 Show Me the Meaning of Being Lonely|Backstreet Boys|1999|py
 Silence|Delerium & Sarah McLachlan|1999|d
 Smooth|Santana|1999|pl
 Sometimes|Britney Spears|1999|p
-SpongeBob SquarePants Theme|Painty the Pirate|1999|gv
+SpongeBob SquarePants Theme|Painty the Pirate|1999|gv|SpongeBob
 Still D.R.E.|Dr. Dre|1999|h
-Strangers Like Me|Phil Collins|1999|gf
+Strangers Like Me|Phil Collins|1999|gfW|Tarzan
 Summer Son|Texas|1999|p
 Swear It Again|Westlife|1999|py
 Take Me to Your Heaven|Charlotte Nilsson|1999|pe
@@ -3251,29 +3385,32 @@ The Bad Touch|Bloodhound Gang|1999|px
 The Kids Aren't Alright|The Offspring|1999|r
 The Launch|DJ Jean|1999|d
 The Riddle|Gigi D'Agostino|1999|du
-Two Worlds|Phil Collins|1999|gf
+The World Is Not Enough|Garbage|1999|f|James Bond: The World Is Not Enough
+Two Worlds|Phil Collins|1999|gfW|Tarzan
 Wait and Bleed|Slipknot|1999|m
 Waiting for Tonight|Jennifer Lopez|1999|dl
 We're Going to Ibiza!|Vengaboys|1999|dxuz
 What a Girl Wants|Christina Aguilera|1999|p
 What's My Age Again?|blink-182|1999|r
-When She Loved Me|Sarah McLachlan|1999|gf
+When She Loved Me|Sarah McLachlan|1999|gfW|Toy Story
+When You Say Nothing at All|Ronan Keating|1999|fa|Notting Hill
 Why Does It Always Rain on Me?|Travis|1999|r
 Why Does My Heart Feel So Bad?|Moby|1999|d
 Why Don't You Get a Job?|The Offspring|1999|r
-Wild Wild West|Will Smith|1999|hf
-You'll Be in My Heart|Phil Collins|1999|gf
+Wild Wild West|Will Smith|1999|hf|Wild Wild West
+You'll Be in My Heart|Phil Collins|1999|gfWa|Tarzan
 Zehn nackte Friseusen|Mickie Krause|1999|jx
 Zombie Nation|Kernkraft 400|1999|d
 Aimer|Roméo & Juliette|2000|q
 Alle kleuren|K3|2000|nbgy
 Around the World (La La La La La)|ATC|2000|duo
+Battle Without Honor or Humanity|Tomoyasu Hotei|2000|f|Kill Bill
 Beautiful Day|U2|2000|r
 Black Coffee|All Saints|2000|py
-Bob the Builder (Can We Fix It?)|Bob the Builder|2000|gv
+Bob the Builder (Can We Fix It?)|Bob the Builder|2000|gv|Bob de Bouwer~Bob the Builder
 Breathless|The Corrs|2000|p
 Bye Bye Bye|NSYNC|2000|py
-Can't Fight the Moonlight|LeAnn Rimes|2000|cf
+Can't Fight the Moonlight|LeAnn Rimes|2000|cf|Coyote Ugly
 Cartoon Heroes|Aqua|2000|pu
 Castles in the Sky|Ian Van Dahl|2000|dbu
 Cha Cha Slide|DJ Casper|2000|x
@@ -3295,7 +3432,7 @@ Hey Baby|DJ Ötzi|2000|xj
 I Would Stay|Krezip|2000|r
 I'm Like a Bird|Nelly Furtado|2000|p
 In the End|Linkin Park|2000|rm
-Independent Women Part I|Destiny's Child|2000|hfy
+Independent Women Part I|Destiny's Child|2000|hfy|Charlie's Angels
 It Feels So Good|Sonique|2000|d
 It Wasn't Me|Shaggy|2000|hl
 It's Gonna Be Me|NSYNC|2000|py
@@ -3313,7 +3450,7 @@ Moi... Lolita|Alizée|2000|q
 Ms. Jackson|OutKast|2000|h
 Music|Madonna|2000|pd
 Natural Blues|Moby|2000|d
-Now We Are Free|Hans Zimmer|2000|f
+Now We Are Free|Hans Zimmer|2000|f|Gladiator
 One More Time|Daft Punk|2000|dx
 One Step Closer|Linkin Park|2000|rm
 Only for the Weak|In Flames|2000|m
@@ -3336,7 +3473,7 @@ Spinning Around|Kylie Minogue|2000|pd
 Spit It Out|Slipknot|2000|m
 Stan|Eminem|2000|h
 Supreme|Robbie Williams|2000|p
-Take a Look Around|Limp Bizkit|2000|mf
+Take a Look Around|Limp Bizkit|2000|mf|Mission: Impossible
 Teenage Dirtbag|Wheatus|2000|ro
 Thank You|Dido|2000|p
 The Next Episode|Dr. Dre|2000|h
@@ -3367,10 +3504,12 @@ Blauwe ruis|Clouseau|2001|nb
 Blub, ik ben een vis|K3|2001|nbgy
 Bodies|Drowning Pool|2001|m
 Bootylicious|Destiny's Child|2001|hy
+Boss of Me|They Might Be Giants|2001|v|Malcolm in the Middle
 Can't Get You Out of My Head|Kylie Minogue|2001|pd
 Chop Suey!|System of a Down|2001|m
 Clint Eastwood|Gorillaz|2001|hi
-Concerning the Hobbits|Howard Shore|2001|f
+Come What May|Ewan McGregor & Nicole Kidman|2001|f|Moulin Rouge!
+Concerning the Hobbits|Howard Shore|2001|f|The Lord of the Rings
 Crawling|Linkin Park|2001|rm
 Dansplaat|Brainpower|2001|nh
 De kapitein deel II|Acda en De Munnik|2001|n
@@ -3389,24 +3528,25 @@ Get Ur Freak On|Missy Elliott|2001|h
 Gotta Get Thru This|Daniel Bedingfield|2001|d
 Harder, Better, Faster, Stronger|Daft Punk|2001|d
 Have a Nice Day|Stereophonics|2001|r
-Hedwig's Theme|John Williams|2001|f
+Hedwig's Theme|John Williams|2001|fg|Harry Potter
 Hero|Enrique Iglesias|2001|pla
 How You Remind Me|Nickelback|2001|r
 Hé gaat het goed met jou|Yasmine|2001|nb
-I'm a Believer|Smash Mouth|2001|gf
+I'm a Believer|Smash Mouth|2001|gf|Shrek
 I'm a Slave 4 U|Britney Spears|2001|p
 Ice Queen|Within Temptation|2001|m
 Ich will|Rammstein|2001|m
-If I Didn't Have You|Billy Crystal & John Goodman|2001|gf
+If I Didn't Have You|Billy Crystal & John Goodman|2001|gfW|Monsters en Co.~Monsters, Inc.
 In My Eyes|Milk Inc.|2001|dbu
 In Too Deep|Sum 41|2001|r
 Island in the Sun|Weezer|2001|rzi
-Lady Marmalade|Christina Aguilera|2001|pfy
+Lady Marmalade|Christina Aguilera|2001|pfy|Moulin Rouge!
 Last Nite|The Strokes|2001|ri
 Le vent nous portera|Noir Désir|2001|q
 Links 2 3 4|Rammstein|2001|m
 Little L|Jamiroquai|2001|s
 Love Foolosophy|Jamiroquai|2001|s
+May It Be|Enya|2001|f|The Lord of the Rings
 Me gustas tú|Manu Chao|2001|l
 Mein Herz brennt|Rammstein|2001|m
 Murder on the Dancefloor|Sophie Ellis-Bextor|2001|pdx
@@ -3414,7 +3554,7 @@ My Sacrifice|Creed|2001|r
 My Way|Limp Bizkit|2001|m
 New Slang|The Shins|2001|i
 Nothing Really Ends|dEUS|2001|ib
-Piet Piraat|Piet Piraat|2001|nbg
+Piet Piraat|Piet Piraat|2001|nbgv|Piet Piraat
 Ride wit Me|Nelly|2001|h
 Romeo|Basement Jaxx|2001|d
 Schism|Tool|2001|m
@@ -3449,7 +3589,9 @@ Aerials|System of a Down|2002|m
 All My Life|Foo Fighters|2002|ri
 Beautiful|Christina Aguilera|2002|p
 Bloed, zweet en tranen|André Hazes|2002|n
+Burning Love|Wynonna|2002|Wfg|Lilo & Stitch
 By the Way|Red Hot Chili Peppers|2002|ri
+California|Phantom Planet|2002|v|The O.C.
 Can't Stop|Red Hot Chili Peppers|2002|ri
 Cheeky Song (Touch My Bum)|The Cheeky Girls|2002|xo
 Chihuahua|DJ BoBo|2002|dxu
@@ -3459,19 +3601,22 @@ Cloud Connected|In Flames|2002|m
 Cochise|Audioslave|2002|r
 Complicated|Avril Lavigne|2002|pr
 Cry Me a River|Justin Timberlake|2002|p
+Die Another Day|Madonna|2002|f|James Bond: Die Another Day
 Dilemma|Nelly|2002|h
 Dirrty|Christina Aguilera|2002|p
 Désenchantée|Kate Ryan|2002|dbu
 Ein Kompliment|Sportfreunde Stiller|2002|xj
 En apesanteur|Calogero|2002|q
-Extreme Ways|Moby|2002|df
+Extreme Ways|Moby|2002|df|The Bourne Identity
 Feel|Robbie Williams|2002|p
 Fell in Love with a Girl|The White Stripes|2002|ri
 Feuer frei!|Rammstein|2002|m
 Girl|Anouk|2002|r
+Hawaiian Roller Coaster Ride|Mark Keali'i Ho'omalu|2002|Wfg|Lilo & Stitch
 Heaven|DJ Sammy|2002|dua
 Here to Stay|Korn|2002|m
 Here Without You|3 Doors Down|2002|r
+Hero|Chad Kroeger|2002|fa|Spider-Man
 Hot in Herre|Nelly|2002|hz
 Hurt|Johnny Cash|2002|rtc
 I Stand Alone|Godsmack|2002|m
@@ -3485,7 +3630,7 @@ Kom maar bij mij|Brainpower|2002|nh
 Lifestyles of the Rich & Famous|Good Charlotte|2002|r
 Like Glue|Sean Paul|2002|l
 Lopen op het water|Marco Borsato & Sita|2002|n
-Lose Yourself|Eminem|2002|hf
+Lose Yourself|Eminem|2002|hf|8 Mile
 Love at First Sight|Kylie Minogue|2002|pd
 Mensch|Herbert Grönemeyer|2002|xj
 Move Your Feet|Junior Senior|2002|pxo
@@ -3533,17 +3678,18 @@ Fighter|Christina Aguilera|2003|p
 Get Busy|Sean Paul|2003|hl
 Go with the Flow|Queens of the Stone Age|2003|r
 Going Under|Evanescence|2003|r
-He's a Pirate|Klaus Badelt|2003|f
+He's a Pirate|Klaus Badelt|2003|fW|Pirates of the Caribbean
 Heb je even voor mij|Frans Bauer|2003|nx
 Hey Ya!|OutKast|2003|hx
 Hole in the Head|Sugababes|2003|py
 Hysteria|Muse|2003|ri
 I Believe in a Thing Called Love|The Darkness|2003|r
+I Don't Want to Be|Gavin DeGraw|2003|v|One Tree Hill
 I Hate Everything About You|Three Days Grace|2003|r
 Ik ben Gerrit|Gebroeders Ko|2003|nx
 In da Club|50 Cent|2003|h
 Like a Stone|Audioslave|2003|r
-Mag ik naar je kijken|Spring|2003|gnb
+Mag ik naar je kijken|Spring|2003|gnbv|Spring
 Maps|Yeah Yeah Yeahs|2003|i
 Maria (I Like It Loud)|Scooter|2003|dxu
 Mijn houten hart|De Poema's|2003|n
@@ -3575,7 +3721,7 @@ Wicked Soul|Admiral Freebee|2003|ib
 1001 Arabian Nights|Ch!pz|2004|pyg
 5 Colours in Her Hair|McFly|2004|py
 99 Problems|Jay-Z|2004|h
-Accidentally in Love|Counting Crows|2004|pfg
+Accidentally in Love|Counting Crows|2004|pfg|Shrek
 American Idiot|Green Day|2004|ri
 Amerika|Rammstein|2004|m
 Baila Morena|Zucchero|2004|l
@@ -3596,12 +3742,12 @@ Gasolina|Daddy Yankee|2004|hxzl
 Geef mij nu je angst|Guus Meeuwis|2004|n
 Golden|Jill Scott|2004|s
 Helicopter|Bloc Party|2004|i
-Holding Out for a Hero|Jennifer Saunders|2004|gf
+Holding Out for a Hero|Jennifer Saunders|2004|gf|Shrek
 Holiday in Spain|BLØF & Counting Crows|2004|n
 I Miss You|blink-182|2004|r
 I Predict a Riot|Kaiser Chiefs|2004|ri
 I'm Not Okay (I Promise)|My Chemical Romance|2004|r
-Ik ben Bumba|Bumba|2004|nbg
+Ik ben Bumba|Bumba|2004|nbgv|Bumba
 Jesus Walks|Kanye West|2004|h
 Jongens|Spring|2004|gnb
 Just Lose It|Eminem|2004|h
@@ -3619,7 +3765,7 @@ Nemo|Nightwish|2004|m
 Never Back Down|Novastar|2004|ib
 Numb/Encore|Jay-Z|2004|hr
 Obviously|McFly|2004|py
-Peppa Pig Theme|Julian Nott|2004|gv
+Peppa Pig Theme|Julian Nott|2004|gv|Peppa Pig
 Porselein|Yasmine|2004|nb
 Pump It Up!|Danzel|2004|ub
 Rebellion (Lies)|Arcade Fire|2004|i
@@ -3656,6 +3802,7 @@ Angels|Within Temptation|2005|ma
 Axel F|Crazy Frog|2005|dogx
 B.Y.O.B.|System of a Down|2005|m
 Bad Day|Daniel Powter|2005|p
+Bad Things|Jace Everett|2005|v|True Blood
 Banquet|Bloc Party|2005|i
 Barman|Soulwax|2005|ib
 Bat Country|Avenged Sevenfold|2005|m
@@ -3683,11 +3830,12 @@ Gold Digger|Kanye West|2005|h
 Have a Nice Day|Bon Jovi|2005|r
 Helena|My Chemical Romance|2005|r
 Het land van|Lange Frans & Baas B|2005|nhu
+Hey Beautiful|The Solids|2005|v|How I Met Your Mother
 Holiday|Green Day|2005|ri
 Hollaback Girl|Gwen Stefani|2005|p
 Hung Up|Madonna|2005|pd
 I Bet You Look Good on the Dancefloor|Arctic Monkeys|2005|ri
-I Like to Move It|Sacha Baron Cohen|2005|gf
+I Like to Move It|Sacha Baron Cohen|2005|gf|Madagascar
 Ik ben je zat|Ali B & Brace|2005|nh
 Kuma hé|K3|2005|nbgy
 La Tortura|Shakira|2005|pl
@@ -3732,11 +3880,11 @@ All Good Things (Come to an End)|Nelly Furtado|2006|p
 Als de morgen is gekomen|Jan Smit|2006|nxa
 America|Razorlight|2006|r
 Back to Black|Amy Winehouse|2006|hts
-Breaking Free|Troy & Gabriella|2006|gf
+Breaking Free|Troy & Gabriella|2006|gfW|High School Musical
 British Mode|Goose|2006|ib
 Buttons|The Pussycat Dolls|2006|py
 Call Me When You're Sober|Evanescence|2006|r
-Chasing Cars|Snow Patrol|2006|rpia
+Chasing Cars|Snow Patrol|2006|rpiav|Grey's Anatomy
 Chelsea Dagger|The Fratellis|2006|rxi
 Crazy|Gnarls Barkley|2006|hs
 Cupido|Jan Smit|2006|nx
@@ -3745,10 +3893,10 @@ Destination Calabria|Alex Gaudino|2006|d
 Door de wind|Het Huis Anubis|2006|gnb
 Hard Rock Hallelujah|Lordi|2006|me
 Hello|Goose|2006|iba
-Het Huis Anubis|Nienke|2006|gnb
+Het Huis Anubis|Nienke|2006|gnbv|Het Huis Anubis
 Hey There Delilah|Plain White T's|2006|p
 Hips Don't Lie|Shakira|2006|pxl
-How to Save a Life|The Fray|2006|p
+How to Save a Life|The Fray|2006|pv|Grey's Anatomy
 I Don't Feel Like Dancin'|Scissor Sisters|2006|p
 I Write Sins Not Tragedies|Panic! at the Disco|2006|r
 Ik wil dat ons land juicht|Guus Meeuwis|2006|nx
@@ -3757,11 +3905,11 @@ Knights of Cydonia|Muse|2006|ri
 Lepeltjesgewijs|Bart Peeters|2006|nb
 Les sardines|Patrick Sébastien|2006|qx
 Lief klein konijntje|Henkie|2006|njx
-Life Is a Highway|Rascal Flatts|2006|gf
+Life Is a Highway|Rascal Flatts|2006|gfW|Cars
 Lonely Day|System of a Down|2006|m
 Maak me gek|Gerard Joling|2006|nx
 Maneater|Nelly Furtado|2006|p
-Mega Mindy|Mega Mindy|2006|nbg
+Mega Mindy|Mega Mindy|2006|nbgv|Mega Mindy
 My Curse|Killswitch Engage|2006|m
 Naive|The Kooks|2006|ri
 Open Your Eyes|Snow Patrol|2006|ri
@@ -3773,6 +3921,7 @@ Pump It|Black Eyed Peas|2006|hx
 Put Your Hands Up for Detroit|Fedde Le Grand|2006|d
 Put Your Records On|Corinne Bailey Rae|2006|ps
 Rampeneren|Ali B & Yes-R & The Partysquad|2006|nhx
+Real Gone|Sheryl Crow|2006|Wfg|Cars
 Redneck|Lamb of God|2006|m
 Rehab|Amy Winehouse|2006|hs
 Relax, Take It Easy|Mika|2006|p
@@ -3787,16 +3936,18 @@ Smile|Lily Allen|2006|p
 Snow (Hey Oh)|Red Hot Chili Peppers|2006|ri
 SOS|Rihanna|2006|h
 Starlight|Muse|2006|ri
+Start of Something New|Zac Efron & Vanessa Hudgens|2006|Wfg|High School Musical
 Supermassive Black Hole|Muse|2006|ri
 Tears Don't Fall|Bullet for My Valentine|2006|m
-The Best of Both Worlds|Hannah Montana|2006|gv
+The Best of Both Worlds|Hannah Montana|2006|gvW|Hannah Montana
 The Sweet Escape|Gwen Stefani|2006|p
 Toppertje!|Guillermo & Tropical Danny|2006|nx
-We're All in This Together|High School Musical Cast|2006|gf
+We're All in This Together|High School Musical Cast|2006|gfW|High School Musical
 Welcome to the Black Parade|My Chemical Romance|2006|r
 When You Were Young|The Killers|2006|i
 World, Hold On (Children of the Sky)|Bob Sinclar|2006|d
 Ya ya yippee|K3|2006|nbgy
+You Know My Name|Chris Cornell|2006|f|James Bond: Casino Royale
 Young Folks|Peter Bjorn and John|2006|i
 Zwemmen in Bacardi lemon|Mooi Wark|2006|njx
 1973|James Blunt|2007|p
@@ -3807,7 +3958,7 @@ Alles is liefde|BLØF|2007|n
 Amaranth|Nightwish|2007|m
 Apologize|Timbaland|2007|p
 Beautiful Girls|Sean Kingston|2007|hz
-Bet on It|Zac Efron|2007|gf
+Bet on It|Zac Efron|2007|gfW|High School Musical
 Bleed It Out|Linkin Park|2007|r
 Bleeding Love|Leona Lewis|2007|p
 Das rote Pferd|Markus Becker|2007|jx
@@ -3824,6 +3975,7 @@ Gimme More|Britney Spears|2007|p
 Girlfriend|Avril Lavigne|2007|p
 Grace Kelly|Mika|2007|p
 Hij gelooft in mij|Nienke|2007|gnb
+History of Everything|Barenaked Ladies|2007|v|The Big Bang Theory
 Icky Thump|The White Stripes|2007|ri
 Ik voel me goed|Wolter Kroes|2007|nx
 In de blote kont|Mooi Wark|2007|njx
@@ -3832,6 +3984,8 @@ Kids|MGMT|2007|pi
 Kijk omhoog|Nick & Simon|2007|n
 Kusjesdag|K3|2007|nbgy
 Kvraagetaan|Fixkes|2007|nbx
+Le Festin|Camille|2007|Wfg|Ratatouille
+Leave It All to Me|Miranda Cosgrove|2007|vg|iCarly
 Love Is Gone|David Guetta|2007|d
 Low|Flo Rida|2007|h
 Misery Business|Paramore|2007|r
@@ -3839,7 +3993,7 @@ Oogcontact|Clouseau|2007|nb
 Pijn|Jeroen van der Boom|2007|n
 Rosanne|Nick & Simon|2007|n
 Ruby|Kaiser Chiefs|2007|ri
-Rule the World|Take That|2007|pfy
+Rule the World|Take That|2007|pfy|Stardust
 Shine|Take That|2007|py
 Shut Up and Drive|Rihanna|2007|p
 Skinny Love|Bon Iver|2007|i
@@ -3848,18 +4002,20 @@ Sterker nu dan ooit|Roméo|2007|n
 Stronger|Kanye West|2007|h
 Tears Dry on Their Own|Amy Winehouse|2007|s
 Teenagers|My Chemical Romance|2007|r
+That's How You Know|Amy Adams|2007|Wfg|Betoverd~Enchanted
 The Big Bang Theory Theme|Barenaked Ladies|2007|v
 The Gummy Bear Song|Gummibär|2007|fg
 The Pretender|Foo Fighters|2007|ri
 The Way I Are|Timbaland|2007|d
 This Ain't a Scene, It's an Arms Race|Fall Out Boy|2007|r
 Thnks fr th Mmrs|Fall Out Boy|2007|r
+Today Is Gonna Be a Great Day|Bowling for Soup|2007|Wvg|Phineas en Ferb~Phineas and Ferb
 Tranen gelachen|Guus Meeuwis|2007|n
 Umbrella|Rihanna|2007|h
 Valerie|Mark Ronson & Amy Winehouse|2007|ps
 Vonken en vuur|Clouseau|2007|nb
 What Have You Done|Within Temptation|2007|m
-What I've Done|Linkin Park|2007|rfm
+What I've Done|Linkin Park|2007|rfm|Transformers
 Wiegelied|3JS|2007|n
 You Know I'm No Good|Amy Winehouse|2007|hs
 A Milli|Lil Wayne|2008|h
@@ -3871,7 +4027,7 @@ Chicken Fried|Zac Brown Band|2008|c
 Circus|Britney Spears|2008|p
 De vijf|Het Huis Anubis|2008|gnb
 De woonboot|Stef Ekkel|2008|nx
-Decode|Paramore|2008|rf
+Decode|Paramore|2008|rf|Twilight
 Disturbia|Rihanna|2008|p
 Electric Feel|MGMT|2008|pi
 Ella elle l'a|Kate Ryan|2008|db
@@ -3894,6 +4050,7 @@ In and Out of Love|Armin van Buuren|2008|d
 Indestructible|Disturbed|2008|m
 Infinity 2008|Guru Josh Project|2008|d
 Just Dance|Lady Gaga|2008|pd
+Kung Fu Fighting|Cee Lo Green & Jack Black|2008|fg|Kung Fu Panda
 Leef nu het kan|Gerard Joling|2008|nx
 Lollipop|Lil Wayne|2008|h
 Love Story|Taylor Swift|2008|pca
@@ -3913,7 +4070,7 @@ Sweet Disposition|The Temper Trap|2008|i
 That's Not My Name|The Ting Tings|2008|p
 The Architect|dEUS|2008|ib
 The Promise|Girls Aloud|2008|py
-This Is Me|Demi Lovato & Joe Jonas|2008|gf
+This Is Me|Demi Lovato & Joe Jonas|2008|gfW|Camp Rock
 Time to Pretend|MGMT|2008|pi
 Twilight of the Thunder God|Amon Amarth|2008|m
 Use Somebody|Kings of Leon|2008|ri
@@ -3927,7 +4084,7 @@ Womanizer|Britney Spears|2008|p
 You Don't Know|Milow|2008|pb
 21 Guns|Green Day|2009|ri
 A Night Like This|Caro Emerald|2009|p
-Almost There|Anika Noni Rose|2009|gf
+Almost There|Anika Noni Rose|2009|gfW|De Prinses en de Kikker~The Princess and the Frog
 Alors on danse|Stromae|2009|dbq
 Als er ooit iets fout zou gaan|Clouseau|2009|nb
 Ayo Technology|Milow|2009|pb
@@ -3938,7 +4095,9 @@ Break Your Heart|Taio Cruz|2009|p
 Broodje bakpao|The Opposites|2009|nhx
 Bulletproof|La Roux|2009|p
 De soldaat|Nick & Simon|2009|n
+Dig a Little Deeper|Jenifer Lewis|2009|Wfg|De Prinses en de Kikker~The Princess and the Frog
 Dog Days Are Over|Florence + the Machine|2009|pi
+Don't Stop Believin'|Glee Cast|2009|v|Glee
 Down|Jay Sean|2009|p
 Empire State of Mind|Jay-Z|2009|h
 Envoi|Absynthe Minded|2009|ib
@@ -3956,7 +4115,7 @@ Kom|3JS|2009|n
 Little Lion Man|Mumford & Sons|2009|rc
 Lotuk|Arsenal|2009|ib
 MaMaSé!|K3|2009|nbgy
-Married Life|Michael Giacchino|2009|gf
+Married Life|Michael Giacchino|2009|gfW|Up
 Meet Me Halfway|Black Eyed Peas|2009|p
 Mistral|Absynthe Minded|2009|ib
 Need You Now|Lady A|2009|c
@@ -3973,7 +4132,7 @@ Shots|LMFAO & Lil Jon|2009|dx
 Snuff|Slipknot|2009|m
 Stuk|The Partysquad|2009|nh
 Sweet Caroline|DJ Ötzi|2009|jx
-The Climb|Miley Cyrus|2009|pfg
+The Climb|Miley Cyrus|2009|pfgW|Hannah Montana
 Tik Tok|Kesha|2009|pd
 Uprising|Muse|2009|ri
 Vallende sterren|Nick & Simon|2009|n
@@ -3996,7 +4155,7 @@ Club Can't Handle Me|Flo Rida|2010|d
 Dancing on My Own|Robyn|2010|pd
 Danza Kuduro|Don Omar|2010|xzl
 De wielen van de bus|Kinderliedjes|2010|gn
-Despicable Me|Pharrell Williams|2010|gf
+Despicable Me|Pharrell Williams|2010|gf|Verschrikkelijke Ikke~Despicable Me
 DJ Got Us Fallin' in Love|Usher|2010|d
 Downton Abbey Theme|John Lunn|2010|v
 Dynamite|Taio Cruz|2010|d
@@ -4006,7 +4165,7 @@ Grenade|Bruno Mars|2010|p
 Hello|Martin Solveig|2010|da
 Hoofd, schouders, knie en teen|Kinderliedjes|2010|gn
 I Like It|Enrique Iglesias|2010|l
-I See the Light|Mandy Moore & Zachary Levi|2010|gf
+I See the Light|Mandy Moore & Zachary Levi|2010|gfWa|Rapunzel~Tangled
 Ik ben verliefd (Shalalie)|Sieneke|2010|ne
 Is It|Triggerfinger|2010|ib
 Je veux|Zaz|2010|q
@@ -4018,6 +4177,7 @@ Love the Way You Lie|Eminem|2010|h
 Marry You|Bruno Mars|2010|p
 Me and My Guitar|Tom Dice|2010|pbe
 Memories|David Guetta|2010|d
+Mother Knows Best|Donna Murphy|2010|Wfg|Rapunzel~Tangled
 Mr. Saxobeat|Alexandra Stan|2010|d
 Nightmare|Avenged Sevenfold|2010|m
 Not Afraid|Eminem|2010|h
@@ -4042,12 +4202,13 @@ Telephone|Lady Gaga|2010|pd
 The Cave|Mumford & Sons|2010|c
 The Time (Dirty Bit)|Black Eyed Peas|2010|pd
 Tighten Up|The Black Keys|2010|ri
+Time|Hans Zimmer|2010|f|Inception
 Tonight (I'm Lovin' You)|Enrique Iglesias|2010|l
 Vanavond (Uit mijn bol)|Jeroen van der Boom|2010|nx
 Waka Waka (This Time for Africa)|Shakira|2010|pxl
 We No Speak Americano|Yolanda Be Cool|2010|dxzo
 What's My Name?|Rihanna|2010|h
-When Will My Life Begin?|Mandy Moore|2010|gf
+When Will My Life Begin?|Mandy Moore|2010|gfW|Rapunzel~Tangled
 Wonderful Life|Hurts|2010|p
 Words|Goose|2010|ib
 Zuipen|PartyfrieX|2010|njx
@@ -4067,7 +4228,7 @@ Elle me dit|Mika|2011|q
 Epic|Sandro Silva & Quintino|2011|d
 Every Teardrop Is a Waterfall|Coldplay|2011|pi
 Feel So Close|Calvin Harris|2011|d
-Game of Thrones Main Title|Ramin Djawadi|2011|v
+Game of Thrones Main Title|Ramin Djawadi|2011|v|Game of Thrones
 Give Me Everything|Pitbull|2011|dxl
 Glad You Came|The Wanted|2011|py
 Gold on the Ceiling|The Black Keys|2011|ri
@@ -4162,7 +4323,7 @@ Pompen|Kraantje Pappie|2012|nhx
 R U Mine?|Arctic Monkeys|2012|ri
 Radioactive|Imagine Dragons|2012|ri
 Shirt uit en zwaaien|Mental Theo & Gordon|2012|nx
-Skyfall|Adele|2012|pf
+Skyfall|Adele|2012|pf|James Bond: Skyfall
 Some Nights|fun.|2012|p
 Spaceman|Hardwell|2012|d
 Starships|Nicki Minaj|2012|pdh
@@ -4171,7 +4332,9 @@ Sweater Weather|The Neighbourhood|2012|i
 Sweet Nothing|Calvin Harris|2012|d
 Swimming Pools (Drank)|Kendrick Lamar|2012|h
 Tage wie diese|Die Toten Hosen|2012|jr
+The Avengers|Alan Silvestri|2012|f|The Avengers
 Thrift Shop|Macklemore & Ryan Lewis|2012|h
+Touch the Sky|Julie Fowlis|2012|Wfg|Brave
 Try|P!nk|2012|p
 We Are Never Ever Getting Back Together|Taylor Swift|2012|p
 Wereld van verschil|Miss Montreal|2012|n
@@ -4196,23 +4359,25 @@ Counting Stars|OneRepublic|2013|p
 Dark Horse|Katy Perry|2013|p
 Dernière danse|Indila|2013|q
 Do I Wanna Know?|Arctic Monkeys|2013|ri
-Do You Want to Build a Snowman?|Kristen Bell|2013|fg
+Do You Want to Build a Snowman?|Kristen Bell|2013|fgW|Frozen
 Drunk in Love|Beyoncé|2013|h
 Feesttent|Kraantje Pappie|2013|nhx
-For the First Time in Forever|Kristen Bell & Idina Menzel|2013|gf
+For the First Time in Forever|Kristen Bell & Idina Menzel|2013|gfW|Frozen
 Formidable|Stromae|2013|pb
 Get Lucky|Daft Punk|2013|ds
 Hail to the King|Avenged Sevenfold|2013|m
-Happy|Pharrell Williams|2013|pfxgs
+Happy|Pharrell Williams|2013|pfxgs|Verschrikkelijke Ikke~Despicable Me
 Heart Attack|Demi Lovato|2013|p
 Hey Brother|Avicii|2013|d
 Hold On, We're Going Home|Drake|2013|h
+In Summer|Josh Gad|2013|Wfg|Frozen
 Jubel|Klingande|2013|d
 Julia|Nick & Simon|2013|n
 Just Give Me a Reason|P!nk|2013|p
 La La La|Naughty Boy|2013|p
-Let It Go|Idina Menzel|2013|fg
-Love Is an Open Door|Kristen Bell|2013|fg
+Let It Go|Idina Menzel|2013|fgW|Frozen
+Let It Go|Demi Lovato|2013|Wfg|Frozen
+Love Is an Open Door|Kristen Bell|2013|fgW|Frozen
 Mammoth|Dimitri Vegas & Like Mike|2013|db
 Mirrors|Justin Timberlake|2013|p
 My Songs Know What You Did in the Dark (Light Em Up)|Fall Out Boy|2013|r
@@ -4220,7 +4385,7 @@ Need U (100%)|Duke Dumont|2013|d
 On ira|Zaz|2013|q
 Only Teardrops|Emmelie de Forest|2013|pe
 Papaoutai|Stromae|2013|pbq
-Paw Patrol Theme|Scott Simons|2013|gv
+Paw Patrol Theme|Scott Simons|2013|gv|Paw Patrol
 Pompeii|Bastille|2013|p
 Rap God|Eminem|2013|h
 Red Lights|Tiësto|2013|d
@@ -4259,7 +4424,7 @@ When I Was Your Man|Bruno Mars|2013|pa
 Why'd You Only Call Me When You're High?|Arctic Monkeys|2013|ri
 Wrecking Ball|Miley Cyrus|2013|p
 Wrong Side of Heaven|Five Finger Death Punch|2013|m
-Young and Beautiful|Lana Del Rey|2013|pfi
+Young and Beautiful|Lana Del Rey|2013|pfi|The Great Gatsby
 A Sky Full of Stars|Coldplay|2014|pdi
 All About That Bass|Meghan Trainor|2014|p
 Anaconda|Nicki Minaj|2014|h
@@ -4282,24 +4447,24 @@ Cheerleader|OMI|2014|pz
 Christine|Christine and the Queens|2014|q
 Color Gitano|Kendji Girac|2014|q
 Drown|Bring Me the Horizon|2014|m
-Earned It|The Weeknd|2014|pf
+Earned It|The Weeknd|2014|pf|Fifty Shades of Grey
 Elastic Heart|Sia|2014|p
 En route|Tourist LeMC|2014|nbh
-Everything Is Awesome|Tegan and Sara|2014|fg
+Everything Is Awesome|Tegan and Sara|2014|fg|The LEGO Movie
 Fancy|Iggy Azalea & Charli XCX|2014|h
 Feest|Feestteam|2014|njx
 Fireball|Pitbull|2014|dxl
 Firestone|Kygo|2014|d
 Gecko (Overdrive)|Oliver Heldens & Becky Hill|2014|d
-Ghost Rockers|Ghost Rockers|2014|gnb
+Ghost Rockers|Ghost Rockers|2014|gnbv|Ghost Rockers
 Gimme Chocolate!!|Babymetal|2014|m
 Hemel valt|Typhoon|2014|nh
 Heroes (We Could Be)|Alesso|2014|d
 Hoe|Miss Montreal & Nielson|2014|n
 Home|Dotan|2014|i
 I'm Not the Only One|Sam Smith|2014|p
-Immortals|Fall Out Boy|2014|gf
-Interstellar: Cornfield Chase|Hans Zimmer|2014|f
+Immortals|Fall Out Boy|2014|gfW|Big Hero 6
+Interstellar: Cornfield Chase|Hans Zimmer|2014|f|Interstellar
 Jij liet mij vallen|Tino Martin|2014|nj
 Left Hand Free|alt-J|2014|i
 Louise|Gers Pardoel|2014|nh
@@ -4324,6 +4489,7 @@ Summer|Calvin Harris|2014|dz
 Sur ma route|Black M|2014|q
 Ta fête|Stromae|2014|pb
 The Devil in I|Slipknot|2014|m
+The Hanging Tree|James Newton Howard & Jennifer Lawrence|2014|f|The Hunger Games
 The Nights|Avicii|2014|d
 Thinking Out Loud|Ed Sheeran|2014|pa
 To Hell and Back|Sabaton|2014|m
@@ -4366,7 +4532,7 @@ Leef|André Hazes Jr.|2015|nx
 Let It Happen|Tame Impala|2015|i
 Lieblingsmensch|Namika|2015|xj
 Links rechts|Snollebollekes|2015|njx
-Love Me Like You Do|Ellie Goulding|2015|pf
+Love Me Like You Do|Ellie Goulding|2015|pf|Fifty Shades of Grey
 Love Yourself|Justin Bieber|2015|p
 Mooi|Marco Borsato|2015|n
 Ocean Drive|Duke Dumont|2015|d
@@ -4376,7 +4542,8 @@ Reality|Lost Frequencies|2015|db
 Rhythm Inside|Loïc Nottet|2015|pbe
 Ride|Twenty One Pilots|2015|ri
 Roses|The Chainsmokers|2015|d
-See You Again|Wiz Khalifa|2015|hf
+Rotten to the Core|Dove Cameron, Sofia Carson, Booboo Stewart & Cameron Boyce|2015|Wvg|Descendants
+See You Again|Wiz Khalifa|2015|hf|Fast & Furious
 Sorry|Justin Bieber|2015|p
 Space Song|Beach House|2015|i
 Sterrenstof|Tino Martin|2015|nj
@@ -4393,27 +4560,28 @@ The Hum|Dimitri Vegas & Like Mike|2015|db
 The Less I Know the Better|Tame Impala|2015|i
 The Sound of Silence|Disturbed|2015|m
 Throne|Bring Me the Horizon|2015|m
-Tuyo|Rodrigo Amarante|2015|v
+Tuyo|Rodrigo Amarante|2015|v|Narcos
 Waiting for Love|Avicii|2015|d
 Want to Want Me|Jason Derulo|2015|p
 What Do You Mean?|Justin Bieber|2015|p
 When We Were Young|Adele|2015|p
 Wildest Dreams|Taylor Swift|2015|p
 Worth It|Fifth Harmony|2015|py
-Writing's on the Wall|Sam Smith|2015|pf
+Writing's on the Wall|Sam Smith|2015|pf|James Bond: Spectre
 Zoveel te doen|Tourist LeMC|2015|nbh
 1944|Jamala|2016|pe
 24K Magic|Bruno Mars|2016|ps
 Alone|Alan Walker|2016|d
+Another Day of Sun|La La Land Cast|2016|f|La La Land
 Baby Shark|Pinkfong|2016|fg
 Bad and Boujee|Migos|2016|h
 Black Beatles|Rae Sremmurd|2016|h
-Can't Stop the Feeling!|Justin Timberlake|2016|pfxgs
+Can't Stop the Feeling!|Justin Timberlake|2016|pfxgs|Trolls
 Chantaje|Shakira & Maluma|2016|l
 Chaos|Bazart|2016|nb
 Cheap Thrills|Sia|2016|p
 Chöre|Mark Forster|2016|xj
-City of Stars|Ryan Gosling & Emma Stone|2016|f
+City of Stars|Ryan Gosling & Emma Stone|2016|f|La La Land
 Closer|The Chainsmokers|2016|d
 Cold Water|Major Lazer|2016|d
 Congratulations|Post Malone|2016|h
@@ -4421,15 +4589,16 @@ Dangerous Woman|Ariana Grande|2016|p
 Die for You|The Weeknd|2016|p
 Don't Let Me Down|The Chainsmokers & Daya|2016|d
 Formation|Beyoncé|2016|h
-Get Back Up Again|Anna Kendrick|2016|gf
+Get Back Up Again|Anna Kendrick|2016|gf|Trolls
 Good as Hell|Lizzo|2016|s
 Goosebumps|Travis Scott|2016|h
 Goud|Bazart|2016|nb
-Heathens|Twenty One Pilots|2016|rfi
-How Far I'll Go|Auli'i Cravalho|2016|fg
+Heathens|Twenty One Pilots|2016|rfi|Suicide Squad
+How Far I'll Go|Auli'i Cravalho|2016|fgW|Vaiana~Moana
 Human|Rag'n'Bone Man|2016|p
 Hymn for the Weekend|Coldplay|2016|pi
 I Feel It Coming|The Weeknd|2016|p
+I'm Still Standing|Taron Egerton|2016|fg|Sing
 In the Name of Love|Martin Garrix|2016|d
 Into You|Ariana Grande|2016|p
 J'ai cherché|Amir|2016|qe
@@ -4447,7 +4616,7 @@ Rockabye|Clean Bandit|2016|pd
 Samen voor altijd|Marco Borsato|2016|n
 Say You Won't Let Go|James Arthur|2016|p
 Send My Love (To Your New Lover)|Adele|2016|p
-Shiny|Jemaine Clement|2016|gf
+Shiny|Jemaine Clement|2016|gfW|Vaiana~Moana
 Shout Out to My Ex|Little Mix|2016|py
 Side to Side|Ariana Grande|2016|p
 Silvera|Gojira|2016|m
@@ -4457,21 +4626,24 @@ Square Hammer|Ghost|2016|m
 Starboy|The Weeknd|2016|p
 Stranded|Gojira|2016|m
 Stranger Things|Kyle Dixon & Michael Stein|2016|v
+Stranger Things Theme|Kyle Dixon & Michael Stein|2016|v|Stranger Things
 This Is What You Came For|Calvin Harris|2016|d
 Touch|Little Mix|2016|py
 Treat You Better|Shawn Mendes|2016|p
-True Colors|Anna Kendrick & Justin Timberlake|2016|gf
-Try Everything|Shakira|2016|pfgl
+True Colors|Anna Kendrick & Justin Timberlake|2016|gf|Trolls
+Try Everything|Shakira|2016|pfglW|Zootropolis~Zootopia
 Unstoppable|Sia|2016|p
 Vrouwkes|Snollebollekes|2016|njx
 We Don't Talk Anymore|Charlie Puth|2016|p
+We Know the Way|Opetaia Foa'i & Lin-Manuel Miranda|2016|Wfg|Vaiana~Moana
 Westworld Main Title|Ramin Djawadi|2016|v
 Work|Rihanna|2016|h
 Work from Home|Fifth Harmony|2016|py
 You Don't Know Me|Jax Jones|2016|d
-You're Welcome|Dwayne Johnson|2016|fg
+You're Welcome|Dwayne Johnson|2016|fgW|Vaiana~Moana
 Zij weet het|Tino Martin|2016|nj
 Zo bijzonder|Kinderen voor Kinderen|2016|ng
+A Million Dreams|Ziv Zaifman, Hugh Jackman & Michelle Williams|2017|f|The Greatest Showman
 Alleen|Lil Kleine|2017|nh
 Amar pelos dois|Salvador Sobral|2017|pe
 Attention|Charlie Puth|2017|p
@@ -4504,7 +4676,8 @@ Million Eyes|Loïc Nottet|2017|pb
 Mwaka Moon|Kalash & Damso|2017|qh
 New Rules|Dua Lipa|2017|p
 Perfect|Ed Sheeran|2017|pa
-Remember Me|Miguel|2017|fg
+Remember Me|Miguel|2017|fgW|Coco
+Rewrite the Stars|Zac Efron & Zendaya|2017|f|The Greatest Showman
 rockstar|Post Malone|2017|h
 Scared to Be Lonely|Martin Garrix|2017|d
 Shape of You|Ed Sheeran|2017|p
@@ -4517,13 +4690,13 @@ Springen nondeju|Snollebollekes|2017|njx
 Stay|Zedd & Alessia Cara|2017|d
 Symphony|Clean Bandit|2017|d
 That's What I Like|Bruno Mars|2017|p
-The Greatest Show|Hugh Jackman|2017|f
+The Greatest Show|Hugh Jackman|2017|f|The Greatest Showman
 There's Nothing Holdin' Me Back|Shawn Mendes|2017|p
-This Is Me|Keala Settle|2017|f
+This Is Me|Keala Settle|2017|f|The Greatest Showman
 Thunder|Imagine Dragons|2017|ri
 Too Good at Goodbyes|Sam Smith|2017|p
 Truth Hurts|Lizzo|2017|p
-Un Poco Loco|Anthony Gonzalez|2017|fg
+Un Poco Loco|Anthony Gonzalez|2017|fgW|Coco
 Verover mij|Niels Destadsbader|2017|nb
 What About Us|P!nk|2017|p
 Whatever It Takes|Imagine Dragons|2017|ri
@@ -4535,11 +4708,12 @@ Zoutelande|BLØF|2017|nb
 A Matter of Time|Sennek|2018|eb
 Alone|Whispering Sons|2018|ib
 Als het avond is|Suzan & Freek|2018|na
+Always Remember Us This Way|Lady Gaga|2018|f|A Star Is Born
 Atje voor de sfeer|René Karst|2018|njx
-Bella ciao|El Profesor|2018|lx
+Bella ciao|El Profesor|2018|lxv|La Casa de Papel
 Better Now|Post Malone|2018|p
 Blah Blah Blah|Armin van Buuren|2018|d
-Bluey Theme Tune|Joff Bush|2018|vg
+Bluey Theme Tune|Joff Bush|2018|vg|Bluey
 Calma|Pedro Capó|2018|l
 Copines|Aya Nakamura|2018|q
 Cordula Grün|Josh.|2018|xj
@@ -4577,14 +4751,14 @@ One Kiss|Calvin Harris|2018|d
 Paradise|George Ezra|2018|c
 Ramenez la coupe à la maison|Vegedream|2018|qx
 Rats|Ghost|2018|m
-Shallow|Lady Gaga|2018|pfa
+Shallow|Lady Gaga|2018|pfa|A Star Is Born
 Shotgun|George Ezra|2018|pzc
 SICKO MODE|Travis Scott|2018|h
 Solo|Clean Bandit|2018|d
 Someone You Loved|Lewis Capaldi|2018|p
 Spijt|Tourist LeMC|2018|nbh
 Succession Main Title Theme|Nicholas Britell|2018|v
-Sunflower|Post Malone|2018|hf
+Sunflower|Post Malone|2018|hf|Spider-Man: Into the Spider-Verse
 Sweet but Psycho|Ava Max|2018|p
 Ta reine|Angèle|2018|pb
 Taki Taki|DJ Snake|2018|dl
@@ -4595,6 +4769,7 @@ Tout oublier|Angèle|2018|pbq
 Toy|Netta|2018|pe
 Without Me|Halsey|2018|p
 7 Rings|Ariana Grande|2019|p
+A Whole New World|ZAYN & Zhavia Ward|2019|Wfg|Aladdin
 Adore You|Harry Styles|2019|p
 Arcade|Duncan Laurence|2019|pe
 Bad Guy|Billie Eilish|2019|pi
@@ -4620,13 +4795,14 @@ Hij is van mij|Kris Kross Amsterdam & Maan & Tabitha|2019|n
 Hoe het danst|Marco Borsato|2019|nd
 Hou vast|Tabitha|2019|n
 I Don't Care|Ed Sheeran|2019|p
-Into the Unknown|Idina Menzel|2019|fg
+Into the Unknown|Idina Menzel|2019|fgW|Frozen 2
 Jerusalema|Master KG|2019|lx
 Juice|Lizzo|2019|s
 Kill This Love|BLACKPINK|2019|py
 Lay-la|Hamza|2019|qbh
 Like-Me|#LikeMe|2019|gnb
 Lose You to Love Me|Selena Gomez|2019|p
+Lost in the Woods|Jonathan Groff|2019|Wfg|Frozen 2
 Love Nwantiti (Ah Ah Ah)|CKay|2019|l
 Lover|Taylor Swift|2019|pa
 Malade|Roméo Elvis|2019|qbh
@@ -4644,12 +4820,15 @@ Reünie|Snelle|2019|n
 Roller|Apache 207|2019|xj
 Roses (Imanbek Remix)|SAINt JHN|2019|d
 Señorita|Shawn Mendes|2019|pl
-Show Yourself|Idina Menzel & Evan Rachel Wood|2019|gf
+Show Yourself|Idina Menzel & Evan Rachel Wood|2019|gfW|Frozen 2
 Soldi|Mahmood|2019|pe
+Some Things Never Change|Kristen Bell|2019|Wfg|Frozen 2
+Speechless|Naomi Scott|2019|Wfg|Aladdin
+Spirit|Beyoncé|2019|Wfg|De Leeuwenkoning~The Lion King
 Sterrenstof|Niels Destadsbader|2019|nb
 Sucker|Jonas Brothers|2019|py
 The Bones|Maren Morris|2019|c
-The Mandalorian|Ludwig Göransson|2019|v
+The Mandalorian|Ludwig Göransson|2019|v|The Mandalorian
 Tusa|Karol G & Nicki Minaj|2019|l
 Vroeger|Kris Kross Amsterdam|2019|nx
 Watermelon Sugar|Harry Styles|2019|pz
@@ -4677,11 +4856,12 @@ Hypnotized|Purple Disco Machine|2020|d
 Kings & Queens|Ava Max|2020|p
 Kom wat dichterbij|Regi & Jake Reese & OT|2020|nbd
 Levitating|Dua Lipa|2020|pd
+Loyal Brave True|Christina Aguilera|2020|Wfg|Mulan
 Mee naar boven|Niels Destadsbader & Regi|2020|nb
 Midnight Sky|Miley Cyrus|2020|p
 Miss Wanna Be|Regi & Jake Reese & OT|2020|bd
 Mood|24kGoldn|2020|h
-No Time to Die|Billie Eilish|2020|pfi
+No Time to Die|Billie Eilish|2020|pfi|James Bond: No Time to Die
 Nu wij niet meer praten|Jaap Reesema & Pommelien Thijs|2020|nb
 Parasite Eve|Bring Me the Horizon|2020|m
 Physical|Dua Lipa|2020|p
@@ -4710,6 +4890,7 @@ Circle with Me|Spiritbox|2021|m
 Cold Heart|Elton John|2021|pd
 Dat heb jij gedaan|MEAU|2021|n
 Denk maar niet aan morgen|Bazart|2021|nb
+Dos Oruguitas|Sebastián Yatra|2021|Wfg|Encanto
 drivers license|Olivia Rodrigo|2021|p
 Easy On Me|Adele|2021|pa
 Enemy|Imagine Dragons|2021|rvi
@@ -4740,9 +4921,10 @@ Santé|Stromae|2021|pb
 Shivers|Ed Sheeran|2021|p
 Skate|Silk Sonic|2021|s
 Stay|The Kid LAROI|2021|p
-Surface Pressure|Jessica Darrow|2021|fg
+Surface Pressure|Jessica Darrow|2021|fgW|Encanto
 Take My Breath|The Weeknd|2021|p
 Thats What I Want|Lil Nas X|2021|p
+The Family Madrigal|Stephanie Beatriz|2021|Wfg|Encanto
 The Wrong Place|Hooverphonic|2021|ebi
 Up|Laura Tesoro|2021|b
 Vechter|Laura Tesoro|2021|nb
@@ -4750,8 +4932,9 @@ Vergeet de tijd|Regi & Camille|2021|nbd
 Voilà|Barbara Pravi|2021|qe
 Vuurwerk|Camille|2021|nb
 Way Back Then|Jung Jae Il|2021|v
-We Don't Talk About Bruno|Carolina Gaitán|2021|fg
+We Don't Talk About Bruno|Carolina Gaitán|2021|fgW|Encanto
 Wellerman|Nathan Evans|2021|pxoc
+What Else Can I Do?|Diane Guerrero & Stephanie Beatriz|2021|Wfg|Encanto
 Where Are You Now|Lost Frequencies|2021|db
 Zitti e buoni|Måneskin|2021|re
 About Damn Time|Lizzo|2022|ps
@@ -4777,15 +4960,15 @@ Glimpse of Us|Joji|2022|p
 Golden Hour|JVKE|2022|p
 Green Green Grass|George Ezra|2022|pc
 Hold Me Closer|Elton John|2022|pd
-Hold My Hand|Lady Gaga|2022|pf
+Hold My Hand|Lady Gaga|2022|pf|Top Gun
 House of the Dragon|Ramin Djawadi|2022|v
-I Ain't Worried|OneRepublic|2022|pf
+I Ain't Worried|OneRepublic|2022|pf|Top Gun
 I'm Good (Blue)|David Guetta|2022|d
 Kill Bill|SZA|2022|h
 L'enfer|Stromae|2022|pb
 Late Night Talking|Harry Styles|2022|p
 Layla|DJ Robin & Schürze|2022|xj
-Lift Me Up|Rihanna|2022|pf
+Lift Me Up|Rihanna|2022|pf|Black Panther
 Made You Look|Meghan Trainor|2022|p
 Me Porto Bonito|Bad Bunny & Chencho Corleone|2022|l
 Meisjes blijven meisjes|Pommelien Thijs|2022|nb
@@ -4816,7 +4999,7 @@ Boy's a Liar Pt. 2|PinkPantheress|2023|p
 Bzrp Music Sessions, Vol. 53|Bizarrap & Shakira|2023|l
 Cha Cha Cha|Käärijä|2023|pxe
 Cupid|FIFTY FIFTY|2023|py
-Dance the Night|Dua Lipa|2023|pf
+Dance the Night|Dua Lipa|2023|pf|Barbie
 Daylight|David Kushner|2023|pi
 Erop of eronder|Pommelien Thijs|2023|nb
 Eyes Closed|Ed Sheeran|2023|p
@@ -4827,7 +5010,7 @@ Greedy|Tate McRae|2023|p
 Hot To Go!|Chappell Roan|2023|px
 Houdini|Dua Lipa|2023|pd
 I Remember Everything|Zach Bryan & Kacey Musgraves|2023|c
-I'm Just Ken|Ryan Gosling|2023|f
+I'm Just Ken|Ryan Gosling|2023|f|Barbie
 Is It Over Now?|Taylor Swift|2023|p
 Ja!|Bankzitters|2023|nx
 Je blik richting mij|Bankzitters|2023|nx
@@ -4838,7 +5021,8 @@ Lovin On Me|Jack Harlow|2023|h
 Miracle|Calvin Harris|2023|d
 Padam Padam|Kylie Minogue|2023|pd
 Paint The Town Red|Doja Cat|2023|h
-Peaches|Jack Black|2023|gf
+Part of Your World|Halle Bailey|2023|Wfg|De Kleine Zeemeermin~The Little Mermaid
+Peaches|Jack Black|2023|gf|The Super Mario Bros. Movie
 Prada|Cassö|2023|d
 Seven|Jung Kook|2023|p
 Si No Estás|Iñigo Quintero|2023|l
@@ -4849,10 +5033,11 @@ Stumblin' In|Cyril|2023|d
 Super Shy|NewJeans|2023|py
 Tattoo|Loreen|2023|pe
 The Last of Us|Gustavo Santaolalla|2023|v
+This Wish|Ariana DeBose|2023|Wfg|Wish
 Vampire|Olivia Rodrigo|2023|pr
 Wat wil je van mij|Metejoor & Hannah Mae|2023|nb
 Water|Tyla|2023|hl
-What Was I Made For?|Billie Eilish|2023|pfi
+What Was I Made For?|Billie Eilish|2023|pfi|Barbie
 360|Charli xcx|2024|pd
 A Bar Song (Tipsy)|Shaboozey|2024|pxc
 Apple|Charli xcx|2024|pd
@@ -4861,7 +5046,9 @@ Atlas|Pommelien Thijs|2024|nb
 Beautiful Things|Benson Boone|2024|p
 Before the Party's Over|Mustii|2024|eb
 Belong Together|Mark Ambor|2024|p
+Beyond|Auliʻi Cravalho|2024|Wfg|Vaiana 2~Moana 2
 Birds of a Feather|Billie Eilish|2024|pi
+Defying Gravity|Cynthia Erivo & Ariana Grande|2024|f|Wicked
 Denial Is a River|Doechii|2024|h
 Die With A Smile|Lady Gaga|2024|pa
 Disease|Lady Gaga|2024|p
@@ -4882,6 +5069,7 @@ Messy|Lola Young|2024|p
 Million Dollar Baby|Tommy Richman|2024|h
 Not Like Us|Kendrick Lamar|2024|h
 Please Please Please|Sabrina Carpenter|2024|p
+Popular|Ariana Grande|2024|f|Wicked
 Rim Tim Tagi Dim|Baby Lasagna|2024|ex
 Sailor Song|Gigi Perez|2024|pi
 Stargazing|Myles Smith|2024|p
@@ -4901,13 +5089,13 @@ Azizam|Ed Sheeran|2025|p
 Bara bada bastu|KAJ|2025|ex
 Blessings|Calvin Harris & Clementine Douglas|2025|d
 Espresso Macchiato|Tommy Cash|2025|ex
-Golden|HUNTR/X|2025|pfg
+Golden|HUNTR/X|2025|pfg|KPop Demon Hunters
 Manchild|Sabrina Carpenter|2025|p
 Mystical Magical|Benson Boone|2025|p
 Ordinary|Alex Warren|2025|p
 Sapphire|Ed Sheeran|2025|p
 Show Me Love|WizTheMc & bees & honey|2025|p
-Soda Pop|Saja Boys|2025|gf
+Soda Pop|Saja Boys|2025|gf|KPop Demon Hunters
 Sorry I'm Here for Someone Else|Benson Boone|2025|p
 Sports Car|Tate McRae|2025|p
 Strobe Lights|Red Sebastian|2025|eb
@@ -4921,13 +5109,13 @@ Wasted Love|JJ|2025|pe
    ========================================================= */
 const PREFIX='draaitafel-v2-';
 const CURY=new Date().getFullYear();
-const MODES=[['evening','🎪'],['hitster','🃏'],['year','📅'],['hl','↕️'],['buzz','🔔'],['chip','🐿️'],['fake','🎭'],['herd','🐑'],['vibe','🎚️'],['cover','🖼️'],['order','🔢'],['type','⌨️'],['tm','⏳'],['battle','🥊'],['bingo','🎱'],['board','🎲']];
-const BOARD_MODES=['year','hl','chip','buzz','herd','fake','cover','order','type','tm'];
-const EV_MODES=['hitster','year','hl','buzz','chip','cover','type','order','tm','fake','herd','vibe','battle'];
-const COOP_OK=['hitster','year','hl','chip','vibe','cover','order','type','tm'];
-const LIVES_OK=['hitster','year','hl','buzz','chip','fake','herd','vibe','cover','order','type','tm'];
+const MODES=[['evening','🎪'],['hitster','🃏'],['year','📅'],['hl','↕️'],['buzz','🔔'],['chip','🐿️'],['fake','🎭'],['herd','🐑'],['vibe','🎚️'],['cover','🖼️'],['order','🔢'],['type','⌨️'],['tm','⏳'],['film','🎞️'],['scene','🍿'],['snd','🎭'],['battle','🥊'],['bingo','🎱'],['board','🎲']];
+const BOARD_MODES=['year','hl','chip','buzz','herd','fake','cover','order','type','tm','film','scene'];
+const EV_MODES=['hitster','year','hl','buzz','chip','cover','type','order','tm','film','scene','fake','herd','vibe','battle'];
+const COOP_OK=['hitster','year','hl','chip','vibe','cover','order','type','tm','film','scene'];
+const LIVES_OK=['hitster','year','hl','buzz','chip','fake','herd','vibe','cover','order','type','tm','film','scene'];
 const GENRES=['p','r','d','x','h','s','i','n','b','q','l','c','m','f','v'];
-const PACKS=[['t','⭐'],['w','🎸'],['u','💿'],['y','💖'],['a','🌹'],['s','🕺'],['j','🍻'],['g','🧸'],['n','🧡'],['b','🍟'],['q','🥖'],['l','🌴'],['e','🏆'],['z','☀️'],['o','🦄'],['fv','🎬'],['k','🎄']];
+const PACKS=[['W','🏰'],['f','🎬'],['v','📺'],['t','⭐'],['w','🎸'],['u','💿'],['y','💖'],['a','🌹'],['s','🕺'],['j','🍻'],['g','🧸'],['n','🧡'],['b','🍟'],['q','🥖'],['l','🌴'],['e','🏆'],['z','☀️'],['o','🦄'],['k','🎄']];
 const DZ_GENRES=[[132,'Pop'],[152,'Rock'],[113,'Dance'],[116,'Hiphop'],[165,'R&B'],[106,'Electro'],[85,'Alternative'],[464,'Metal'],[169,'Soul & Funk'],[144,'Reggae'],[197,'Latin'],[84,'Country'],[173,'Film'],[95,'Kids']];
 const THEMES=[['neon','🌈'],['disco','🪩'],['arcade','👾'],['festival','🎪'],['strand','🏖️'],['rock','🤘'],['kerst','🎄']];
 const LANGS=[['vl','🇧🇪','Vlaams'],['nl','🇳🇱','Nederlands'],['en','🇬🇧','English']];
@@ -4977,7 +5165,16 @@ function setupIcons(){try{const i192=makeIcon(192),i512=makeIcon(512);const add=
    genres: p pop, r rock, d dance, x feest, h hiphop/r&b, m metal, n nederlandstalig, b belgisch, f film, v tv
    pakketten: e eurovisie, z zomer, o one-hit wonders, t tijdloos, k kerst */
 const hashKey=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0;return h.toString(36)};
-const SONGS=RAW.trim().split('\n').map(l=>{const [title,artist,year,tags]=l.split('|');return {key:'k'+hashKey(norm(title)+'|'+norm(artist)),title:title.trim(),artist:artist.trim(),year:+year,tags:(tags||'p').trim()}});
+const SONGS=RAW.trim().split('\n').map(l=>{const [title,artist,year,tags,src]=l.split('|');const o={key:'k'+hashKey(norm(title)+'|'+norm(artist)),title:title.trim(),artist:artist.trim(),year:+year,tags:(tags||'p').trim()};if(src&&src.trim())o.src=src.trim();return o});
+/* film & serie: bron van een nummer */
+const srcName=s=>{if(!s||!s.src)return '';const p=s.src.split('~');return (LANG==='en'&&p[1])?p[1]:p[0]};
+const srcKind=s=>s.tags.includes('W')?'d':s.tags.includes('f')?'f':s.tags.includes('v')?'s':'f';
+const SRC_SONGS=SONGS.filter(s=>s.src);
+function srcPool(){const p=pool().filter(s=>s.src);if(new Set(p.map(s=>s.src)).size>=6)return p;const ks=new Set(p.map(srcKind));const q=SRC_SONGS.filter(s=>!ks.size||ks.has(srcKind(s)));return new Set(q.map(s=>s.src)).size>=6?q:SRC_SONGS}
+function makeSrcQ(song){const k=srcKind(song),me=srcName(song);const names=new Set([me]);const opts=[me];
+  const same=shuffle(SRC_SONGS.filter(s=>srcKind(s)===k)),other=shuffle(SRC_SONGS.slice());
+  for(const s of same.concat(other)){if(opts.length>=4)break;const n=srcName(s);if(!n||names.has(n))continue;if(me.startsWith('James Bond')!==n.startsWith('James Bond')&&opts.length<3&&same.length>20)continue;names.add(n);opts.push(n)}
+  return {type:'src',options:shuffle(opts),answer:me}}
 const SONG_IDX=new Map();SONGS.forEach(s=>{const k=songKey(s.title,s.artist);if(!SONG_IDX.has(k))SONG_IDX.set(k,s)});
 
 const params=new URLSearchParams(location.search);
@@ -5102,7 +5299,7 @@ let playedM=null;
 function playedMap(){if(!playedM){playedM=store.get('dt_played',{})||{};const cut=Date.now()-120*864e5;for(const k in playedM)if(!(playedM[k]>cut))delete playedM[k]}return playedM}
 let playedT=null;function markPlayed(s){if(!s||!s.key)return;playedMap()[s.key]=Date.now();clearTimeout(playedT);playedT=setTimeout(()=>store.set('dt_played',playedM),1500)}
 function heardCount(){const pm=playedMap();return pool().filter(s=>pm[s.key]).length}
-function drawSong(){const p=pool();const held=new Set();T.units.forEach(u=>u.timeline.forEach(c=>held.add(c.key)));
+function drawSong(L){const p=L||pool();const held=new Set();T.units.forEach(u=>u.timeline.forEach(c=>held.add(c.key)));
   let c=p.filter(s=>!T.used.has(s.key)&&!held.has(s.key));if(!c.length){T.used.clear();c=p.filter(s=>!held.has(s.key))}
   if(!c.length)return null;
   const pm=playedMap();const fresh=c.filter(s=>!pm[s.key]);if(fresh.length>=Math.min(6,c.length))c=fresh;else c=c.slice().sort((a,b)=>(pm[a.key]||0)-(pm[b.key]||0)).slice(0,Math.max(6,Math.ceil(c.length*.3)));const s=rnd(c);T.used.add(s.key);return s}
@@ -5111,7 +5308,7 @@ function mergeSong(s,d){if(!s.year&&d.year)s.year=d.year;return Object.assign({}
 const FAME_THR={hits:500000,mix:150000,all:0};
 const fameThr=()=>FAME_THR[T.settings.fame]||0;
 const famous=d=>{const th=fameThr();return !th||d.rank==null||d.rank>=th};
-async function getPlayableSong(needY){let net=0,fb=null;const tries=fameThr()>=500000?22:16;for(let i=0;i<tries;i++){const s=drawSong();if(!s)break;let d=null;
+async function getPlayableSong(needY,L){let net=0,fb=null;const tries=fameThr()>=500000?22:16;for(let i=0;i<tries;i++){const s=drawSong(L);if(!s)break;let d=null;
   try{d=await resolveTrack(s)}catch(e){if(++net>=3)throw e;continue}
   if(!d||!d.preview)continue;const m=mergeSong(s,d);if(needY&&!m.year)continue;if(!famous(d)){if(!fb||(d.rank||0)>(fb.rank||0))fb=Object.assign(m,{rank:d.rank});continue}return m}return fb}
 async function buildDeck(n){const out=[],spare=[];let tries=0,net=0;
@@ -5141,8 +5338,8 @@ const activeUnits=()=>onlineUnits().filter(u=>!u.out);
 const teamDefs=()=>TEAMS.slice(0,T.settings.teams);
 function smallestTeam(){const c={};teamDefs().forEach(([id])=>c[id]=0);T.players.forEach(p=>{if(p.team&&c[p.team]!=null)c[p.team]++});return Object.keys(c).sort((a,b)=>c[a]-c[b])[0]}
 function assignUnit(p){const s=T.settings;
-  if(s.play==='coop'){if(!T.units.has('coop'))T.units.set('coop',newUnit('coop','','🛋️','#ff3d9a','coopName'));p.unit='coop';return T.units.get('coop')}
-  if(s.play==='teams'){if(!p.team||!teamDefs().some(d=>d[0]===p.team))p.team=smallestTeam();const id='t'+p.team;
+  if(s.mode!=='snd'&&s.play==='coop'){if(!T.units.has('coop'))T.units.set('coop',newUnit('coop','','🛋️','#ff3d9a','coopName'));p.unit='coop';return T.units.get('coop')}
+  if(s.mode!=='snd'&&s.play==='teams'){if(!p.team||!teamDefs().some(d=>d[0]===p.team))p.team=smallestTeam();const id='t'+p.team;
     if(!T.units.has(id)){const d=TEAMS.find(x=>x[0]===p.team);T.units.set(id,newUnit(id,'',d[2],d[1],'team_'+p.team))}p.unit=id;return T.units.get(id)}
   const id='u'+p.id;if(!T.units.has(id))T.units.set(id,newUnit(id,p.name,p.emoji,p.color));const u=T.units.get(id);u.name=p.name;u.emoji=p.emoji;u.color=p.color;p.unit=id;return u}
 function buildUnits(){T.units=new Map();[...T.players.values()].forEach(p=>{p.unit=null;assignUnit(p)});for(const [id,u] of T.units)if(!members(u).length)T.units.delete(id)}
@@ -5154,7 +5351,7 @@ function addPts(u,n){const v=n*mult();u.score=Math.max(0,u.score+v);return v}
 function loseLife(u){if(!livesOn()||!u||u.out)return;u.lives=Math.max(0,u.lives-1);if(u.lives===0&&T.settings.play!=='coop'){u.out=true;u.outAt=T.round}}
 
 /* ---------- statistieken ---------- */
-const newStats=()=>({placeOk:0,bonusOk:0,fast:Infinity,exact:0,errSum:0,errN:0,blunder:null,streak:0,best:0,dec:{},buzzOk:0,marks:0,idk:0,coins:0,answers:0,fooled:0,sheep:0,herdOk:0,djPts:0});
+const newStats=()=>({placeOk:0,bonusOk:0,fast:Infinity,exact:0,errSum:0,errN:0,blunder:null,streak:0,best:0,dec:{},buzzOk:0,marks:0,idk:0,coins:0,answers:0,fooled:0,sheep:0,herdOk:0,djPts:0,sndWin:0});
 const st=pid=>{const p=T.players.get(pid);if(!p)return null;return p.st||(p.st=newStats())};
 function stat(pid,k,n=1){const s=st(pid);if(s)s[k]+=n}
 function fastest(pid,ms){const s=st(pid);if(s&&ms!=null&&ms>0)s.fast=Math.min(s.fast,ms)}
@@ -5163,11 +5360,12 @@ function credit(pid,ok,o={}){const s=st(pid);if(!s)return;s.answers++;
   if(o.err!=null){s.errSum+=o.err;s.errN++;if(o.err>=3&&(!s.blunder||o.err>s.blunder.d))s.blunder={d:o.err,t:o.title}}}
 
 /* ---------- spelverloop ---------- */
-function sanitize(){const s=T.settings;if(s.play==='coop'&&!COOP_OK.includes(s.mode))s.play='solo';if(!s.evModes.filter(m=>EV_MODES.includes(m)).length)s.evModes=['year','herd'];}
+function sanitize(){const s=T.settings;if(s.mode==='snd')s.play='solo';if(s.play==='coop'&&!COOP_OK.includes(s.mode))s.play='solo';if(!s.evModes.filter(m=>EV_MODES.includes(m)).length)s.evModes=['year','herd'];}
 async function startGame(){
   if(!['lobby','end'].includes(T.phase))return;
   const s=T.settings;sanitize();
   const n=pool().length;
+  if(s.mode==='snd'&&[...T.players.values()].filter(p=>p.online).length<3){T.liveStatus=t('sndNeed3');sync();return}
   if(n<minPool()){T.liveStatus=t('tooFew',{n});sync();return}
   const needsTwo=s.mode==='vibe'||(isEvening()&&s.evModes.includes('vibe'));
   if(needsTwo&&[...T.players.values()].filter(p=>p.online).length<2){T.liveStatus=t('needTwo');sync();return}
@@ -5176,7 +5374,7 @@ async function startGame(){
   T.players.forEach(p=>{p.st=newStats()});T.wishes=new Map();
   buildUnits();sfx('start');crowd('clap');
   if(isEvening()){const order=EV_MODES.filter(m=>s.evModes.includes(m));T.ev={list:order,idx:-1};return nextSegment()}
-  T.ev=null;if(isBoard())return startBoard();
+  T.ev=null;T.snd=null;if(isBoard())return startBoard();
   if(!T.explained.has(s.mode)){T.explained.add(s.mode);T.phase='howto';T.deadline=now()+12000;sync();speak(t('m_'+s.mode)+'!');DJ('dj_howto');sched(()=>{if(T.phase==='howto')startSegment()},12000);return}
   startSegment();
 }
@@ -5199,14 +5397,17 @@ async function nextRound(){
   if(cm==='hl'&&T.cur&&T.cur.year)T.anchor=T.cur;
   if(cardMode()&&s.quick&&T.sinceQuick>=s.quick){T.sinceQuick=0;return startQuick()}
   T.sinceQuick++;T.round++;T.segRound++;T.phase='loading';audio.pause();resetRate();
-  T.buzz=null;T.buzzWin=null;T.locked=new Set();T.fake=null;T.herd=null;T.vibe=null;T.chip=null;T.ord=null;T.tm=null;T.units.forEach(u=>{u.ans=null;u.res=null;u.draft=null;u.fakeErr=false;u._s0=u.score});
+  T.buzz=null;T.buzzWin=null;T.locked=new Set();T.fake=null;T.herd=null;T.vibe=null;T.chip=null;T.ord=null;T.tm=null;T.scn=null;T.units.forEach(u=>{u.ans=null;u.res=null;u.draft=null;u.fakeErr=false;u._s0=u.score});
   const pre=takePre(cm);if(!(pre&&pre.done))sync();
   try{
     if(cm==='herd')return await startHerdRound(pre);
     if(cm==='vibe')return await startVibeRound(pre);
     if(cm==='order')return await startOrderRound(pre);
     if(cm==='tm')return await startTmRound();
-    let song=pre?await pre.p:null;if(!song)song=await getPlayableSong(needYear());
+    if(cm==='scene')return await startSceneRound();
+    if(cm==='snd')return await startSndRound();
+    let song=pre?await pre.p:null;if(!song)song=await getPlayableSong(needYear(),cm==='film'?srcPool():undefined);
+    if(cm==='film'&&song&&!song.src)song=await getPlayableSong(false,srcPool());
     if(cm==='cover'&&song&&!song.cover){const s2=await getPlayableSong(false);if(s2&&s2.cover)song=s2}
     if(T.phase!=='loading')return;
     if(!song)return fail(t('errNone'));
@@ -5217,6 +5418,7 @@ async function nextRound(){
   else if(cm==='buzz')T.bonusQ=makeQ(song,'both');
   else if(cm==='chip')T.bonusQ=makeQ(song,'title');
   else if(cm==='cover')T.bonusQ=makeQ(song,'both');
+  else if(cm==='film')T.bonusQ=makeSrcQ(song);
   else T.bonusQ=null;
   if(cm==='fake')T.fake={sub:'write',opts:null,votes:new Map()};
   T.phase='round';T.roundStart=now();T.deadline=T.roundStart+roundTime()*1000;T.lastSec=-1;
@@ -5230,13 +5432,13 @@ function unitDone(u){const cm=curMode(),a=u.ans;
   if(cm==='herd')return !!(T.herd&&T.herd.votes.has(u.id));
   if(cm==='vibe'){if(!T.vibe||T.vibe.sub!=='guess')return false;if(!vibeEligible(u))return true;return !!(a&&a.pos!=null)}
   if(!a)return false;
-  if(cm==='hitster')return a.slot!=null&&a.bonus!=null;if(cm==='year')return a.year!=null;if(cm==='hl')return !!a.dir;if(cm==='chip'||cm==='cover')return a.choice!=null;if(cm==='type')return !!(a.gotT&&a.gotA);if(cm==='order')return !!a.order;if(cm==='tm')return a.year!=null;return false}
+  if(cm==='hitster')return a.slot!=null&&a.bonus!=null;if(cm==='year')return a.year!=null;if(cm==='hl')return !!a.dir;if(cm==='chip'||cm==='cover'||cm==='film'||cm==='scene')return a.choice!=null;if(cm==='snd')return false;if(cm==='type')return !!(a.gotT&&a.gotA);if(cm==='order')return !!a.order;if(cm==='tm')return a.year!=null;return false}
 function reveal(){
   if(T.applying)return;
   /* gekozen maar niet bevestigd? Dan telt de keuze toch. */
   T.applying=true;try{T.units.forEach(u=>{const d=u.draft;u.draft=null;if(!d||u.out||unitDone(u))return;const p=T.players.get(d.by);if(p&&unitOf(p)===u){try{onMsg(null,d.m,p)}catch(e){}}})}finally{T.applying=false}
   const s=T.settings,cm=curMode(),coop=s.play==='coop';
-  if(cm==='fake')return revealFake();if(cm==='herd')return revealHerd();if(cm==='vibe')return revealVibe();if(cm==='order')return revealOrder();if(cm==='tm')return revealTm();
+  if(cm==='fake')return revealFake();if(cm==='herd')return revealHerd();if(cm==='vibe')return revealVibe();if(cm==='order')return revealOrder();if(cm==='tm')return revealTm();if(cm==='scene')return revealScene();if(cm==='snd')return revealSnd();
   const song=T.cur;if(!song)return;
   T.phase='reveal';resetRate();setVol(.55);if(audio.paused&&audio.src)audio.play().catch(()=>{});
   let anyOk=false,maxErr=0;
@@ -5268,7 +5470,7 @@ function reveal(){
     T.units.forEach(u=>{if(u.out){u.res=null;return}const a=u.ans||{};const base=(a.gotT?3:0)+(a.gotA?2:0)+(u===fastU?1:0);
       if(!base){u.res={none:!a.tries,pts:0,gotT:false,gotA:false,tries:a.tries||0};loseLife(u);if(a.by)credit(a.by,false);return}
       const pts=addPts(u,base);anyOk=true;u.res={gotT:!!a.gotT,gotA:!!a.gotA,pts,tries:a.tries||0,fastest:u===fastU};credit(a.byT||a.byA,true,{ms:a.tT||a.tA,year:song.year})});
-  }else if(cm==='chip'||cm==='cover'){const tot=roundTime()*1000;
+  }else if(cm==='chip'||cm==='cover'||cm==='film'){const tot=roundTime()*1000;
     T.units.forEach(u=>{if(u.out){u.res=null;return}const a=u.ans;if(!a||a.choice==null){u.res={none:true,pts:0};loseLife(u);return}
       const ok=a.choice===T.bonusQ.answer;let pts=0;if(ok){pts=addPts(u,Math.max(1,Math.ceil(5*(1-a.t/tot))));anyOk=true}else loseLife(u);
       u.res={ok,pts,choice:a.choice};credit(a.by,ok,{ms:a.t,year:song.year})});
@@ -5579,7 +5781,10 @@ function onMsg(conn,m,fp){
       if(!a.gotA&&(fuzzy(tx,c.artist)||fuzzy(tx,firstArtist(c.artist)))){a.gotA=true;a.tA=tnow-T.roundStart;a.byA=p.id;hit=true}
       a.last=hit?'ok':'no';a.by=p.id;if(hit)sfx('stamp');sync()}return;
     case 'order':if(R&&cm==='order'&&T.ord){const a=A();const n=T.ord.songs.length;if(!a.order&&Array.isArray(m.o)&&m.o.length===n&&new Set(m.o).size===n&&m.o.every(i=>Number.isInteger(i)&&i>=0&&i<n)){a.order=m.o.slice();a.by=p.id;a.t=tnow-T.roundStart;sync()}}return;
-    case 'chip':if(R&&(cm==='chip'||cm==='cover')){const a=A();if(a.choice==null&&T.bonusQ.options.includes(m.choice)){a.choice=m.choice;a.by=p.id;a.t=tnow-T.roundStart;sync()}}return;
+    case 'spick':if(R&&cm==='scene'&&T.scn){const a=A();const i=+m.i;if(a.choice==null&&Number.isInteger(i)&&i>=0&&i<T.scn.songs.length){a.choice=i;a.by=p.id;a.t=tnow-T.roundStart;a.heard=T.scn.heard;sync()}}return;
+    case 'scard':if(T.phase==='round'&&cm==='snd'&&T.snd&&T.snd.sub==='pick'&&p.id!==T.snd.judge){const h=T.snd.hands.get(p.id);const i=+m.i;if(h&&!T.snd.subs.has(p.id)&&Number.isInteger(i)&&h[i]){T.snd.subs.set(p.id,{song:h[i],i,at:tnow});sfx('stamp');sync()}}return;
+    case 'sjudge':if(T.phase==='round'&&cm==='snd'&&T.snd&&T.snd.sub==='play'&&p.id===T.snd.judge){const i=+m.i;if(Number.isInteger(i)&&T.snd.order[i]){T.snd.win=i;reveal()}}return;
+    case 'chip':if(R&&(cm==='chip'||cm==='cover'||cm==='film')){const a=A();if(a.choice==null&&T.bonusQ.options.includes(m.choice)){a.choice=m.choice;a.by=p.id;a.t=tnow-T.roundStart;sync()}}return;
     case 'fake':if(R&&cm==='fake'&&T.fake&&T.fake.sub==='write'){const a=A();const tx=String(m.text||'').replace(/\s+/g,' ').trim().slice(0,40);if(a.fake||!tx)return;
       if(norm(tx)===norm(T.cur.title)||overlap(T.cur.title,tx)>=.8){u.fakeErr=true;sync();return}a.fake=tx;a.by=p.id;u.fakeErr=false;sync()}return;
     case 'fvote':if(R&&cm==='fake'&&T.fake&&T.fake.sub==='vote'&&!T.fake.votes.has(u.id)){const o=T.fake.opts[m.i];if(o&&!o.authors.includes(u.id)){T.fake.votes.set(u.id,{i:m.i,by:p.id,t:tnow-T.roundStart});sync()}}return;
@@ -5611,7 +5816,7 @@ function onMsg(conn,m,fp){
     case 'next':hostNext();break;
     case 'lobby':toLobby();break;
     case 'replay':if(['round','reveal','bingo'].includes(T.phase)&&audio.src){audio.currentTime=0;audio.play().catch(()=>{})}break;
-    case 'skip':if(T.phase==='round'&&!T.buzz&&!['herd','vibe','order','tm'].includes(cm)){T.round--;T.segRound--;T.sinceQuick=Math.max(0,T.sinceQuick-1);T.cur=null;nextRound()}break;
+    case 'skip':if(T.phase==='round'&&!T.buzz&&!['herd','vibe','order','tm','scene','snd'].includes(cm)){T.round--;T.segRound--;T.sinceQuick=Math.max(0,T.sinceQuick-1);T.cur=null;nextRound()}break;
   }
 }
 function doneState(u){if(u.out)return -2;if(T.phase==='round'){const cm=curMode();if(cm==='buzz')return T.locked.has(u.id)?-1:0;if(cm==='hitster'){const a=u.ans;if(!a)return 0;return (a.slot!=null?1:0)+(a.bonus!=null?1:0)}
@@ -5629,6 +5834,9 @@ function view(p){const s=T.settings,u=unitOf(p),cm=curMode();
     me:{id:p.id,name:p.name,emoji:p.emoji,color:p.color,host:p.host,team:p.team},unit:u?pubUnit(u,true):null,
     players:[...T.players.values()].map(pub),units:[...T.units.values()].map(x=>pubUnit(x,false))};
   if(T.ev)v.ev={i:T.ev.idx,n:T.ev.list.length,list:T.ev.list};
+  if(T.snd&&curMode()==='snd'&&['round','reveal','loading'].includes(T.phase)){const S0=T.snd;const jp=T.players.get(S0.judge);const mine=S0.subs.get(p.id);
+    v.snd={sub:S0.sub,prompt:S0.prompt,isJudge:p.id===S0.judge,judgeName:jp?jp.name:'',judgeEmoji:jp?jp.emoji:'',hand:(S0.hands.get(p.id)||[]).map(s=>({title:s.title,artist:s.artist})),mine:mine?mine.i:null,nSubs:S0.subs.size,nNeed:sndCanJudge().length,
+      order:(S0.sub==='play'||T.phase==='reveal')?S0.order.map(x=>({title:x.song.title,artist:x.song.artist,mine:x.pid===p.id})):null,playing:S0.playing,win:S0.win,winName:S0.winName||null}}
   v.paused=!!T.paused;v.vol=T.settings.vol||5;if(T.phase==='howto')v.remaining=Math.max(0,T.deadline-(T.paused?T.paused.at:now()));if(isBoard()){v.boardLen=T.settings.boardLen;if(T.board)v.turn=T.board.turn}
   if(p.host){v.settings=s;v.pool=pool().length;v.heard=inGame()?0:heardCount();v.live=T.live?{name:T.live.name,n:T.live.songs.length}:null;v.liveStatus=T.liveStatus;v.liveResults=T.liveResults;if(!inGame()){v.liveRecent=store.get('dt_lists',[])||[];v.dzGenres=T.dzGenres||DZ_GENRES}}
   if(!inGame()){const w={};T.wishes.forEach((m,pid)=>{if(T.players.has(pid))w[m]=(w[m]||0)+1});v.wishes=w;v.myWish=T.wishes.get(p.id)||null}
@@ -5636,7 +5844,8 @@ function view(p){const s=T.settings,u=unitOf(p),cm=curMode();
   if(T.phase==='deal'){if(T.anchor)v.anchor=pubSong(T.anchor)}
   if(T.phase==='round'&&u){const a=u.ans||{};v.remaining=T.buzz?Math.max(0,T.deadline-T.buzz.at):rem;
     v.ans={slot:a.slot,bonus:a.bonus,year:a.year,dir:a.dir,choice:a.choice,fake:a.fake,pos:a.pos,order:a.order||null,byName:pName(a.by||a.bby)};
-    if(cm==='cover')v.q={options:T.bonusQ.options};
+    if(cm==='cover'||cm==='film')v.q={options:T.bonusQ.options};
+    if(cm==='scene'&&T.scn)v.scn={src:T.scn.name,n:T.scn.songs.length,playing:T.scn.playing,heard:T.scn.heard};
     if(cm==='type')v.typ={gotT:!!a.gotT,gotA:!!a.gotA,last:a.last||null,tries:a.tries||0};
     if(cm==='order'&&T.ord)v.ord={songs:T.ord.songs.map(x=>({title:x.title,artist:x.artist})),playing:T.ord.playing};
     if(cm==='tm'&&T.tm){v.tm={i:T.tm.i,n:T.tm.songs.length,max:TM_PTS[0][T.tm.i]||3};v.decades=s.src==='mix'?s.decades:DECADES}
@@ -5654,6 +5863,8 @@ function view(p){const s=T.settings,u=unitOf(p),cm=curMode();
     if(cm==='hl'&&T.anchor)v.anchor={year:T.anchor.year,title:T.anchor.title};
     if(cm==='buzz'){const w=T.units.get(T.buzzWin);v.buzzWin=w?{name:uName(w),emoji:w.emoji,me:w.id===u.id}:null}
     if(cm==='chip'||cm==='fake'||cm==='cover')v.answer=c.title;
+    if(cm==='film')v.answer=srcName(c);
+    if(cm==='scene'&&T.scn)v.scn={src:T.scn.name,songs:T.scn.songs.map(pubSong),target:T.scn.target};
     if(cm==='order'&&T.ord)v.ord={songs:T.ord.songs.map(pubSong),correct:T.ord.correct};
     if(cm==='tm'&&T.tm)v.tm={year:T.tm.year,songs:T.tm.songs.map(pubSong)};
     if(cm==='herd'&&T.herd)v.herd={q:tList('herdQs')[T.herd.q],songs:T.herd.songs.map(pubSong),counts:T.herd.counts,win:T.herd.win};
@@ -5677,14 +5888,15 @@ function tick(){
   if(T.phase==='round'){
     if(cm==='buzz'){if(T.buzz){if(tn>=T.buzz.until)resolveBuzz(null)}else{const on=activeUnits();if(tn>=T.deadline||(on.length&&on.every(x=>T.locked.has(x.id))))reveal()}}
     else if(cm==='vibe'&&T.vibe&&T.vibe.sub==='pick'){if(tn>=T.deadline)vibePick(-1)}
-    else{if(cm==='herd')herdTick();if(cm==='order')ordTick();if(cm==='tm')tmTick();
+    else if(cm==='snd')sndTick();
+    else{if(cm==='herd')herdTick();if(cm==='order')ordTick();if(cm==='tm')tmTick();if(cm==='scene')sceneTick();
       if(cm==='chip'&&T.chip){const f=Math.min(1,(tn-T.roundStart)/(roundTime()*850));const r=T.chip.start+(1-T.chip.start)*f;setRate(r);T.chip.rate=r}
       const on=activeUnits();const all=on.length>0&&on.every(unitDone);if(tn>=T.deadline||all)reveal()}
   }else if(T.phase==='quick'&&T.quick&&T.quick.sub==='play'){const on=activeUnits();const all=on.length>0&&on.every(x=>T.quick.ans.has(x.id));if(tn>=T.deadline||all)quickShow()}
   else if(T.phase==='bingo'&&T.bingo){const B=T.bingo;if(B.sub==='play'&&tn>=T.deadline)bingoShow();else if(B.sub==='show'&&tn>=T.deadline)bingoNext();else if(B.sub==='win'&&tn>=B.endAt)endGame()}
   else if(T.phase==='battle')battleTick();
   else if(T.phase==='board')boardTick();
-  if(['round','quick'].includes(T.phase)&&!T.buzz){const sec=Math.ceil((T.deadline-tn)/1000);if(sec<=5&&sec>0&&sec!==T.lastSec){T.lastSec=sec;sfx('tick')}}
+  if(['round','quick'].includes(T.phase)&&!T.buzz&&!(cm==='snd'&&T.snd&&T.snd.sub==='play')){const sec=Math.ceil((T.deadline-tn)/1000);if(sec<=5&&sec>0&&sec!==T.lastSec){T.lastSec=sec;sfx('tick')}}
   if(MODE==='tv'){updTimer();updCorner()}
 }
 
@@ -5693,7 +5905,7 @@ function sched(fn,ms){clearTimeout(T.qTimer);T.qFn=fn;T.qAt=now()+ms;T.qTimer=se
 const pausable=()=>['round','reveal','quick','bingo','battle','segintro','howto','board','quickend'].includes(T.phase);
 function togglePause(){
   if(T.paused){const P=T.paused,d=now()-P.at;T.paused=null;
-    T.deadline+=d;T.roundStart+=d;if(T.buzz){T.buzz.at+=d;T.buzz.until+=d}if(T.herd)T.herd.nextAt+=d;if(T.ord)T.ord.nextAt+=d;if(T.tm)T.tm.nextAt+=d;
+    T.deadline+=d;T.roundStart+=d;if(T.buzz){T.buzz.at+=d;T.buzz.until+=d}if(T.herd)T.herd.nextAt+=d;if(T.ord)T.ord.nextAt+=d;if(T.tm)T.tm.nextAt+=d;if(T.scn)T.scn.nextAt+=d;if(T.snd&&T.snd.nextAt)T.snd.nextAt+=d;
     if(T.battle){T.battle.startedAt+=d;T.battle.nextSwap=(T.battle.nextSwap||0)+d}if(T.bingo)T.bingo.endAt+=d;if(T.board)T.board.nextStep=(T.board.nextStep||0)+d;
     if(P.q)sched(P.q.fn,P.q.left);if(P.playing&&audio.src)audio.play().catch(()=>{});sfx('start');sync();return}
   if(!pausable())return;
@@ -5706,10 +5918,10 @@ function prefetch(){T.pre=null;const s=T.settings;const cm=isBoard()?(T.board&&T
   if(!cm||['bingo','battle'].includes(cm))return;
   if(!isBoard()&&T.segRound>=segRounds())return;
   if(cardMode()&&s.quick&&T.sinceQuick>=s.quick)return;
-  if(cm==='tm')return;
+  if(['tm','scene','snd'].includes(cm))return;
   const multi=cm==='herd'||cm==='vibe'||cm==='order';const ny=['hitster','year','hl','order'].includes(cm);
   const job={mode:cm,done:false};
-  job.p=(multi?Promise.all((cm==='order'?[0,1,2,3,4,5]:[0,1,2,3]).map(()=>getPlayableSong(cm==='order'))).then(r=>r.filter(Boolean)):getPlayableSong(ny))
+  job.p=(multi?Promise.all((cm==='order'?[0,1,2,3,4,5]:[0,1,2,3]).map(()=>getPlayableSong(cm==='order'))).then(r=>r.filter(Boolean)):getPlayableSong(ny,cm==='film'?srcPool():undefined))
     .then(r=>{job.done=true;preloadAudio(r);return r}).catch(()=>{job.done=true;return null});
   T.pre=job}
 function applyZoom(){if(MODE!=='tv')return;try{document.documentElement.style.setProperty('--z',{S:.88,M:1,L:1.15}[T.settings.textSize]||1)}catch(e){}}
@@ -5838,6 +6050,63 @@ function relayStartTV(code){relayStopTV();if(!relayOK())return;const R=T.relay={
     open()});
   R.sweep=setInterval(()=>{R.links.forEach(L=>[...L.vcs.values()].forEach(v=>{if(now()-v.last>16000)v.close()}))},4000)}
 
+/* ---------- zoek de soundtrack: zie de film, kies het juiste nummer ---------- */
+const SCN_CLIP=8000;
+async function startSceneRound(){const P0=srcPool();let tgt=null;for(let k=0;k<3&&!tgt;k++){tgt=await getPlayableSong(false,P0);if(tgt&&!tgt.src)tgt=null}
+  if(T.phase!=='loading')return;if(!tgt)return fail(t('errNone'));
+  const kind=srcKind(tgt);const others=shuffle(SRC_SONGS.filter(s=>s.src!==tgt.src&&srcKind(s)===kind)).concat(shuffle(SRC_SONGS.filter(s=>s.src!==tgt.src)));
+  const got=[];const usedSrc=new Set([tgt.src]);
+  for(const s of others){if(got.length>=2)break;if(usedSrc.has(s.src))continue;let d=null;try{d=await resolveTrack(s)}catch(e){}if(T.phase!=='loading')return;if(d&&d.preview){usedSrc.add(s.src);got.push(mergeSong(s,d))}}
+  if(got.length<1)return fail(t('errNone'));
+  const songs=shuffle([tgt,...got]);songs.forEach(x=>{markPlayed(x);T.used.add(x.key)});
+  T.scn={songs,target:songs.indexOf(tgt),name:srcName(tgt),playing:0,heard:1,nextAt:now()+SCN_CLIP};T.cur=songs[0];
+  T.phase='round';T.roundStart=now();T.deadline=T.roundStart+Math.max(roundTime()*1000,songs.length*SCN_CLIP*2);T.lastSec=-1;playAudio(songs[0].preview,6);sync();announceRound()}
+function sceneTick(){const S0=T.scn;if(!S0||now()<S0.nextAt)return;S0.playing=(S0.playing+1)%S0.songs.length;if(S0.heard<S0.songs.length)S0.heard++;S0.nextAt=now()+SCN_CLIP;playAudio(S0.songs[S0.playing].preview,6);tvKey='';sync()}
+function revealScene(){const S0=T.scn;if(!S0)return;T.phase='reveal';let anyOk=false;
+  T.units.forEach(u=>{if(u.out){u.res=null;return}const a=u.ans;if(!a||a.choice==null){u.res={none:true,pts:0};loseLife(u);return}
+    const ok=a.choice===S0.target;const base=ok?(a.heard<S0.songs.length?4:3):0;const pts=base?addPts(u,base):0;if(ok)anyOk=true;else loseLife(u);
+    u.res={ok,pick:a.choice,pts,early:ok&&a.heard<S0.songs.length};credit(a.by,ok,{ms:a.t})});
+  T.cur=S0.songs[S0.target];playAudio(T.cur.preview,6);setVol(.55);afterReveal(anyOk,0)}
+
+/* ---------- soundtrack van…: een jurylid kiest het beste nummer bij een stelling ---------- */
+const SND_HAND=4,SND_CLIP=9000;
+function sndDeal(n){const out=[];for(let i=0;i<n*3&&out.length<n;i++){const s=drawSong();if(s&&!out.some(x=>x.key===s.key))out.push(s)}return out}
+function sndPrompt(){const S0=T.snd;const all=tList('snd_prompts');if(!S0.deck||!S0.deck.length)S0.deck=shuffle(all.map((_,i)=>i));return all[S0.deck.pop()]||all[0]}
+async function startSndRound(){if(T.phase!=='loading')return;
+  if(!T.snd)T.snd={hands:new Map(),judges:[],deck:null};const S0=T.snd;
+  const online=[...T.players.values()].filter(p=>p.online);
+  if(online.length<3)return fail(t('sndNeed3'));
+  online.forEach(p=>{const h=S0.hands.get(p.id)||[];while(h.length<SND_HAND){const d=sndDeal(1)[0];if(!d)break;h.push(d)}S0.hands.set(p.id,h)});
+  if(!S0.judges.length)S0.judges=online.map(p=>p.id);let j=S0.judges.shift();if(!T.players.get(j)||!T.players.get(j).online)j=online[0].id;S0.judges.push(j);
+  Object.assign(S0,{sub:'pick',judge:j,prompt:sndPrompt(),subs:new Map(),order:[],playing:-1,nextAt:0,win:null});
+  T.cur=null;T.phase='round';T.roundStart=now();T.deadline=T.roundStart+Math.max(35,T.settings.time+15)*1000;T.lastSec=-1;
+  audio.pause();sync();announceRound();speak(S0.prompt)}
+function sndCanJudge(){const S0=T.snd;return [...T.players.values()].filter(p=>p.online&&p.id!==S0.judge)}
+async function sndPlay(){const S0=T.snd;if(!S0||S0.sub!=='pick')return;S0.sub='loading';
+  const subs=shuffle([...S0.subs.entries()].map(([pid,x])=>({pid,song:x.song})));
+  if(!subs.length){S0.sub='play';S0.order=[];return reveal()}
+  await Promise.all(subs.map(async x=>{try{const d=await resolveTrack(x.song);if(d&&d.preview)x.song=mergeSong(x.song,d)}catch(e){}}));
+  if(T.phase!=='round'||!T.snd)return;
+  S0.order=subs;S0.sub='play';S0.playing=0;S0.nextAt=now()+SND_CLIP;
+  T.deadline=now()+subs.length*SND_CLIP+25000;T.lastSec=-1;
+  if(subs.length===1){S0.win=0;return reveal()}
+  sndClip();sync()}
+function sndClip(){const S0=T.snd;const x=S0.order[S0.playing];if(x&&x.song.preview)playAudio(x.song.preview,4);else audio.pause();tvKey='';}
+function sndTick(){const S0=T.snd;if(!S0)return;const tn=now();
+  if(S0.sub==='pick'){const need=sndCanJudge();if(tn>=T.deadline||(need.length&&need.every(p=>S0.subs.has(p.id))))sndPlay();return}
+  if(S0.sub==='play'){if(tn>=S0.nextAt&&S0.order.length){S0.playing=(S0.playing+1)%S0.order.length;S0.nextAt=tn+SND_CLIP;sndClip();sync()}
+    if(tn>=T.deadline)reveal()}}
+function revealSnd(){const S0=T.snd;if(!S0)return;T.phase='reveal';setVol(.6);
+  const w=S0.win!=null?S0.order[S0.win]:null;const wp=w&&T.players.get(w.pid);
+  T.units.forEach(u=>{u.res=null});
+  S0.order.forEach((x,i)=>{const p=T.players.get(x.pid);const u=p&&unitOf(p);if(!u)return;const win=i===S0.win;const pts=win?addPts(u,3):0;u.res={card:pubSong(x.song),win,pts};if(win)stat(x.pid,'sndWin')});
+  const ju=T.players.get(S0.judge);if(ju){const u=unitOf(ju);if(u&&!u.res)u.res={judge:true,pts:0}}
+  T.units.forEach(u=>{if(!u.res)u.res={none:true,pts:0}});
+  if(w){T.cur=w.song;if(w.song.preview)playAudio(w.song.preview,4)}else{T.cur=(S0.order[0]&&S0.order[0].song)||{title:'—',artist:'',year:null}}
+  /* gebruikte kaarten vervangen */
+  S0.subs.forEach((x,pid)=>{const h=S0.hands.get(pid);if(h){const k=h.findIndex(s=>s.key===x.song.key);if(k>=0)h.splice(k,1)}});
+  S0.winName=wp?wp.name:null;afterReveal(!!w,0)}
+
 /* =========================================================
    TV — weergave
    ========================================================= */
@@ -5891,7 +6160,9 @@ function resultsHTML(){const cm=curMode();
     else if(cm==='type')mid=r.none?`<span class="bad">${t('late')}</span>`:`<span class="${r.gotT?'ok':'bad'}">${r.gotT?'✔':'✖'} ${t('kTitle')}</span> <span class="${r.gotA?'ok':'bad'}">${r.gotA?'✔':'✖'} ${t('kArtist')}</span>${r.fastest?' ⚡':''}`;
     else if(cm==='order')mid=r.none||!r.order?`<span class="bad">${t('late')}</span>`:`${r.order.map(i=>'ABCD'[i]).join(' ')} <span class="${r.good===r.n?'ok':r.good>=2?'gold':'bad'}">${r.good}/${r.n}</span>`;
     else if(cm==='tm')mid=r.none?`<span class="bad">${t('late')}</span>`:`<b>${r.guess}</b> <span class="${r.d<=1?'ok':r.d<=2?'gold':'bad'}">${r.d===0?t('exactHit'):'±'+r.d}</span>`;
-    else if(cm==='chip'||cm==='cover')mid=r.none?`<span class="bad">${t('late')}</span>`:r.ok?`<span class="ok">✔ ${t('correct')}</span>`:`<span class="bad">✖ ${esc(r.choice)}</span>`;
+    else if(cm==='scene')mid=r.none?`<span class="bad">${t('late')}</span>`:`${'ABC'[r.pick]} <span class="${r.ok?'ok':'bad'}">${r.ok?'✔':'✖'}</span>${r.early?' ⚡':''}`;
+    else if(cm==='snd')mid=r.judge?`⚖️ ${t('sndJudgeWord')}`:r.card?`${r.win?'🏆 ':''}<span class="${r.win?'ok':''}">${esc(r.card.title)}</span>`:`<span class="bad">${t('late')}</span>`;
+    else if(cm==='chip'||cm==='cover'||cm==='film')mid=r.none?`<span class="bad">${t('late')}</span>`:r.ok?`<span class="ok">✔ ${t('correct')}</span>`:`<span class="bad">✖ ${esc(r.choice)}</span>`;
     else if(cm==='fake')mid=`${r.ok?`<span class="ok">✔ ${t('foundReal')}</span>`:`<span class="bad">✖</span>`}${r.fooled?` <span class="gold">🎭 ${t('fooledN',{n:r.fooled})}</span>`:''}`;
     else if(cm==='herd')mid=r.none?`<span class="bad">${t('late')}</span>`:`${'ABCD'[r.pick]} ${r.ok?'<span class="ok">🐄 '+t('withHerd')+'</span>':'<span class="bad">✖</span>'}${r.alone?' 🐑':''}`;
     else if(cm==='vibe')mid=r.dj&&r.pos==null?`<span class="gold">🎧 DJ</span>`:r.none?`<span class="bad">${t('late')}</span>`:`🎯 ${r.pos} <span class="${r.base>=3?'ok':r.base?'gold':'bad'}">±${r.d}</span>${r.dj?' 🎧':''}`;
@@ -5918,6 +6189,11 @@ function roundScreen(){const s=T.settings,cm=curMode();let stage,ask;
   else if(cm==='buzz'){stage=`<div class="eq">${bars(10)}</div><div class="buzzring">BUZZ!</div><div class="eq">${bars(10)}</div>`;ask=`<b>${t('askBuzz')}</b>${t('askBuzzSub')}`}
   else if(cm==='year'){stage=`<div class="eq">${bars(12)}</div>${vinylHTML('?')}<div class="eq">${bars(12)}</div>`;ask=`<b>${t('askGuess')}</b>${t('askGuessSub')}`}
   else if(cm==='chip'){const up=T.chip&&T.chip.start>1;stage=`<div class="chipbig">${up?'🐿️':'🐌'}<b id="chiprate">×${T.chip?T.chip.start.toFixed(2):'1.00'}</b><small>${up?t('chipFast'):t('chipSlow')}</small></div>${vinylHTML('?')}`;ask=`<b>${t('whatTitle')}</b>${t('chipSub')}`}
+  else if(cm==='film'){const q=T.bonusQ;stage=`<div class="covq"><div class="filmreel">${vinylHTML('🎞️')}</div><div class="fopts">${q.options.map((o,i)=>`<div class="fopt"><span class="ltr L${i%4}">${'ABCD'[i]}</span><span>${esc(o)}</span></div>`).join('')}</div></div>`;ask=`<b>${t('askFilm')}</b>${t('askFilmSub')}`}
+  else if(cm==='scene'&&T.scn){const S0=T.scn;stage=`<div class="herdwrap"><div class="herdq">🍿 ${t('askScene',{f:'<b class="gold">'+esc(S0.name)+'</b>'})}</div><div class="htiles">${S0.songs.map((c,i)=>`<div class="stile ${i===S0.playing?'playing':''} ${i<S0.heard?'':'hid'}"><span class="sl">${'ABC'[i]}</span><div class="cov scov">${i===S0.playing?'🔊':i<S0.heard?'🎵':'⏳'}</div><b>${t('sceneSong',{l:'ABC'[i]})}</b><small>${i===S0.playing?t('nowPlaying'):i<S0.heard?t('heardIt'):t('tmSoon')}</small></div>`).join('')}</div></div>`;ask=t('askSceneSub')}
+  else if(cm==='snd'&&T.snd){const S0=T.snd;const jp=T.players.get(S0.judge);const jury=jp?`${jp.emoji} <b>${esc(jp.name)}</b>`:'';
+    if(S0.sub==='play'){stage=`<div class="herdwrap"><div class="sndq">🎭 ${esc(S0.prompt)}</div><div class="htiles">${S0.order.map((x,i)=>songTile(x.song,i===S0.playing?'playing':'','ABCDEFGHIJKL'[i])).join('')}</div></div>`;ask=`⚖️ ${t('sndJudging',{n:jury})}`}
+    else{const need=sndCanJudge().length;stage=`<div class="sndwrap"><div class="sndq big">🎭 ${esc(S0.prompt)}</div><div class="sndcards">${[...Array(need)].map((_,i)=>`<div class="sndcard ${i<S0.subs.size?'in':''}">${i<S0.subs.size?'🎵':''}</div>`).join('')}</div></div>`;ask=`<b>${t('sndPickTv')}</b>${t('sndJury',{n:jury})}`}}
   else if(cm==='cover'){const c=T.cur,q=T.bonusQ;const tot=roundTime(),el=Math.max(0,(now()-T.roundStart)/1000);
     stage=`<div class="covq"><div class="covframe"><img src="${esc(c.cover||'')}" alt="" style="animation-duration:${tot}s;animation-delay:-${el.toFixed(2)}s"></div><div class="fopts">${q.options.map((o,i)=>`<div class="fopt"><span class="ltr L${i%4}">${'ABCD'[i]}</span><span>${esc(o)}</span></div>`).join('')}</div></div>`;ask=`<b>${t('askCover')}</b>${t('askCoverSub')}`}
   else if(cm==='type'){stage=`<div class="eq">${bars(10)}</div>${vinylHTML('⌨️')}<div class="eq">${bars(10)}</div>`;ask=`<b>${t('askType')}</b>${t('askTypeSub')}`}
@@ -5940,6 +6216,9 @@ function revealScreen(){const s=T.settings,cm=curMode(),c=T.cur;let extra='';
   if(cm==='hl'&&T.anchor)extra=`<div class="bonusline">${t('hlCompare',{a:'<b>'+T.anchor.year+'</b>',b:'<b class="gold">'+c.year+'</b>'})} ${c.year>T.anchor.year?'⏩ '+t('newer'):c.year<T.anchor.year?'⏪ '+t('older'):'= '+t('sameYear')}</div>`;
   if(cm==='buzz'){const w=T.units.get(T.buzzWin);extra=`<div class="bonusline">${w?t('buzzWin',{n:w.emoji+' <b>'+esc(uName(w))+'</b>'}):t('buzzNobody')}</div>`}
   if(cm==='chip')extra=`<div class="bonusline">${t('chipNormal')}</div>`;
+  if(cm==='film')extra=`<div class="bonusline">🎞️ ${t('filmWas',{f:'<b class="gold">'+esc(srcName(c))+'</b>'})}</div>`;
+  if(cm==='scene'&&T.scn){const S0=T.scn;extra=`<div class="bonusline">🍿 ${esc(S0.name)}</div><div class="olist">${S0.songs.map((sg,i)=>`<div class="orow ${i===S0.target?'win':''}" style="animation-delay:${(.2+i*.3).toFixed(2)}s;--c:${i===S0.target?'#3ee08f':'#666'}"><span class="ltr L${i}">${'ABC'[i]}</span><span class="ot">${esc(sg.title)} <small>${esc(sg.artist)} · ${esc(srcName(sg))}</small></span><span class="oy">${i===S0.target?'✔':''}</span></div>`).join('')}</div>`}
+  if(cm==='snd'&&T.snd){const S0=T.snd;const w=S0.win!=null?S0.order[S0.win]:null;const wp=w&&T.players.get(w.pid);extra=`<div class="bonusline">🎭 ${esc(S0.prompt)}</div><div class="bonusline">${wp?t('sndWinner',{n:wp.emoji+' <b>'+esc(wp.name)+'</b>'}):t('sndNoWin')}</div>`}
   if(cm==='tm'&&T.tm)extra=`<div class="bonusline">⏳ ${t('tmWas',{y:'<b class="gold">'+T.tm.year+'</b>'})}</div><div class="tmchips">${T.tm.songs.map(sg=>`<span>♪ ${esc(sg.title)} <small>${esc(sg.artist)}</small></span>`).join('')}</div>`+nlineHTML();
   if(cm==='order'&&T.ord){const O=T.ord;extra=`<div class="olist">${O.correct.map((ix,k)=>{const sg=O.songs[ix];return `<div class="orow" style="animation-delay:${(.2+k*.3).toFixed(2)}s;--c:${decCol(sg.year)}"><span class="oy">${sg.year}</span><span class="ltr L${ix}">${'ABCD'[ix]}</span><span class="ot">${esc(sg.title)} <small>${esc(sg.artist)}</small></span></div>`}).join('')}</div>`}
   if(cm==='fake'&&T.fake&&T.fake.opts)extra=`<div class="frev">${T.fake.opts.map((o,i)=>{const au=o.authors.map(id=>T.units.get(id)).filter(Boolean);const vs=(o.voters||[]).map(id=>T.units.get(id)).filter(Boolean);
@@ -6024,7 +6303,7 @@ function renderTV(){if(MODE!=='tv')return;LANG=T.settings.lang;const app=$('#app
   if(!T.unlocked){if(tvKey!=='unlock'+LANG){tvKey='unlock'+LANG;app.innerHTML=unlockHTML();const b=$('#unlockBtn');if(b&&b.focus)b.focus()}return}
   const cm=curMode();
   const key=[T.phase,T.round,T.segRound,T.ev?T.ev.idx:'',T.quick?T.quick.i+T.quick.sub:'',T.bingo?T.bingo.i+T.bingo.sub:'',T.buzz?T.buzz.by:'',T.fake?T.fake.sub:'',T.herd?T.herd.playing:'',T.vibe?T.vibe.sub:'',
-    T.battle?T.battle.sub+T.battle.duel+T.battle.side:'',T.board?T.board.sub+T.board.turn+(T.board.msg?T.board.msg.txt:''):'',T.settings.mode,cm,T.settings.play,LANG,['error','boot'].includes(T.phase)?T.msg:'',T.phase==='deal'&&T.anchor?'a':''].join('|');
+    T.battle?T.battle.sub+T.battle.duel+T.battle.side:'',T.board?T.board.sub+T.board.turn+(T.board.msg?T.board.msg.txt:''):'',T.snd&&cm==='snd'?T.snd.sub+T.snd.subs.size+'/'+T.snd.playing+(T.snd.order?T.snd.order.length:''):'',T.scn?T.scn.playing+'/'+T.scn.heard:'',T.ord?T.ord.playing:'',T.tm?T.tm.i:'',T.settings.mode,cm,T.settings.play,LANG,['error','boot'].includes(T.phase)?T.msg:'',T.phase==='deal'&&T.anchor?'a':''].join('|');
   if(key!==tvKey){tvKey=key;let h;try{h=tvScreen()}catch(e){console.warn('tvScreen',e);tvKey='';h=`<div class="tv col"><div class="big-center">${vinylHTML('♪',true,'5s')}</div></div>`}app.innerHTML=h;afterTV()}
   tvUpdate()}
 function floatReact(p,e){const fx=document.getElementById('fx');if(!fx||!fx.appendChild)return;const d=document.createElement('div');d.className='react';d.style.left=(6+Math.random()*86)+'%';d.style.setProperty('--c',p.color);d.innerHTML=`<span>${e}</span><small>${esc(p.name)}</small>`;fx.appendChild(d);setTimeout(()=>d.remove(),3300)}
@@ -6189,7 +6468,9 @@ function phKey(v){const a=v.ans||{};let k=[v.phase,v.round,v.me.host,v.lang,v.mo
     if(m==='hitster')k+='|'+(a.slot==null?'place':a.bonus==null?'bonus':'done');
     else if(m==='year')k+='|'+(a.year==null?'pick':'done');
     else if(m==='hl')k+='|'+(a.dir?'done':'pick');
-    else if(m==='chip'||m==='cover')k+='|'+(a.choice!=null);
+    else if(m==='chip'||m==='cover'||m==='film')k+='|'+(a.choice!=null);
+    else if(m==='scene'&&v.scn)k+='|'+(a.choice!=null)+v.scn.heard+v.scn.playing;
+    else if(m==='snd'&&v.snd)k+='|'+v.snd.sub+'|'+v.snd.mine+'|'+v.snd.isJudge+(v.snd.order?v.snd.order.length:'')+'|'+v.snd.nSubs;
     else if(m==='type'&&v.typ)k+='|'+v.typ.gotT+v.typ.gotA+v.typ.tries;
     else if(m==='order')k+='|'+!!a.order;
     else if(m==='tm'&&v.tm)k+='|'+(a.year==null?'pick':'done')+v.tm.i;
@@ -6280,6 +6561,17 @@ function roundPhone(v){const H=v.me.host,u=v.unit,a=v.ans||{},m=v.mode,me=v.me;
       <div class="tcard big" style="--c:${decCol(an.year)}"><b>${an.year}</b><span>${esc(an.title)}<br><small>${esc(an.artist)}</small></span></div>
       <div class="hlbtns"><button class="opt o1" data-act="hl" data-v="older">⏪ ${t('older')}<small>${t('beforeY',{y:an.year})}</small></button><button class="opt o0" data-act="hl" data-v="newer">${t('newer')} ⏩<small>${t('afterY',{y:an.year})}</small></button></div>${H?hostCtl():''}`;
     return waiting(a.dir==='newer'?'⏩':'⏪',(a.dir==='newer'?t('newer'):t('older'))+'!')+(H?hostCtl():'')}
+  if(m==='film'&&v.q){if(a.choice==null)return `<div><h2>${t('askFilm')}</h2><p>${t('filmTip')}</p></div>${teamNote}${bar}<div class="opts">${optBtns(v.q.options,'chip',null)}</div>${H?hostCtl():''}`;
+    return waiting('🎞️',t('answerIn'))}
+  if(m==='scene'&&v.scn){if(a.choice==null)return `<div><h2>${t('askScene',{f:esc(v.scn.src)})}</h2><p>${t('sceneTip')}</p></div>${teamNote}${bar}<div class="opts">${[...Array(v.scn.n)].map((_,i)=>`<button class="opt o${i}" data-act="spick" data-v="${i}" ${i<v.scn.heard?'':'disabled'}><span class="ltr">${'ABC'[i]}</span><span>${t('sceneSong',{l:'ABC'[i]})}<small>${i===v.scn.playing?'🔊 '+t('nowPlaying'):i<v.scn.heard?t('heardIt'):'⏳ '+t('tmSoon')}</small></span></button>`).join('')}</div>${H?hostCtl():''}`;
+    return waiting('🍿',t('answerIn'))}
+  if(m==='snd'&&v.snd){const Sd=v.snd;const pr=`<div class="sndprompt">🎭 ${esc(Sd.prompt)}</div>`;
+    if(Sd.sub==='pick'||Sd.sub==='loading'){
+      if(Sd.isJudge)return `${bar}${pr}<div class="hero"><div class="em">⚖️</div><h2>${t('sndYouJudge')}</h2><p>${t('sndJudgeWait',{a:Sd.nSubs,b:Sd.nNeed})}</p></div>${H?hostCtl():''}`;
+      if(Sd.mine!=null)return `${bar}${pr}<div class="hero"><div class="em">🎵</div><h2>${t('sndSent')}</h2><p>${esc((Sd.hand[Sd.mine]||{}).title||'')}</p></div><p class="center small">${t('sndJudgeWait',{a:Sd.nSubs,b:Sd.nNeed})}</p>${H?hostCtl():''}`;
+      return `${bar}${pr}<p>${t('sndPickTip',{n:esc(Sd.judgeEmoji+' '+Sd.judgeName)})}</p><div class="opts">${Sd.hand.map((c,i)=>`<button class="opt o${i%4}" data-act="scard" data-v="${i}"><span class="ltr">🎵</span><span>${esc(c.title)}<small>${esc(c.artist)}</small></span></button>`).join('')}</div>${H?hostCtl():''}`}
+    if(Sd.isJudge)return `${bar}${pr}<p>${t('sndJudgeTip')}</p><div class="opts">${(Sd.order||[]).map((c,i)=>`<button class="opt o${i%4} ${i===Sd.playing?'picked':''}" data-act="sjudge" data-v="${i}"><span class="ltr">${'ABCDEFGHIJKL'[i]}</span><span>${esc(c.title)}<small>${esc(c.artist)}${i===Sd.playing?' · 🔊':''}</small></span></button>`).join('')}</div>${H?hostCtl():''}`;
+    return `${bar}${pr}<div class="hero"><div class="em">⚖️</div><h2>${t('sndJudging',{n:esc(Sd.judgeEmoji+' '+Sd.judgeName)})}</h2></div><div class="sec">${(Sd.order||[]).map((c,i)=>`<div class="hrow ${c.mine?'win':''}"><span>${'ABCDEFGHIJKL'[i]}</span><span class="n">${esc(c.title)}${i===Sd.playing?' 🔊':''}</span><b>${c.mine?t('you'):''}</b></div>`).join('')}</div>${H?hostCtl():''}`}
   if(m==='cover'){if(a.choice==null)return `<div><h2>${t('askCover')}</h2><p>${t('coverTip')}</p></div>${teamNote}${bar}<div class="opts">${optBtns(v.q.options,'chip',null)}</div>${H?hostCtl():''}`;
     return waiting('🖼️',t('answerIn'))}
   if(m==='type'&&v.typ){const Ty=v.typ;const chips=`<div class="tychips"><span class="${Ty.gotT?'on':''}">${Ty.gotT?'✅':'⬜'} ${t('kTitle')} <small>+3</small></span><span class="${Ty.gotA?'on':''}">${Ty.gotA?'✅':'⬜'} ${t('kArtist')} <small>+2</small></span></div>`;
@@ -6358,7 +6650,11 @@ function phScreen(v){const me=v.me,H=me.host,u=v.unit;
       extra=`<div class="sec">${O.correct.map((ix,k)=>{const sg=O.songs[ix];const ok=r.order&&r.order[k]===ix;return `<div class="hrow ${ok?'win':''}"><span>${sg.year}</span><span class="n">${'ABCD'[ix]} · ${esc(sg.title)}</span><b>${r.order?(ok?'✔':'✖'):''}</b></div>`}).join('')}</div>`}
     else if(m==='tm'&&v.tm){verdict=r.none?`<div class="verdict bad">${t('tooLate')}</div>`:r.d===0?`<div class="verdict ok">🎯 ${t('ptsV',{n:r.pts})}</div>`:`<div class="verdict ${r.pts?'ok':'bad'}">${r.pts?t('ptsV',{n:r.pts}):t('wayOff')}</div>`;
       extra=`<p class="center">⏳ ${t('tmWas',{y:'<b>'+v.tm.year+'</b>'})}${r.none?'':' · '+t('youSaid',{g:'<b>'+r.guess+'</b>',d:r.d})}</p>`}
-    else if(m==='chip'||m==='cover')verdict=r.none?`<div class="verdict bad">${t('tooLate')}</div>`:r.ok?`<div class="verdict ok">${t('ptsV',{n:r.pts})}</div>`:`<div class="verdict bad">${t('wrongV')}</div>`;
+    else if(m==='scene'&&v.scn){verdict=r.none?`<div class="verdict bad">${t('tooLate')}</div>`:r.ok?`<div class="verdict ok">${t('ptsV',{n:r.pts})}${r.early?' ⚡':''}</div>`:`<div class="verdict bad">${t('wrongV')}</div>`;
+      extra=`<div class="sec"><p>🍿 ${esc(v.scn.src)}</p>${v.scn.songs.map((sg,i)=>`<div class="hrow ${i===v.scn.target?'win':''}"><span>${'ABC'[i]}</span><span class="n">${esc(sg.title)}</span><b>${i===v.scn.target?'✔':r.pick===i?'✖':''}</b></div>`).join('')}</div>`}
+    else if(m==='snd'){verdict=r.judge?`<div class="verdict gold">⚖️ ${t('sndWasJudge')}</div>`:r.win?`<div class="verdict ok">🏆 ${t('sndYouWin')} +${r.pts}</div>`:r.card?`<div class="verdict bad">${t('sndNotChosen')}</div>`:`<div class="verdict bad">${t('tooLate')}</div>`;
+      extra=v.snd?`<div class="sndprompt">🎭 ${esc(v.snd.prompt)}</div><p class="center">${v.snd.winName?t('sndWinner',{n:'<b>'+esc(v.snd.winName)+'</b>'}):t('sndNoWin')}</p>`:''}
+    else if(m==='chip'||m==='cover'||m==='film')verdict=r.none?`<div class="verdict bad">${t('tooLate')}</div>`:r.ok?`<div class="verdict ok">${t('ptsV',{n:r.pts})}</div>`:`<div class="verdict bad">${t('wrongV')}</div>`;
     else if(m==='fake'){verdict=`<div class="verdict ${r.ok?'ok':'bad'}">${r.ok?t('foundRealV'):t('fooledV')}</div>`;extra=`<p class="center">${t('realWas',{t:'<b>'+esc(v.answer)+'</b>'})}</p>${r.fooled?`<p class="gold center">🎭 ${t('fooledN',{n:r.fooled})}</p>`:''}${r.pts?`<p class="gold center">+${r.pts} ⭐</p>`:''}`}
     else if(m==='herd'&&v.herd){const Hd=v.herd;verdict=r.none?`<div class="verdict bad">${t('tooLate')}</div>`:`<div class="verdict ${r.ok?'ok':'bad'}">${r.ok?t('withHerdV'):Hd.win<0?t('herdTieV'):t('notHerdV')}</div>`;
       extra=`<div class="sec">${Hd.songs.map((sg,i)=>`<div class="hrow ${i===Hd.win?'win':''}"><span>${'ABCD'[i]}</span><span class="n">${esc(sg.title)}</span><b>${Hd.counts[i]}</b></div>`).join('')}</div>${r.alone?`<p class="center">🐑 ${t('aloneSheep')}</p>`:''}`}
@@ -6393,9 +6689,10 @@ function lobbyUpdate(v){{const wg=document.getElementById('wishg');if(wg){const 
   set('sminfo',`<div class="mihead"><span>${modeEm(s.mode)}</span><div><b>${t('m_'+s.mode)}</b><p>${t('md_'+s.mode)}</p></div></div>`);
   if(s.mode==='board'){set('sev',`<h4>${t('boardModesLbl')}</h4><div class="chipset">${BOARD_MODES.map(m=>`<button class="tg ${s.boardModes.includes(m)?'on':''}" data-act="bm" data-v="${m}">${modeEm(m)} ${t('m_'+m)}</button>`).join('')}</div><h4>${t('boardLenLbl')}</h4><div class="chipset">${[20,30,40].map(n=>`<button class="tg ${s.boardLen===n?'on':''}" data-act="set" data-k="boardLen" data-v="${n}">${t('boardLenN',{n})}</button>`).join('')}</div><p class="small">${t('boardTip')}</p>`)}else
   set('sev',s.mode==='evening'?`<h4>${t('evParts')}</h4><div class="chipset">${EV_MODES.map(m=>`<button class="tg ${s.evModes.includes(m)?'on':''}" data-act="ev" data-v="${m}">${modeEm(m)} ${t('m_'+m)}</button>`).join('')}</div><h4>${t('evRoundsLbl')}</h4><div class="chipset">${[3,4,5].map(n=>`<button class="tg ${s.evRounds===n?'on':''}" data-act="set" data-k="evRounds" data-v="${n}">${t('roundsN',{n})}</button>`).join('')}</div><p class="small">${t('evTip')}</p>`:'');
-  const noCoop=!COOP_OK.includes(s.mode);
+  const noCoop=!COOP_OK.includes(s.mode);const soloOnly=s.mode==='snd';
+  if(soloOnly)set('splay',`<p class="small" style="width:100%">🙋 ${t('sndSoloOnly')}</p>`);else
   set('splay',['solo','teams','coop'].map(id=>`<button class="tg ${s.play===id?'on':''}" data-act="set" data-k="play" data-v="${id}" ${id==='coop'&&noCoop?'disabled':''}>${{solo:'🙋',teams:'👥',coop:'🤝'}[id]} ${t(id)}</button>`).join('')+(noCoop?`<p class="small" style="width:100%">${t('coopNA')}</p>`:s.play==='coop'?`<p class="small" style="width:100%">${t('coopTip')}</p>`:''));
-  set('steams',s.play==='teams'?[2,3,4].map(n=>`<button class="tg ${s.teams===n?'on':''}" data-act="set" data-k="teams" data-v="${n}">${t('nTeams',{n})}</button>`).join('')+`<button class="tg" data-act="shuffle">🔀 ${t('shuffleTeams')}</button>`:'');
+  set('steams',s.play==='teams'&&!soloOnly?[2,3,4].map(n=>`<button class="tg ${s.teams===n?'on':''}" data-act="set" data-k="teams" data-v="${n}">${t('nTeams',{n})}</button>`).join('')+`<button class="tg" data-act="shuffle">🔀 ${t('shuffleTeams')}</button>`:'');
   set('stabs',[['mix','🎚️ '+t('srcMix')],['pack','🎁 '+t('srcPack')],['live','🎧 '+t('srcLive')]].map(([id,l])=>`<button class="${s.src===id?'on':''}" data-act="src" data-v="${id}">${l}</button>`).join(''));
   ['mix','pack','live'].forEach(id=>{const e=document.getElementById('p'+id);if(e)e.hidden=s.src!==id});
   set('sgen',GENRES.map(k=>`<button class="tg ${s.genres.includes(k)?'on':''}" data-act="g" data-v="${k}">${t('g_'+k)}</button>`).join(''));
@@ -6413,9 +6710,9 @@ function lobbyUpdate(v){{const wg=document.getElementById('wishg');if(wg){const 
   else if(m==='battle')rules=`<h4>${t('battleSizeLbl')}</h4><div class="chipset">${chips('battleSize',[8,16],n=>t('battleN',{n}))}</div>`;
   else if(m!=='evening'&&m!=='board')rules=`<h4>${t('roundsLbl')}</h4><div class="chipset">${chips('rounds',[5,10,15,20],n=>t('roundsN',{n}))}</div>`;
   rules+=`<h4>${t('timeLbl')}</h4><div class="chipset">${chips('time',m==='bingo'?[15,20,30]:[20,30,45],n=>t('timeN',{n}))}</div>`;
-  const livesAble=s.play!=='coop'&&m!=='board'&&(m==='evening'||LIVES_OK.includes(m));
+  const livesAble=s.play!=='coop'&&m!=='board'&&m!=='snd'&&(m==='evening'||LIVES_OK.includes(m));
   if(livesAble)rules+=`<h4>💀 ${t('lastStanding')}</h4><div class="chipset">${chips('lives',[0,3],n=>n?t('livesN',{n}):t('off'))}</div>`;
-  const dblAble=!['bingo','hitster','board'].includes(m);
+  const dblAble=!['bingo','hitster','board','snd'].includes(m);
   if(dblAble)rules+=`<h4>×2 ${t('doublePts')}</h4><div class="chipset">${chips('double',[0,1,3],n=>n===0?t('off'):n===1?t('dblLast'):t('dblLast3'))}</div>`;
   set('srules',rules+(livesAble&&s.lives?`<p class="small">${t('livesTip')}</p>`:'')+(dblAble&&s.double?`<p class="small">${t(m==='evening'?'dblTipEv':'dblTip')}</p>`:''));
   set('sfame',['hits','mix','all'].map(f=>`<button class="tg ${s.fame===f?'on':''}" data-act="set" data-k="fame" data-v="${f}">${t('fameIco_'+f)} ${t('fame_'+f)}</button>`).join(''));set('sfametip',t('fameTip_'+s.fame));
@@ -6426,8 +6723,8 @@ function lobbyUpdate(v){{const wg=document.getElementById('wishg');if(wg){const 
   set('pman',v.players.map(p=>{const tm=TEAMS.find(x=>x[0]===p.team);const me=p.id===v.me.id;return `<div class="prow ${p.online?'':'off'}" style="--c:${p.color}"><span class="e">${p.emoji}</span><span class="n">${esc(p.name)}${p.host?' 👑':''}${me?' <small>('+t('you')+')</small>':''}${p.online?'':' 📵'}</span>${s.play==='teams'?`<button class="tg team ${tm?'on':''}" style="--c:${tm?tm[1]:'#888'}" data-act="pteam" data-v="${p.id}">${tm?tm[2]:'❔'}</button>`:''}${me?'':`<button class="tg" data-act="mkhost" data-v="${p.id}" ${p.online?'':'disabled'}>👑</button><button class="tg kick ${P.kickArm===p.id?'armed':''}" data-act="pkick" data-v="${p.id}">${P.kickArm===p.id?t('kickSure'):'✖'}</button>`}</div>`}).join(''));
   set('svoice',`<button class="tg ${s.voice?'on':''}" data-act="tog" data-v="voice">${s.voice?'🔊':'🔇'} ${t('announcer')}</button><button class="tg ${s.crowd?'on':''}" data-act="tog" data-v="crowd">${s.crowd?'👏':'🔇'} ${t('crowdSounds')}</button><button class="tg ${s.mascot?'on':''}" data-act="tog" data-v="mascot">💿 ${t('mascotLbl')}</button>`);
   set('svol',[1,2,3,4,5].map(n=>`<button class="tg ${(s.vol||5)===n?'on':''}" data-act="set" data-k="vol" data-v="${n}">${'▮'.repeat(n)}</button>`).join(''));
-  const n=v.pool;const need=m==='bingo'?(s.bingo===4?28:16):m==='battle'?s.battleSize+2:m==='evening'?12:8;set('poolinfo',s.src==='live'&&!v.live?'⚠️ '+t('liveNone'):n<need?'⚠️ '+t('poolN',{n}):'');
- const sb=document.getElementById('startBtn');if(sb)sb.disabled=n<need;
+  const n=v.pool;const need=m==='bingo'?(s.bingo===4?28:16):m==='battle'?s.battleSize+2:m==='evening'?12:8;const few3=m==='snd'&&v.players.filter(p=>p.online).length<3;set('poolinfo',s.src==='live'&&!v.live?'⚠️ '+t('liveNone'):n<need?'⚠️ '+t('poolN',{n}):few3?'⚠️ '+t('sndNeed3'):'');
+ const sb=document.getElementById('startBtn');if(sb)sb.disabled=n<need||few3;
   wizShow(v);
   set('tvwarn',(v.tvReady?'':`<div class="lost">${t('pressTvFirst')}</div>`)+(v.liveStatus&&s.src!=='live'?`<div class="lost">${esc(v.liveStatus)}</div>`:''))}
 function phUpdate(v){const me=v.me,u=v.unit;const set=(id,h)=>{const e=document.getElementById(id);if(e)e.innerHTML=h};
@@ -6483,6 +6780,9 @@ function phoneClick(e){keepAwake();const b=e.target.closest&&e.target.closest('[
     else{const ms=MODES.map(m=>m[0]).filter(m=>!['evening','vibe'].includes(m)&&m!==s.mode);s.mode=ms[Math.floor(Math.random()*ms.length)]}
     if(s.play==='coop'&&!COOP_OK.includes(s.mode))s.play='solo';pushSettings(s);return}
   case 'gsend':{const i=document.getElementById('tyin');const tx=i?i.value.trim():'';if(!tx){if(i)i.focus();return}send({t:'guess',text:tx});return}
+  case 'spick':send({t:'spick',i:+b.dataset.v});lockOpts(b);return;
+  case 'scard':send({t:'scard',i:+b.dataset.v});lockOpts(b);return;
+  case 'sjudge':send({t:'sjudge',i:+b.dataset.v});lockOpts(b);return;
   case 'ordtap':{const i=+b.dataset.v;P.ord=P.ord||[];const k=P.ord.indexOf(i);if(k>=0)P.ord.splice(k,1);else P.ord.push(i);updOrd(v);draft(v.ord&&P.ord.length===v.ord.songs.length?{t:'order',o:P.ord.slice()}:null);return}
   case 'ordreset':P.ord=[];updOrd(v);draft(null);return;
   case 'ordsend':if(v.ord&&P.ord&&P.ord.length===v.ord.songs.length){send({t:'order',o:P.ord});b.disabled=true}return;
