@@ -1251,6 +1251,17 @@ escMinLbl:"How much time?",escMinN:"{n} minutes",escTip:"4 minutes is tough, 8 m
 remoteHint:"📺 Remote: ◀ ▶ game mode · ▲ ▼ theme · OK start · ⏯ pause"
 }};
 Object.assign(I18N.nl,I18N_ADD13.nl);Object.assign(I18N.vl,I18N_ADD13.nl,I18N_ADD13.vl);Object.assign(I18N.en,I18N_ADD13.en);
+const I18N_ADD14={
+nl:{audioNet:"De muziek laadt niet. Kijk of de tv nog internet heeft, of sla dit nummer over.",audioDead:"Dit nummer wil niet spelen. Het is gemeld en wordt voortaan overgeslagen.",repBtn:"Meld dit nummer",repT:"Wat is er mis?",repSub:"Het nummer wordt bewaard in een lijst en komt niet meer voor tot je die lijst wist.",
+rep_noplay:"🔇 Speelt niet af",rep_wrong:"🎵 Verkeerd nummer of versie",rep_year:"📅 Jaartal klopt niet",rep_other:"❓ Iets anders",repCancel:"Annuleren",repClose:"Sluiten",repAuto:"vanzelf gemeld",
+repDone:"Gemeld: {s}",repThanks:"Bedankt! {s} is gemeld.",repN:"{n} gemelde nummers",repView:"Bekijk",repListT:"Gemelde nummers",repListSub:"Stuur deze lijst door, dan kunnen de nummers nagekeken en verbeterd worden.",
+repShare:"Delen of kopiëren",repGit:"Melden op GitHub",repClear:"Lijst wissen",repNone:"Er zijn nog geen nummers gemeld.",repCopied:"Lijst gekopieerd",repMailT:"Draaitafel: gemelde nummers",repGitBody:"Deze nummers gaven problemen tijdens het spelen:"},
+vl:{audioNet:"De muziek laadt niet. Kijk of de tv nog internet heeft, of sla dit nummer over.",audioDead:"Dit nummer wil niet spelen. Het is gemeld en wordt voortaan overgeslagen.",repSub:"Het nummer komt in een lijst en wordt niet meer gespeeld tot ge die lijst wist.",repListSub:"Stuur deze lijst door, dan kunnen de nummers nagekeken en verbeterd worden."},
+en:{audioNet:"The music isn't loading. Check the TV's internet connection, or skip this song.",audioDead:"This song won't play. It has been reported and will be skipped from now on.",repBtn:"Report this song",repT:"What's wrong?",repSub:"The song is saved to a list and won't come up again until you clear that list.",
+rep_noplay:"🔇 Doesn't play",rep_wrong:"🎵 Wrong song or version",rep_year:"📅 Wrong year",rep_other:"❓ Something else",repCancel:"Cancel",repClose:"Close",repAuto:"auto-reported",
+repDone:"Reported: {s}",repThanks:"Thanks! {s} has been reported.",repN:"{n} reported songs",repView:"View",repListT:"Reported songs",repListSub:"Send this list on so the songs can be checked and fixed.",
+repShare:"Share or copy",repGit:"Report on GitHub",repClear:"Clear list",repNone:"No songs have been reported yet.",repCopied:"List copied",repMailT:"Draaitafel: reported songs",repGitBody:"These songs caused problems during play:"}};
+Object.assign(I18N.nl,I18N_ADD14.nl);Object.assign(I18N.vl,I18N_ADD14.nl,I18N_ADD14.vl);Object.assign(I18N.en,I18N_ADD14.en);
 
 const RAW=`
 Heigh-Ho|The Dwarf Chorus|1937|gfW|Sneeuwwitje~Snow White
@@ -6993,6 +7004,17 @@ function scoreHit(r,song){
   return {s:tm*2+am*2-bad*5+(r.rank?Math.min(1,r.rank/1e6):0),tm,am};
 }
 const trackCache=new Map();
+/* welk nummer hoort bij welke Deezer-link (om verlopen links te vernieuwen) */
+const urlSong=new Map();const baseUrl=u=>String(u||'').split('#')[0];const songOfUrl=u=>urlSong.get(baseUrl(u))||null;
+function urlExp(u){const m=/exp=(\d{9,11})/.exec(u||'');return m?+m[1]*1000:0}
+async function refreshSong(s){trackCache.delete(s.key);let d=null;try{d=await resolveTrack(s)}catch(e){}if(d&&d.preview){if(d.preview!==s.preview){urlSong.set(baseUrl(d.preview),s);s.preview=d.preview}return d.preview}return null}
+/* gemelde nummers: bewaard op de tv, nooit meer gekozen tot de lijst gewist wordt */
+let REPS=null,repBlock=null;
+function repList(){if(!REPS){REPS=store.get('dt_reports',[]);if(!Array.isArray(REPS))REPS=[]}return REPS}
+function repBlocked(){if(!repBlock)repBlock=new Set(repList().map(r=>r.k));return repBlock}
+function addReport(s,why,auto){if(!s||!s.key)return false;const L=repList();const ex=L.find(r=>r.k===s.key&&r.why===why);
+  if(ex){ex.n=(ex.n||1)+1;ex.at=Date.now()}else L.unshift({k:s.key,ti:s.title,ar:s.artist,y:s.year||null,why,auto:!!auto,m:(typeof curMode==='function'&&curMode())||'',src:s.src||'',at:Date.now(),n:1});
+  if(L.length>150)L.length=150;repBlock=null;store.set('dt_reports',L);return true}
 async function resolveTrack(song){
   if(trackCache.has(song.key))return trackCache.get(song.key);
   let out=null;
@@ -7030,6 +7052,18 @@ const T={code:null,peer:null,players:new Map(),units:new Map(),phase:'boot',msg:
   awards:null,coopWon:null,record:null,ratings:new Map(),hitflop:null,vol:1,lastSec:-1,explained:new Set(),wishes:new Map()};
 const audio=new Audio();audio.preload='auto';audio.loop=true;
 let actx=null,tvKey='',fadeTok=0,speaking=false,voices=[];
+/* een nummer dat niet wil spelen: eerst een verse link proberen, anders melden en (als het kan) overslaan */
+try{audio.addEventListener('error',()=>{try{onAudioErr()}catch(e){}})}catch(e){}
+let audioOk=false,deadRow=0;try{audio.addEventListener('playing',()=>{audioOk=true;deadRow=0})}catch(e){}
+function onAudioErr(){if(MODE!=='tv')return;const u=baseUrl(audio.src);if(!/^https?:/.test(u))return;const s=songOfUrl(u),off=audio._off||0,tok=playTok,want=audio._play;
+  if(s&&Date.now()-(s._refAt||0)>60000){s._refAt=Date.now();refreshSong(s).then(nu=>{if(tok!==playTok)return;if(nu&&baseUrl(nu)!==u){if(want)playAudio(nu,off);else{try{audio.src=nu}catch(e){}}}else audioDead(s)});return}
+  audioDead(s)}
+function audioDead(s){if(s&&s._dead)return;deadRow++;
+  /* nog niets gelukt of meerdere na elkaar kapot: dan ligt het aan het internet, niet aan het nummer */
+  if(!audioOk||deadRow>=3){try{toast('📡 '+t('audioNet'))}catch(e){}return sync()}
+  if(s){s._dead=true;addReport(s,'noplay',true)}
+  try{toast('⚠️ '+t('audioDead'))}catch(e){}
+  if(s&&T.cur&&T.cur.key===s.key&&canSkip(true))return skipRound();sync()}
 const CH='ABCDEFGHJKMNPQRSTUVWXYZ23456789'.split('');
 const genCode=()=>Array.from({length:4},()=>rnd(CH)).join('');
 
@@ -7064,7 +7098,10 @@ const DJ=(k,o,f)=>{try{if(typeof djSay==='function'&&(f==null||Math.random()<f))
 let wakeL=null;function keepAwake(){try{if(navigator.wakeLock&&(!wakeL||wakeL.released)&&document.visibilityState==='visible')navigator.wakeLock.request('screen').then(l=>{wakeL=l}).catch(()=>{})}catch(e){}}
 function setRate(r){try{audio.preservesPitch=false;audio.mozPreservesPitch=false;audio.webkitPreservesPitch=false;audio.playbackRate=r}catch(e){}}
 function resetRate(){try{audio.playbackRate=1;audio.preservesPitch=true}catch(e){}}
-function playAudio(url,offset){fadeTok++;audio.pause();resetRate();audio.src=url+(offset?'#t='+offset:'');setVol(1);const pr=audio.play();if(pr&&pr.catch)pr.catch(err=>{if(err&&err.name==='NotAllowedError'){T.unlocked=false;tvKey='';renderTV()}})}
+let playTok=0;
+function playAudio(url,offset){const tok=++playTok;const so=songOfUrl(url),ex=urlExp(url);
+  if(so&&ex&&ex<Date.now()+20000&&Date.now()-(so._refAt||0)>60000){so._refAt=Date.now();fadeTok++;audio.pause();refreshSong(so).then(nu=>{if(tok===playTok)playAudio(nu||url,offset)});return}
+  audio._play=true;audio._off=offset||0;fadeTok++;audio.pause();resetRate();audio.src=url+(offset?'#t='+offset:'');setVol(1);const pr=audio.play();if(pr&&pr.catch)pr.catch(err=>{if(err&&err.name==='NotAllowedError'){T.unlocked=false;tvKey='';renderTV()}})}
 function fadeOut(){const tok=++fadeTok;const iv=setInterval(()=>{if(tok!==fadeTok){clearInterval(iv);return}audio.volume=Math.max(0,audio.volume-.08);if(audio.volume<=.01){clearInterval(iv);audio.pause();audio.volume=1}},120)}
 function loadVoices(){try{voices=window.speechSynthesis?speechSynthesis.getVoices():[]}catch(e){voices=[]}}
 function speak(txt){if(MODE!=='tv'||!T.settings.voice||!T.unlocked||!txt||!window.speechSynthesis||!window.SpeechSynthesisUtterance)return;
@@ -7079,7 +7116,7 @@ function speak(txt){if(MODE!=='tv'||!T.settings.voice||!T.unlocked||!txt||!windo
 function srcSongs(){const s=T.settings;if(s.src==='live')return T.live?T.live.songs:[];
   if(s.src==='pack'){const k=s.pack;return SONGS.filter(x=>[...k].some(c=>x.tags.includes(c)))}
   return SONGS.filter(x=>[...x.tags].some(c=>s.genres.includes(c))&&s.decades.includes(Math.max(1950,decade(x.year))))}
-const pool=()=>srcSongs();
+const pool=()=>{const p=srcSongs();const b=repBlocked();if(!b.size)return p;const q=p.filter(s=>!b.has(s.key));return q.length>=20?q:p};
 function minPool(){const s=T.settings;if(isBoard())return 12;if(s.mode==='bingo')return s.bingo===4?28:16;if(s.mode==='battle')return s.battleSize+2;if(isEvening())return s.evModes.includes('battle')?Math.max(12,s.battleSize+2):12;return 8}
 function card(s){return {key:s.key,title:s.title,artist:s.artist,year:s.year,cover:s.cover||null}}
 function insertCard(u,s){u.timeline.push(card(s));u.timeline.sort((a,b)=>a.year-b.year)}
@@ -7092,7 +7129,7 @@ function drawSong(L){const p=L||pool();const held=new Set();T.units.forEach(u=>u
   let c=p.filter(s=>!T.used.has(s.key)&&!held.has(s.key));if(!c.length){T.used.clear();c=p.filter(s=>!held.has(s.key))}
   if(!c.length)return null;
   const pm=playedMap();const fresh=c.filter(s=>!pm[s.key]);if(fresh.length>=Math.min(6,c.length))c=fresh;else c=c.slice().sort((a,b)=>(pm[a.key]||0)-(pm[b.key]||0)).slice(0,Math.max(6,Math.ceil(c.length*.3)));const s=rnd(c);T.used.add(s.key);return s}
-function mergeSong(s,d){if(!s.year&&d.year)s.year=d.year;return Object.assign({},s,{preview:d.preview,cover:d.cover||s.cover,link:d.link,year:s.year||d.year||null})}
+function mergeSong(s,d){if(!s.year&&d.year)s.year=d.year;const o=Object.assign({},s,{preview:d.preview,cover:d.cover||s.cover,link:d.link,year:s.year||d.year||null});if(o.preview)urlSong.set(baseUrl(o.preview),o);return o}
 /* bekendheid: Deezer-populariteit (0–1.000.000) */
 const FAME_THR={hits:500000,mix:150000,all:0};
 const fameThr=()=>FAME_THR[T.settings.fame]||0;
@@ -7213,7 +7250,7 @@ async function nextRound(){
   else T.bonusQ=null;
   if(cm==='fake')T.fake={sub:'write',opts:null,votes:new Map()};
   T.phase='round';T.roundStart=now();T.deadline=T.roundStart+roundTime()*1000;T.lastSec=-1;
-  if(cm==='cover'){fadeTok++;audio.pause();resetRate();try{audio.src=song.preview}catch(e){}setVol(1)}else playAudio(song.preview,0);markPlayed(song);
+  if(cm==='cover'){playTok++;audio._play=false;audio._off=0;fadeTok++;audio.pause();resetRate();try{audio.src=song.preview}catch(e){}setVol(1)}else playAudio(song.preview,0);markPlayed(song);
   if(cm==='chip'){T.chip={start:Math.random()<.5?2:.55};setRate(T.chip.start)}
   sync();announceRound();
 }
@@ -7435,6 +7472,8 @@ function endGame(){
 function toLobby(){clearTimeout(T.qTimer);T.pre=null;T.paused=null;T.board=null;T.phase='lobby';T.msg='';audio.pause();resetRate();T.bingo=null;T.battle=null;T.buzz=null;T.ev=null;
   for(const [id,p] of T.players){if(!p.online)T.players.delete(id)}
   T.units=new Map();fixHost();sync()}
+function canSkip(auto){return T.phase==='round'&&!T.buzz&&!(auto&&T.paused)&&!['herd','vibe','order','tm','scene','snd'].concat(auto?['who','escape']:[]).includes(curMode())}
+function skipRound(){T.round--;T.segRound--;T.sinceQuick=Math.max(0,T.sinceQuick-1);T.cur=null;nextRound()}
 function fail(m){T.phase='error';T.msg=m;audio.pause();sync()}
 
 /* ---------- prijzen, hit & flop, eregalerij ---------- */
@@ -7614,7 +7653,10 @@ function onMsg(conn,m,fp){
     case 'next':hostNext();break;
     case 'lobby':toLobby();break;
     case 'replay':if(['round','reveal','bingo'].includes(T.phase)&&audio.src){audio.currentTime=0;audio.play().catch(()=>{})}break;
-    case 'skip':if(T.phase==='round'&&!T.buzz&&!['herd','vibe','order','tm','scene','snd'].includes(cm)){T.round--;T.segRound--;T.sinceQuick=Math.max(0,T.sinceQuick-1);T.cur=null;nextRound()}break;
+    case 'skip':if(canSkip())skipRound();break;
+    case 'report':{const s=songOfUrl(audio.src)||T.cur;if(s&&s.key&&['noplay','wrong','year','other'].includes(m.why)){addReport(s,m.why,false);try{toast('🚩 '+t('repDone',{s:s.title}))}catch(e){}try{p.conn&&p.conn.send({t:'repok',ti:s.title,ar:s.artist})}catch(e){}sync()}break}
+    case 'reps':try{p.conn&&p.conn.send({t:'reps',list:repList()})}catch(e){}break;
+    case 'repclear':REPS=[];repBlock=null;store.set('dt_reports',[]);try{p.conn&&p.conn.send({t:'reps',list:[]})}catch(e){}sync();break;
   }
 }
 function doneState(u){if(u.out)return -2;if(T.phase==='round'){const cm=curMode();if(cm==='buzz')return T.locked.has(u.id)?-1:0;if(cm==='hitster'){const a=u.ans;if(!a)return 0;return (a.slot!=null?1:0)+(a.bonus!=null?1:0)}
@@ -7631,6 +7673,7 @@ function view(p){const s=T.settings,u=unitOf(p),cm=curMode();
     lives:livesOn(),cardMode:cardMode(),mult:inGame()?mult():1,
     me:{id:p.id,name:p.name,emoji:p.emoji,color:p.color,host:p.host,team:p.team},unit:u?pubUnit(u,true):null,
     players:[...T.players.values()].map(pub),units:[...T.units.values()].map(x=>pubUnit(x,false))};
+  if(p.host)v.rep=repList().length;
   if(T.ev)v.ev={i:T.ev.idx,n:T.ev.list.length,list:T.ev.list};
   if(T.snd&&curMode()==='snd'&&['round','reveal','loading'].includes(T.phase)){const S0=T.snd;const jp=S0.judge&&T.players.get(S0.judge);const mine=S0.subs.get(p.id);const nm=id=>{const q=T.players.get(id);return q?q.emoji+' '+q.name:''};
     v.snd={v:S0.v||'jury',sub:S0.sub,prompt:S0.prompt,isJudge:p.id===S0.judge,isPicker:(S0.pickers||[]).includes(p.id),isVoter:(S0.voters||[]).includes(p.id),voted:S0.votes?S0.votes.has(p.id):false,myVote:S0.votes&&S0.votes.has(p.id)?S0.votes.get(p.id):null,
@@ -8338,6 +8381,8 @@ function onPhoneMsg(m){
   if(!m)return;P.lastRx=now();if(m.t==='pong'){P.pongSeen=true;return}
   if(m.t==='full'){P.connecting=false;P.status=t('gameFull');renderPhone();return}
   if(m.t==='kicked'){P.kicked=true;P.joined=false;P.connecting=false;store.set('dt_sess',null);ss.set('dt_joined','');try{P.conn&&P.conn.close()}catch(e){}P.status='';const app=$('#app');if(app)app.innerHTML=`<div class="ph"><div class="hero"><div class="em">👋</div><h2>${t('kickedT')}</h2><p>${t('kickedSub')}</p></div><button class="btn big" data-act="unkick">${t('rejoinAgain')}</button></div>`;['reactbar','lostov','pauseovp'].forEach(id=>{const e=document.getElementById(id);if(e)e.hidden=true});return}
+  if(m.t==='reps'){P.reps=Array.isArray(m.list)?m.list:[];repListOv();return}
+  if(m.t==='repok'){toast('🚩 '+t('repThanks',{s:m.ti||''}));return}
   if(m.t!=='state')return;
   const first=!P.joined;
   P.joined=true;P.connecting=false;if(P.lost)setLost(false);ss.set('dt_joined',P.code);store.set('dt_sess',{code:P.code,name:P.name,emoji:P.emoji,ts:Date.now()});
@@ -8406,7 +8451,16 @@ function placeTL(tl){let h='';for(let i=0;i<=tl.length;i++){
   h+=`<button class="slot" data-act="slot" data-i="${i}" data-l="${esc(l)}">${esc(l)}</button>`;
   if(i<tl.length){const c=tl[i];h+=`<div class="tcard" style="--c:${decCol(c.year)}"><b>${c.year}</b><span>${esc(c.title)}<br><small>${esc(c.artist)}</small></span></div>`}}
   return h}
-const hostCtl=(skip=true)=>`<div class="hostctl"><button class="btn ghost" data-act="replay">🔁 ${t('replay')}</button>${skip?`<button class="btn ghost" data-act="skip">⏭ ${t('skipSong')}</button>`:''}</div>`;
+const hostCtl=(skip=true)=>`<div class="hostctl"><button class="btn ghost" data-act="replay">🔁 ${t('replay')}</button>${skip?`<button class="btn ghost" data-act="skip">⏭ ${t('skipSong')}</button>`:''}<button class="btn ghost" data-act="rep" title="${t('repBtn')}">🚩</button></div>`;
+/* nummer melden: keuzevenster en lijst */
+function repOv(html){let e=document.getElementById('repov');if(!e){e=document.createElement('div');e.id='repov';e.className='lostov';document.body.appendChild(e)}if(html==null){e.hidden=true;e.innerHTML='';return}e.hidden=false;e.innerHTML=`<div class="lostbox">${html}</div>`}
+function repSheet(){repOv(`<div class="em">🚩</div><h2>${t('repT')}</h2><p>${t('repSub')}</p>${['noplay','wrong','year','other'].map(w=>`<button class="btn ghost big" data-act="repsend" data-v="${w}" style="width:100%">${t('rep_'+w)}</button>`).join('')}<button class="btn big" data-act="repclose" style="width:100%">${t('repCancel')}</button>`)}
+const repWhy=r=>t('rep_'+r.why)+(r.auto?' · '+t('repAuto'):'')+(r.n>1?' ×'+r.n:'');
+function repText(L){return L.map(r=>`- ${r.ti} — ${r.ar}${r.y?' ('+r.y+')':''} · ${repWhy(r)}${r.m?' · '+t('m_'+r.m):''} · ${new Date(r.at).toISOString().slice(0,10)}`).join('\n')}
+function repListOv(){const L=P.reps||[];repOv(`<h2>🚩 ${t('repListT')}</h2>${L.length?`<p>${t('repListSub')}</p><div class="sec" style="max-height:42vh;overflow:auto;text-align:left;width:100%">${L.map(r=>`<div class="small" style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08)"><b>${esc(r.ti)}</b> — ${esc(r.ar)}${r.y?' ('+r.y+')':''}<br><span style="opacity:.7">${esc(repWhy(r))}</span></div>`).join('')}</div>
+  <button class="btn big" data-act="repshare" style="width:100%">📤 ${t('repShare')}</button><button class="btn ghost big" data-act="repgit" style="width:100%">🐙 ${t('repGit')}</button><button class="btn ghost" data-act="repclear" style="width:100%">🗑 ${t('repClear')}</button>`:`<p>${t('repNone')}</p>`}<button class="btn ghost big" data-act="repclose" style="width:100%">${t('repClose')}</button>`)}
+function repCopy(tx){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(tx).then(()=>toast('📋 '+t('repCopied')),()=>repCopyOld(tx));return}}catch(e){}repCopyOld(tx)}
+function repCopyOld(tx){try{const a=document.createElement('textarea');a.value=tx;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast('📋 '+t('repCopied'))}catch(e){}}
 const optBtns=(opts,act,mine,vals)=>opts.map((o,i)=>{const val=vals?vals[i]:o;return `<button class="opt o${i%4} ${mine!=null?(String(mine)===String(val)?'picked':'dim'):''}" data-act="${act}" data-v="${esc(val)}" ${mine!=null?'disabled':''}><span class="ltr">${'ABCDEF'[i]}</span><span>${esc(o)}</span></button>`}).join('');
 const songLinks=s=>`<div class="links"><a class="sp" target="_blank" rel="noopener" href="${spot(s)}">▶ Spotify</a><a class="dzl" target="_blank" rel="noopener" href="${dzr(s)}">▶ Deezer</a></div>`;
 const songCard=s=>`<div class="songcard">${s.cover?`<img src="${esc(s.cover)}" alt="" onerror="this.remove()">`:''}<div><div class="y">${s.year||'♪'}</div><div class="t">${esc(s.title)}</div><div class="a">${esc(s.artist)}</div></div></div>`;
@@ -8425,7 +8479,7 @@ function hostLobby(){return `<div class="wiz"><div id="wsteps" class="wsteps"></
     <div id="plive"><div id="linfo"></div><button class="btn cyan" data-act="lchart" style="width:100%">🔥 ${t('liveChart')}</button>
       <div class="row" style="margin-top:8px"><input id="lq" placeholder="${t('liveSearchPh')}" autocomplete="off" enterkeyhint="search"><button class="btn cyan" data-act="lsearch">🔍</button></div>
       <div id="lsug" class="chipset" style="margin-top:8px"></div><h4>📈 ${t('dzCharts')}</h4><div id="lgen" class="chipset"></div><div id="lrec"></div><div id="lres" class="lres" style="margin-top:8px"></div><p class="small" style="margin-top:6px">${t('liveNote')}</p></div></div>
-    <div class="sec"><h3>🌟 ${t('fame')}</h3><div id="sfame" class="chipset"></div><p class="small" id="sfametip"></p><div id="sheard" class="row small"></div></div></div>
+    <div class="sec"><h3>🌟 ${t('fame')}</h3><div id="sfame" class="chipset"></div><p class="small" id="sfametip"></p><div id="sheard" class="row small"></div><div id="srep" class="row small"></div></div></div>
   <div class="wpane" data-step="3" hidden><h2 class="wtitle">${t('wiz3T')}</h2>
     <div class="sec" id="secTeam"><h3>${t('yourTeam')}</h3><div id="steam" class="chipset"></div></div>
     <div class="sec"><h3>${t('players')}</h3><div id="pman" class="pman"></div><p class="small">${t('manageTip')}</p></div>
@@ -8533,7 +8587,7 @@ function battlePhone(v){const B=v.battle,H=v.me.host;const bar='<div class="pbar
   return ''}
 function phScreen(v){const me=v.me,H=me.host,u=v.unit;
   const W=h=>`<div class="ph">${topBar(v)}${h}</div>`;
-  const nextBtn=(tx=t('next'))=>H?`<button class="btn big" data-act="next" style="margin-top:auto">${tx}</button>`:`<p class="center" style="margin-top:auto">${t('waitLeaderNext')}</p>`;
+  const nextBtn=(tx=t('next'))=>H?`${v.phase==='reveal'&&v.song?`<button class="btn ghost" data-act="rep" style="margin-top:auto;align-self:center;font-size:.85rem;padding:6px 14px">🚩 ${t('repBtn')}</button>`:''}<button class="btn big" data-act="next" style="${v.phase==='reveal'&&v.song?'':'margin-top:auto'}">${tx}</button>`:`<p class="center" style="margin-top:auto">${t('waitLeaderNext')}</p>`;
   if(u&&u.out&&['round','battle'].includes(v.phase))return W(`<div class="hero"><div class="em">💀</div><h2>${t('youOut')}</h2><p>${t('youOutSub')}</p></div><div class="sec"><div id="ppl" class="plist"></div></div>`);
   switch(v.phase){
   case 'boot':case 'lobby':return W(H?hostLobby():guestLobby(v));
@@ -8639,6 +8693,7 @@ function lobbyUpdate(v){{const wg=document.getElementById('wishg');if(wg){const 
   set('stheme',THEMES.map(([id,em])=>`<button class="tg ${s.theme===id?'on':''}" data-act="set" data-k="theme" data-v="${id}">${em} ${t('th_'+id)}</button>`).join(''));
   set('slang',LANGS.map(([id,fl,nm])=>`<button class="tg ${s.lang===id?'on':''}" data-act="set" data-k="lang" data-v="${id}">${fl} ${nm}</button>`).join(''));
   set('stext',['S','M','L'].map(z=>`<button class="tg ${s.textSize===z?'on':''}" data-act="set" data-k="textSize" data-v="${z}">${t('ts_'+z)}</button>`).join(''));
+  set('srep',v.rep?`<span style="flex:1">🚩 ${t('repN',{n:v.rep})}</span><button class="tg" data-act="replist">${t('repView')}</button>`:'');
   set('sheard',v.heard?`<span style="flex:1">${t('heardN',{h:v.heard,n:v.pool})}</span><button class="tg" data-act="resetHeard">🔄 ${t('resetHeard')}</button>`:'');
   set('pman',v.players.map(p=>{const tm=TEAMS.find(x=>x[0]===p.team);const me=p.id===v.me.id;return `<div class="prow ${p.online?'':'off'}" style="--c:${p.color}"><span class="e">${p.emoji}</span><span class="n">${esc(p.name)}${p.host?' 👑':''}${me?' <small>('+t('you')+')</small>':''}${p.online?'':' 📵'}</span>${s.play==='teams'?`<button class="tg team ${tm?'on':''}" style="--c:${tm?tm[1]:'#888'}" data-act="pteam" data-v="${p.id}">${tm?tm[2]:'❔'}</button>`:''}${me?'':`<button class="tg" data-act="mkhost" data-v="${p.id}" ${p.online?'':'disabled'}>👑</button><button class="tg kick ${P.kickArm===p.id?'armed':''}" data-act="pkick" data-v="${p.id}">${P.kickArm===p.id?t('kickSure'):'✖'}</button>`}</div>`}).join(''));
   set('svoice',`<button class="tg ${s.voice?'on':''}" data-act="tog" data-v="voice">${s.voice?'🔊':'🔇'} ${t('announcer')}</button><button class="tg ${s.crowd?'on':''}" data-act="tog" data-v="crowd">${s.crowd?'👏':'🔇'} ${t('crowdSounds')}</button><button class="tg ${s.mascot?'on':''}" data-act="tog" data-v="mascot">💿 ${t('mascotLbl')}</button>`);
@@ -8746,6 +8801,13 @@ function phoneClick(e){keepAwake();const b=e.target.closest&&e.target.closest('[
   case 'share':shareResults(v);return;
   case 'unkick':P.kicked=false;renderPhone();return;
   case 'resetHeard':send({t:'resetHeard'});return;
+  case 'rep':repSheet();return;
+  case 'repsend':send({t:'report',why:b.dataset.v});repOv(null);return;
+  case 'repclose':repOv(null);return;
+  case 'replist':P.reps=null;repOv(`<div class="em">🚩</div><p>…</p>`);send({t:'reps'});return;
+  case 'repshare':{const L=P.reps||[];const tx=t('repMailT')+'\n\n'+repText(L);if(navigator.share){navigator.share({title:'Draaitafel',text:tx}).catch(()=>{})}else repCopy(tx);return}
+  case 'repgit':{const L=P.reps||[];let body=t('repGitBody')+'\n\n'+repText(L);if(body.length>6000)body=body.slice(0,6000)+'\n…';window.open('https://github.com/jonfreak89/hitster/issues/new?title='+encodeURIComponent(t('repMailT')+' ('+L.length+')')+'&body='+encodeURIComponent(body),'_blank');return}
+  case 'repclear':send({t:'repclear'});return;
   case 'mkhost':send({t:'mkhost',id:b.dataset.v});return;
   case 'pkick':if(P.kickArm===b.dataset.v){send({t:'kick',id:b.dataset.v});P.kickArm=null}else{P.kickArm=b.dataset.v;setTimeout(()=>{if(P.kickArm===b.dataset.v){P.kickArm=null;if(v)phUpdate(v)}},3000)}phUpdate(v);return;
   case 'pteam':{const p=v.players.find(x=>x.id===b.dataset.v);if(!p)return;const ids=TEAMS.slice(0,(v.settings&&v.settings.teams)||2).map(x=>x[0]);const i=ids.indexOf(p.team);send({t:'setteam',id:p.id,team:ids[(i+1)%ids.length]});return}
