@@ -361,6 +361,7 @@ input[type=range]::-moz-range-thumb{width:28px;height:28px;border-radius:50%;bac
 .cell.on{background:var(--c);border-color:#fff;color:#111}
 .cell.on small{color:#333}
 .cell.on::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;font:900 2.4rem var(--hd);color:rgba(0,0,0,.25)}
+.cell.miss{background:repeating-linear-gradient(135deg,rgba(255,77,88,.34) 0 8px,rgba(255,77,88,.16) 8px 16px);border-color:#ff4d58;opacity:1}.cell.miss small{color:#ffc2c6}.cell.miss::after{content:'✗';position:absolute;top:2px;right:5px;font:900 1.05rem var(--hd);color:#ff4d58;pointer-events:none}.bg-g i.miss{background:transparent;box-shadow:inset 0 0 0 .4vh #ff4d58;position:relative}.bg-g i.miss::after{content:'✗';position:absolute;inset:0;display:grid;place-items:center;color:#ff4d58;font:900 2.6vh var(--hd)}
 .cell.just{animation:stamp .5s cubic-bezier(.3,1.6,.5,1) both}
 @keyframes stamp{0%{transform:scale(1.6) rotate(-14deg);opacity:.3}100%{transform:none;opacity:1}}
 .lockov{position:absolute;inset:0;border-radius:12px;background:rgba(255,90,95,.55);display:grid;place-items:center;font:900 1.4rem var(--hd);color:#fff;z-index:2}
@@ -7430,6 +7431,8 @@ async function startBingo(){const s=T.settings;T.phase='bingoload';sync();const 
   T.bingo={size,deck,order:shuffle(deck.map((_,i)=>i)),i:-1,sub:'play',cards:new Map(),marks:new Map(),lock:new Map(),winner:null,endAt:0};
   T.units.forEach(u=>bingoCard(u));T.phase='bingo';speak(t('sayBingoStart'));bingoNext()}
 function bingoCard(u){const B=T.bingo;if(!B||B.cards.has(u.id))return;B.cards.set(u.id,shuffle(B.deck.map((_,i)=>i)).slice(0,B.size*B.size));B.marks.set(u.id,new Set())}
+/* nummers op de kaart die al voorbij zijn gekomen maar niet aangetikt werden */
+function bingoMissed(uid){const B=T.bingo;if(!B)return[];const cl=B.cards.get(uid)||[],mk=B.marks.get(uid)||new Set();const done=new Set(B.order.slice(0,Math.max(0,B.sub==='play'?B.i:B.i+1)));return cl.map((di,i)=>done.has(di)&&!mk.has(i)?i:-1).filter(i=>i>=0)}
 function bingoNext(){const B=T.bingo;if(!B||T.phase!=='bingo')return;B.i++;if(B.i>=B.order.length)return endGame();
   B.sub='play';T.round=B.i+1;T.segRound=B.i+1;T.cur=B.deck[B.order[B.i]];markPlayed(T.cur);T.roundStart=now();T.deadline=T.roundStart+Math.min(T.settings.time,30)*1000;T.lastSec=-1;playAudio(T.cur.preview,0);sync()}
 function bingoShow(){const B=T.bingo;if(!B||B.sub!=='play')return;B.sub='show';T.deadline=now()+SHOW_MS;setVol(.5);sync();speak(t('saySong',{t:T.cur.title,a:T.cur.artist}))}
@@ -7721,7 +7724,7 @@ function view(p){const s=T.settings,u=unitOf(p),cm=curMode();
   if(T.phase==='quick'&&T.quick&&u){const Q=T.quick,it=Q.list[Q.i],sh=Q.sub==='show',a=Q.ans.get(u.id);
     v.quick={i:Q.i,n:Q.list.length,sub:Q.sub,options:it.q.options,mine:a?a.c:null,answer:sh?it.q.answer:null,gained:sh?(Q.res.get(u.id)||0):0,song:sh?pubSong(it.s):null};v.remaining=rem}
   if(T.phase==='bingo'&&T.bingo&&u){const B=T.bingo;const cl=B.cards.get(u.id)||[];const mk=B.marks.get(u.id)||new Set();const w=T.units.get(B.winner);
-    v.bingo={size:B.size,i:B.i+1,n:B.order.length,sub:B.sub,cells:cl.map(di=>({title:B.deck[di].title,artist:B.deck[di].artist})),marks:[...mk],lock:Math.max(0,(B.lock.get(u.id)||0)-now()),
+    v.bingo={size:B.size,i:B.i+1,n:B.order.length,sub:B.sub,cells:cl.map(di=>({title:B.deck[di].title,artist:B.deck[di].artist})),marks:[...mk],missed:bingoMissed(u.id),lock:Math.max(0,(B.lock.get(u.id)||0)-now()),
       song:B.sub!=='play'&&T.cur?pubSong(T.cur):null,winner:w?{name:uName(w),emoji:w.emoji,me:w.id===u.id}:null};v.remaining=rem}
   if(T.phase==='battle'&&T.battle&&u){const B=T.battle;const pr=B.preds.get(u.id);const vt=B.votes.get(u.id);
     v.battle={sub:B.sub,stage:stageName(),songs:B.songs.map(pubSong),pair:B.sub==='predict'?null:(B.sub==='res'&&B.last?B.last.pair:duelPair()),side:B.side,pred:pr?pr.i:null,vote:vt?vt.side:null,
@@ -8218,7 +8221,7 @@ function tvUpdate(){const set=(id,h)=>{const e=document.getElementById(id);if(e)
   if(s.play==='coop'){const u=[...T.units.values()][0];if(u)set('lives',heartStr(u))}
   set('chips',chipsHTML());if(T.phase==='reveal')set('results',resultsHTML());set('scores',scoresHTML());
   set('dealgrid',[...T.units.values()].filter(u=>u.timeline[0]).map((u,i)=>{const c=u.timeline[0];return `<div class="dcard" style="--c:${u.color};animation-delay:${(i*.18).toFixed(2)}s"><div class="who">${u.emoji} ${esc(uName(u))}</div><div class="y">${c.year}</div><div class="t">${esc(c.title)}</div></div>`}).join(''));
-  if(T.phase==='bingo'&&T.bingo){const B=T.bingo;set('bgrids',[...T.units.values()].map(u=>{const mk=B.marks.get(u.id)||new Set();return `<div class="bg-unit" style="--c:${u.color}"><div class="bg-g" style="--n:${B.size}">${Array.from({length:B.size*B.size},(_,i)=>`<i class="${mk.has(i)?'on':''}"></i>`).join('')}</div><span>${u.emoji} ${esc(uName(u))}</span></div>`}).join(''))}
+  if(T.phase==='bingo'&&T.bingo){const B=T.bingo;set('bgrids',[...T.units.values()].map(u=>{const mk=B.marks.get(u.id)||new Set();const ms=new Set(bingoMissed(u.id));return `<div class="bg-unit" style="--c:${u.color}"><div class="bg-g" style="--n:${B.size}">${Array.from({length:B.size*B.size},(_,i)=>`<i class="${mk.has(i)?'on':ms.has(i)?'miss':''}"></i>`).join('')}</div><span>${u.emoji} ${esc(uName(u))}</span></div>`}).join(''))}
   if(T.phase==='board')updPawns();
   updTimer();updCorner()}
 let cornerCode='';
@@ -8710,8 +8713,8 @@ function phUpdate(v){const me=v.me,u=v.unit;const set=(id,h)=>{const e=document.
   const rk=v.ranking||(v.phase==='quickend'?v.units.slice().sort((a,b)=>b.score-a.score||b.coins-a.coins):null);
   if(rk)set('rank',rk.map((x,i)=>`<div class="rankrow" style="--c:${x.color};animation-delay:${(i*.08).toFixed(2)}s"><span class="pos">${i+1}</span><span>${x.emoji}</span><span class="n">${esc(x.name)}${x.out?' 💀':''}</span><span>${v.baseMode==='board'?'📍':v.cardMode?'🃏':'⭐'} ${x.score}</span>${v.cardMode?`<span class="gold">🪙 ${x.coins}</span>`:''}</div>`).join(''));
   if(v.awards)set('awl',v.awards.length?v.awards.map((a,i)=>`<div class="awardrow ${a.pid===me.id?'mine':''}" style="--c:${a.color};animation-delay:${(i*.12).toFixed(2)}s"><span class="ae">${a.em}</span><div><b>${esc(a.title)}</b><small>${a.emoji} ${esc(a.name)} · ${esc(a.d)}</small></div></div>`).join(''):`<p>${t('awardsNone')}</p>`);
-  if(v.bingo){const B=v.bingo;const mk=new Set(B.marks);const col=u?u.color:'#ffd23f';
-    set('bgrid',B.cells.map((c,i)=>`<button class="cell ${mk.has(i)?'on':''} ${mk.has(i)&&!P.prevMarks.has(i)?'just':''}" style="--c:${col}" data-act="cell" data-i="${i}" ${mk.has(i)?'disabled':''}><b>${esc(c.title)}</b><small>${esc(c.artist)}</small></button>`).join('')+'<div id="block"></div>');
+  if(v.bingo){const B=v.bingo;const mk=new Set(B.marks),ms=new Set(B.missed||[]);const col=u?u.color:'#ffd23f';
+    set('bgrid',B.cells.map((c,i)=>`<button class="cell ${mk.has(i)?'on':ms.has(i)?'miss':''} ${mk.has(i)&&!P.prevMarks.has(i)?'just':''}" style="--c:${col}" data-act="cell" data-i="${i}" ${mk.has(i)||ms.has(i)?'disabled':''}><b>${esc(c.title)}</b><small>${esc(c.artist)}</small></button>`).join('')+'<div id="block"></div>');
     P.prevMarks=mk;set('bsong',B.song?`${t('thatWas')} <b>${esc(B.song.title)}</b> — ${esc(B.song.artist)}`:'');updLock()}
   if(v.phase==='lobby'||v.phase==='boot')lobbyUpdate(v);
   const pp=document.getElementById('ppos');if(pp&&u)pp.textContent=(u.pos||0)+1;
