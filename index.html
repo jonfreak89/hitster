@@ -1253,12 +1253,12 @@ remoteHint:"📺 Remote: ◀ ▶ game mode · ▲ ▼ theme · OK start · ⏯ p
 }};
 Object.assign(I18N.nl,I18N_ADD13.nl);Object.assign(I18N.vl,I18N_ADD13.nl,I18N_ADD13.vl);Object.assign(I18N.en,I18N_ADD13.en);
 const I18N_ADD14={
-nl:{audioNet:"De muziek laadt niet. Kijk of de tv nog internet heeft, of sla dit nummer over.",audioDead:"Dit nummer wil niet spelen. Het is gemeld en wordt voortaan overgeslagen.",repBtn:"Meld dit nummer",repT:"Wat is er mis?",repSub:"Het nummer wordt bewaard in een lijst en komt niet meer voor tot je die lijst wist.",
+nl:{evPickOne:"Kies minstens één spel. Kies je niets, dan wordt het Jaartal raden en Kuddegeest.",audioNet:"De muziek laadt niet. Kijk of de tv nog internet heeft, of sla dit nummer over.",audioDead:"Dit nummer wil niet spelen. Het is gemeld en wordt voortaan overgeslagen.",repBtn:"Meld dit nummer",repT:"Wat is er mis?",repSub:"Het nummer wordt bewaard in een lijst en komt niet meer voor tot je die lijst wist.",
 rep_noplay:"🔇 Speelt niet af",rep_wrong:"🎵 Verkeerd nummer of versie",rep_year:"📅 Jaartal klopt niet",rep_other:"❓ Iets anders",repCancel:"Annuleren",repClose:"Sluiten",repAuto:"vanzelf gemeld",
 repDone:"Gemeld: {s}",repThanks:"Bedankt! {s} is gemeld.",repN:"{n} gemelde nummers",repView:"Bekijk",repListT:"Gemelde nummers",repListSub:"Stuur deze lijst door, dan kunnen de nummers nagekeken en verbeterd worden.",
 repShare:"Delen of kopiëren",repGit:"Melden op GitHub",repClear:"Lijst wissen",repNone:"Er zijn nog geen nummers gemeld.",repCopied:"Lijst gekopieerd",repMailT:"Draaitafel: gemelde nummers",repGitBody:"Deze nummers gaven problemen tijdens het spelen:"},
-vl:{audioNet:"De muziek laadt niet. Kijk of de tv nog internet heeft, of sla dit nummer over.",audioDead:"Dit nummer wil niet spelen. Het is gemeld en wordt voortaan overgeslagen.",repSub:"Het nummer komt in een lijst en wordt niet meer gespeeld tot ge die lijst wist.",repListSub:"Stuur deze lijst door, dan kunnen de nummers nagekeken en verbeterd worden."},
-en:{audioNet:"The music isn't loading. Check the TV's internet connection, or skip this song.",audioDead:"This song won't play. It has been reported and will be skipped from now on.",repBtn:"Report this song",repT:"What's wrong?",repSub:"The song is saved to a list and won't come up again until you clear that list.",
+vl:{evPickOne:"Kies minstens één spel. Kiest ge niets, dan wordt het Jaartal raden en Kuddegeest.",audioNet:"De muziek laadt niet. Kijk of de tv nog internet heeft, of sla dit nummer over.",audioDead:"Dit nummer wil niet spelen. Het is gemeld en wordt voortaan overgeslagen.",repSub:"Het nummer komt in een lijst en wordt niet meer gespeeld tot ge die lijst wist.",repListSub:"Stuur deze lijst door, dan kunnen de nummers nagekeken en verbeterd worden."},
+en:{evPickOne:"Pick at least one game. Pick none and you get Guess the year and Herd mind.",audioNet:"The music isn't loading. Check the TV's internet connection, or skip this song.",audioDead:"This song won't play. It has been reported and will be skipped from now on.",repBtn:"Report this song",repT:"What's wrong?",repSub:"The song is saved to a list and won't come up again until you clear that list.",
 rep_noplay:"🔇 Doesn't play",rep_wrong:"🎵 Wrong song or version",rep_year:"📅 Wrong year",rep_other:"❓ Something else",repCancel:"Cancel",repClose:"Close",repAuto:"auto-reported",
 repDone:"Reported: {s}",repThanks:"Thanks! {s} has been reported.",repN:"{n} reported songs",repView:"View",repListT:"Reported songs",repListSub:"Send this list on so the songs can be checked and fixed.",
 repShare:"Share or copy",repGit:"Report on GitHub",repClear:"Clear list",repNone:"No songs have been reported yet.",repCopied:"List copied",repMailT:"Draaitafel: reported songs",repGitBody:"These songs caused problems during play:"}};
@@ -7188,10 +7188,10 @@ function credit(pid,ok,o={}){const s=st(pid);if(!s)return;s.answers++;
   if(o.err!=null){s.errSum+=o.err;s.errN++;if(o.err>=3&&(!s.blunder||o.err>s.blunder.d))s.blunder={d:o.err,t:o.title}}}
 
 /* ---------- spelverloop ---------- */
-function sanitize(){const s=T.settings;if(s.mode==='snd'||s.mode==='who')s.play='solo';if(s.mode==='escape')s.play='coop';if(s.play==='coop'&&!COOP_OK.includes(s.mode))s.play='solo';if(!s.evModes.filter(m=>EV_MODES.includes(m)).length)s.evModes=['year','herd'];}
+function sanitize(start){const s=T.settings;if(s.mode==='snd'||s.mode==='who')s.play='solo';if(s.mode==='escape')s.play='coop';if(s.play==='coop'&&!COOP_OK.includes(s.mode))s.play='solo';if(start&&!s.evModes.filter(m=>EV_MODES.includes(m)).length)s.evModes=['year','herd'];}
 async function startGame(){
   if(!['lobby','end'].includes(T.phase))return;
-  const s=T.settings;sanitize();
+  const s=T.settings;sanitize(true);
   const n=pool().length;
   if((s.mode==='snd'||s.mode==='who')&&[...T.players.values()].filter(p=>p.online).length<3){T.liveStatus=t('sndNeed3');sync();return}
   if(n<minPool()){T.liveStatus=t('tooFew',{n});sync();return}
@@ -7517,7 +7517,7 @@ function applySettings(n){if(!n||typeof n!=='object')return;const s=T.settings;
   if(['mix','pack','live'].includes(n.src))s.src=n.src;
   if(Array.isArray(n.genres))s.genres=n.genres.filter(x=>GENRES.includes(x));
   if(Array.isArray(n.decades))s.decades=n.decades.map(Number).filter(x=>DECADES.includes(x));
-  if(Array.isArray(n.evModes)){const e=EV_MODES.filter(x=>n.evModes.includes(x));if(e.length>=1)s.evModes=e}
+  if(Array.isArray(n.evModes))s.evModes=EV_MODES.filter(x=>n.evModes.includes(x));
   if(PACKS.some(p=>p[0]===n.pack))s.pack=n.pack;
   if([5,8,10,15].includes(+n.target))s.target=+n.target;
   if([5,10,15,20].includes(+n.rounds))s.rounds=+n.rounds;
@@ -8664,7 +8664,7 @@ function lobbyUpdate(v){{const wg=document.getElementById('wishg');if(wg){const 
   if(s.mode==='escape'){set('sev',`<h4>${t('escMinLbl')}</h4><div class="chipset">${[4,6,8].map(n=>`<button class="tg ${(s.escMin||6)===n?'on':''}" data-act="set" data-k="escMin" data-v="${n}">⏱ ${t('escMinN',{n})}</button>`).join('')}</div><p class="small">${t('escTip')}</p>`)}else
   if(s.mode==='snd'){set('sev',`<h4>${t('sndVarLbl')}</h4><div class="chipset">${[['jury','⚖️'],['crowd','🗳️'],['duel','🥊']].map(([k,e])=>`<button class="tg ${(s.sndVar||'jury')===k?'on':''}" data-act="set" data-k="sndVar" data-v="${k}">${e} ${t('sndVar_'+k)}</button>`).join('')}</div><p class="small">${t('sndVarTip_'+(s.sndVar||'jury'))}</p><div class="chipset"><button class="tg ${s.sndMe?'on':''}" data-act="tog" data-v="sndMe">👥 ${t('sndMeLbl')}</button></div><p class="small">${t('sndMeTip')}</p><h4>${t('spiceLbl')}</h4><div class="chipset">${[['family','🧸'],['stout','🌶️'],['zwart','💀']].map(([k,e])=>`<button class="tg ${(s.spice||'family')===k?'on':''}" data-act="set" data-k="spice" data-v="${k}">${e} ${t('spice_'+k)}</button>`).join('')}</div><p class="small">${t('spiceTip_'+(s.spice||'family'))}</p>`)}else
   if(s.mode==='board'){set('sev',`<h4>${t('boardModesLbl')}</h4><div class="chipset">${BOARD_MODES.map(m=>`<button class="tg ${s.boardModes.includes(m)?'on':''}" data-act="bm" data-v="${m}">${modeEm(m)} ${t('m_'+m)}</button>`).join('')}</div><h4>${t('boardLenLbl')}</h4><div class="chipset">${[20,30,40].map(n=>`<button class="tg ${s.boardLen===n?'on':''}" data-act="set" data-k="boardLen" data-v="${n}">${t('boardLenN',{n})}</button>`).join('')}</div><p class="small">${t('boardTip')}</p>`)}else
-  set('sev',s.mode==='evening'?`<h4>${t('evParts')}</h4><div class="chipset">${EV_MODES.map(m=>`<button class="tg ${s.evModes.includes(m)?'on':''}" data-act="ev" data-v="${m}">${modeEm(m)} ${t('m_'+m)}</button>`).join('')}</div><h4>${t('evRoundsLbl')}</h4><div class="chipset">${[3,4,5].map(n=>`<button class="tg ${s.evRounds===n?'on':''}" data-act="set" data-k="evRounds" data-v="${n}">${t('roundsN',{n})}</button>`).join('')}</div><p class="small">${t('evTip')}</p>`:'');
+  set('sev',s.mode==='evening'?`<h4>${t('evParts')}</h4><div class="chipset"><button class="tg all" data-act="evall" data-v="1">✔ ${t('allOn')}</button><button class="tg all" data-act="evall" data-v="0">✖ ${t('allOff')}</button>${s.evModes.length?'':`<span class="small" style="flex-basis:100%;color:#ff8a8f">⚠️ ${t('evPickOne')}</span>`}${EV_MODES.map(m=>`<button class="tg ${s.evModes.includes(m)?'on':''}" data-act="ev" data-v="${m}">${modeEm(m)} ${t('m_'+m)}</button>`).join('')}</div><h4>${t('evRoundsLbl')}</h4><div class="chipset">${[3,4,5].map(n=>`<button class="tg ${s.evRounds===n?'on':''}" data-act="set" data-k="evRounds" data-v="${n}">${t('roundsN',{n})}</button>`).join('')}</div><p class="small">${t('evTip')}</p>`:'');
   const noCoop=!COOP_OK.includes(s.mode);const soloOnly=s.mode==='snd'||s.mode==='who';const coopOnly=s.mode==='escape';
   if(coopOnly)set('splay',`<p class="small" style="width:100%">🤝 ${t('escCoopOnly')}</p>`);else
   if(soloOnly)set('splay',`<p class="small" style="width:100%">🙋 ${t(s.mode==='who'?'whoSoloOnly':'sndSoloOnly')}</p>`);else
@@ -8728,7 +8728,7 @@ function renderPhone(){if(MODE!=='phone')return;const app=$('#app');if(!app)retu
     if(v.phase==='round'&&v.mode==='order')updOrd(v);haptic(v)}
   try{document.body.classList.toggle('wizmode',v.phase==='lobby'&&!!v.me.host)}catch(e){}
   phUpdate(v)}
-function pushSettings(s){const v=P.v;v.settings=s;v.mode=s.mode;v.baseMode=s.mode;v.play=s.play;v.teams=s.teams;v.pool=localPool(s);if(s.lang!==v.lang||s.theme!==v.theme){v.lang=s.lang;v.theme=s.theme;applyTheme(s.theme);P.key=''}renderPhone();send({t:'settings',settings:s})}
+function pushSettings(s){const v=P.v;const prevMode=v.settings&&v.settings.mode;v.settings=s;if(s.mode!==prevMode){v.mode=s.mode;v.baseMode=s.mode}v.play=s.play;v.teams=s.teams;v.pool=localPool(s);if(s.lang!==v.lang||s.theme!==v.theme){v.lang=s.lang;v.theme=s.theme;applyTheme(s.theme);P.key=''}renderPhone();send({t:'settings',settings:s})}
 function setYear(y){P.ypick=Math.max(YEAR_MIN+10,Math.min(CURY,Math.round(y)));const b=document.getElementById('ybig');if(b)b.textContent=P.ypick;const r=document.getElementById('yrange');if(r)r.value=P.ypick;draft({t:'year',year:P.ypick})}
 function setVpos(x){P.vpos=Math.max(0,Math.min(100,Math.round(x)));const g=document.getElementById('pguess');if(g)g.style.left=P.vpos+'%';draft({t:'vguess',pos:P.vpos})}
 function lockOpts(b){(b.closest&&b.closest('.ph')||document).querySelectorAll('.opt').forEach(o=>{o.disabled=true;o.classList.add(o===b?'picked':'dim')})}
@@ -8784,7 +8784,8 @@ function phoneClick(e){keepAwake();const b=e.target.closest&&e.target.closest('[
   case 'team':send({t:'team',team:b.dataset.v});v.me.team=b.dataset.v;phUpdate(v);return;
   case 'shuffle':send({t:'shuffle'});return;
   case 'set':{if(!v||!v.settings)return;const s=S();const k=b.dataset.k;const raw=b.dataset.v;s[k]=/^\d+$/.test(raw)?+raw:raw;if(s.play==='coop'&&!COOP_OK.includes(s.mode))s.play='solo';if(k==='mode'&&raw==='bingo'&&s.time>30)s.time=20;if(k==='mode'&&raw!=='bingo'&&s.time<20)s.time=30;pushSettings(s);return}
-  case 'ev':{if(!v||!v.settings)return;const s=S();const e=new Set(s.evModes);e.has(b.dataset.v)?e.delete(b.dataset.v):e.add(b.dataset.v);if(e.size<2)return;s.evModes=EV_MODES.filter(x=>e.has(x));pushSettings(s);return}
+  case 'ev':{if(!v||!v.settings)return;const s=S();const e=new Set(s.evModes);e.has(b.dataset.v)?e.delete(b.dataset.v):e.add(b.dataset.v);s.evModes=EV_MODES.filter(x=>e.has(x));pushSettings(s);return}
+  case 'evall':{if(!v||!v.settings)return;const s=S();s.evModes=b.dataset.v==='1'?EV_MODES.slice():[];pushSettings(s);return}
   case 'src':{if(!v||!v.settings)return;const s=S();s.src=b.dataset.v;pushSettings(s);return}
   case 'gall':{if(!v||!v.settings)return;const s=S();s.genres=b.dataset.v==='1'?GENRES.slice():[];pushSettings(s);return}
   case 'dall':{if(!v||!v.settings)return;const s=S();s.decades=b.dataset.v==='1'?DECADES.slice():[];pushSettings(s);return}
